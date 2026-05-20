@@ -1890,7 +1890,7 @@ async function delDonante(id) {
 async function saveDonante() {
   const id = fv('m-don-id'), name = fv('m-don-name').trim();
   if (!name) { toast('El nombre es obligatorio', 'err'); return; }
-  const data = { name, phone: fv('m-don-tel'), email: fv('m-don-email'), currency: fv('m-don-cur'), compromiso: parseFloat(fv('m-don-comp'))||0, pagado: parseFloat(fv('m-don-pag'))||0, naming_id: parseInt(fv('m-don-naming'))||null, status: fv('m-don-status'), date: fv('m-don-date'), notes: fv('m-don-notes') };
+  const data = { name, phone: fv('m-don-tel'), email: fv('m-don-email'), currency: fv('m-don-cur'), compromiso: parseFloat(fv('m-don-comp'))||0, pagado: parseFloat(fv('m-don-pag'))||0, naming_id: fv('m-don-naming') || null, status: fv('m-don-status'), date: fv('m-don-date'), notes: fv('m-don-notes') };
   try {
     if (id) { await API.put('donantes/' + id, data); toast('Donante actualizado ✓', 'ok'); }
     else { await API.post('donantes', data); toast('Donante registrado ✓', 'ok'); }
@@ -1939,9 +1939,9 @@ async function renderNaming() {
       return NR['patio_pb']||'';
     };
 
-    // Render floor filter bar
+    // Render floor + status filter bar
     const floors = [...new Set(items.map(n => n.floor).filter(Boolean))];
-    const filterBtns = ['', ...floors].map(f => {
+    const floorBtns = ['', ...floors].map(f => {
       const active = f === namFloor;
       return `<button onclick="namFloor='${f}';renderNaming()"
         style="padding:5px 14px;border-radius:20px;border:1.5px solid ${active?'#c8880a':'#e2e8f0'};
@@ -1950,9 +1950,24 @@ async function renderNaming() {
         ${f || 'Todos'}
       </button>`;
     }).join('');
-    eid('nam-filter-bar').innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:6px">${filterBtns}</div>`;
+    const statusOpts = [['','Todos','#64748b'],['available','Disponible','#0891b2'],['reserved','Reservado','#c8880a'],['taken','Confirmado','#059669']];
+    const statusBtns = statusOpts.map(([val, lbl, col]) => {
+      const active = val === namStatus;
+      return `<button onclick="namStatus='${val}';renderNaming()"
+        style="padding:5px 14px;border-radius:20px;border:1.5px solid ${active?col:'#e2e8f0'};
+          background:${active?col:'#fff'};color:${active?'#fff':col};
+          font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap">
+        ${lbl}
+      </button>`;
+    }).join('');
+    eid('nam-filter-bar').innerHTML =
+      `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">${floorBtns}</div>` +
+      `<div style="display:flex;flex-wrap:wrap;gap:6px">${statusBtns}</div>`;
 
-    const filtered = namFloor ? items.filter(n => n.floor === namFloor) : items;
+    const filtered = items.filter(n =>
+      (!namFloor || n.floor === namFloor) &&
+      (!namStatus || n.status === namStatus)
+    );
     const isAdmin = CU && CU.role === 'admin';
     const logoSrc = (document.getElementById('tb-logo') && document.getElementById('tb-logo').src) || '';
     eid('nam-grid').innerHTML = filtered.map(n => {
@@ -2550,6 +2565,7 @@ const FLOOR_MAP = {
 let fpCurrent  = 'pb';
 let fpSelected = null;
 let namFloor = '';
+let namStatus = '';
 
 function renderFloor(fid) {
   fpCurrent = fid || 'pb';
