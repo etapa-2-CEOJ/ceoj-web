@@ -600,16 +600,16 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
     <div><h1>Planos Interactivos</h1><p>Hover sobre cada espacio para ver info · Click para detalles · Plano ejecutivo aprobado Nov 2025</p></div>
     <div class="ph-btns">
       <select id="floor-sel" onchange="renderFloor(this.value)" style="background:#fff;border:1.5px solid #e2e8f0;color:#1a2540;padding:7px 12px;border-radius:7px;font-size:13px;font-weight:600;outline:none;cursor:pointer">
-        <option value="ss2">Subsuelo 2 — Gimnasio + SUM</option>
-        <option value="ss1">Subsuelo 1 — Salón Fiestas + Recepción</option>
-        <option value="pb" selected>Planta Baja — Hall + Patio + SUM</option>
-        <option value="p1">Piso 1 — Maternal — Aulas + Dirección</option>
-        <option value="p2">Piso 2 — Gan — Aulas + SUM + Balcón</option>
-        <option value="p3">Piso 3 — Gan — Aulas + SUM + Comedor</option>
-        <option value="p4">Piso 4 — Aulas + SUM + Comedor</option>
-        <option value="p5">Piso 5 — Aulas + SUM</option>
-        <option value="p6">Piso 6 — Aulas + SUM + Cap. Docente</option>
-        <option value="terraza">Terraza — Canchas + Jardín</option>
+        <option value="ss2">SUBSUELO 2 — Gimnasio + SUM</option>
+        <option value="ss1">SUBSUELO 1 — Salón Fiestas + Recepción</option>
+        <option value="pb" selected>PLANTA BAJA — Hall + Patio + SUM</option>
+        <option value="p1">PISO 1 — Maternal — Aulas + Dirección</option>
+        <option value="p2">PISO 2 — Gan — Aulas + Patio Interno + Balcón</option>
+        <option value="p3">PISO 3 — Gan — Aulas + Patio Interno + Comedor</option>
+        <option value="p4">PISO 4 — Aulas + Patio Interno + Comedor</option>
+        <option value="p5">PISO 5 — Aulas + Patio Interno</option>
+        <option value="p6">PISO 6 — Aulas + Patio Interno</option>
+        <option value="terraza">TERRAZA — Canchas + Jardín</option>
       </select>
       <button class="btn btn-ghost btn-sm" onclick="toggleFPImg()" id="btn-toggle-fp">📐 Plano real</button>
       <button class="btn btn-ghost btn-sm private-only" onclick="toggleFPCoords()" id="btn-fp-coords" title="Muestra coordenadas al pasar el cursor — útil para calibrar posición de zonas">📍 Calibrar</button>
@@ -2816,9 +2816,9 @@ const FLOOR_MAP = {
       { id:'ad6', name:'Aula 6', m2:40, w:'6.70m', h:'5.55m', color:'#38bdf8',
         x:1061, y:420, W:99, H:103,
         img:'aula_gan', desc:'Aula 6. 40m².' },
-      { id:'sum2', name:'SUM', m2:455, w:'34.08m', h:'13.42m', color:'#7c3aed',
+      { id:'sum2', name:'Patio Interno', m2:455, w:'34.08m', h:'13.42m', color:'#7c3aed',
         x:314, y:304, W:197, H:489,
-        img:'g3', desc:'SUM. 34.08m × 13.42m = 455m².' },
+        img:'g3', desc:'Patio Interno. 34.08m × 13.42m = 455m².' },
       { id:'bal2', name:'Balcón', m2:210, w:'34.08m', h:'6.16m', color:'#84cc16',
         x:519, y:530, W:129, H:325,
         img:'patio_piso', desc:'Balcón exterior. 34.08m × 6.16m = 210m². Vista al patio central.' },
@@ -2860,8 +2860,8 @@ const FLOOR_MAP = {
         x:956, y:417, W:97, H:105, img:'aula_gan', desc:'Aula 5. 40m².' },
       { id:'b36', name:'Aula 6', m2:40, w:'6.70m', h:'5.51m', color:'#4ade80',
         x:1062, y:421, W:97, H:104, img:'aula_gan', desc:'Aula 6. 40m².' },
-      { id:'sum3', name:'SUM',     m2:455, w:'34.08m', h:'13.42m', color:'#7c3aed',
-        x:299, y:303, W:209, H:489, img:'g1', desc:'SUM. 34.08m × 13.42m = 455m².' },
+      { id:'sum3', name:'Patio Interno', m2:455, w:'34.08m', h:'13.42m', color:'#7c3aed',
+        x:299, y:303, W:209, H:489, img:'g1', desc:'Patio Interno. 34.08m × 13.42m = 455m².' },
       { id:'com3', name:'Comedor', m2:125, w:'10.91m', h:'11.53m', color:'#c8880a',
         x:810, y:64, W:156, H:164, img:'comedor', desc:'Comedor escolar kasher. 10.91m × 11.53m = 125m².' },
     ]
@@ -2899,8 +2899,8 @@ const FLOOR_MAP = {
         x:958, y:417, W:98, H:105, img:'aula_gan', desc:'Aula 5. 40m².' },
       { id:'d46', name:'Aula 6', m2:40, w:'6.70m', h:'5.55m', color:'#fbbf24',
         x:1061, y:418, W:93, H:105, img:'aula_gan', desc:'Aula 6. 40m².' },
-      { id:'sum4', name:'SUM',     m2:455, w:'34.08m', h:'13.42m', color:'#7c3aed',
-        x:316, y:295, W:192, H:497, img:'g1', desc:'SUM. 455m².' },
+      { id:'sum4', name:'Patio Interno', m2:455, w:'34.08m', h:'13.42m', color:'#7c3aed',
+        x:316, y:295, W:192, H:497, img:'g1', desc:'Patio Interno. 455m².' },
       { id:'com4', name:'Comedor', m2:125, w:'10.91m', h:'11.53m', color:'#c8880a',
         x:814, y:61, W:159, H:146, img:'comedor', desc:'Comedor. 10.91m × 11.53m = 125m².' },
       { id:'bal4', name:'Balcón',  m2:55,  w:'~10m',   h:'~5.4m',  color:'#84cc16',
@@ -2942,8 +2942,8 @@ const FLOOR_MAP = {
         x:961, y:420, W:95, H:100, img:'aula_gan', desc:'Aula 5. 40m².' },
       { id:'f56', name:'Aula 6', m2:40, w:'6.70m', h:'5.51m', color:'#f9a8d4',
         x:1066, y:424, W:88, H:98, img:'aula_gan', desc:'Aula 6. 40m².' },
-      { id:'sum5', name:'SUM',     m2:405, w:'34.08m', h:'11.91m', color:'#7c3aed',
-        x:332, y:303, W:175, H:489, img:'g1', desc:'SUM. 34.08m × 11.91m = 405m².' },
+      { id:'sum5', name:'Patio Interno', m2:405, w:'34.08m', h:'11.91m', color:'#7c3aed',
+        x:332, y:303, W:175, H:489, img:'g1', desc:'Patio Interno. 34.08m × 11.91m = 405m².' },
       { id:'of5',  name:'Oficinas',m2:105, w:'10.91m', h:'9.51m',  color:'#94a3b8',
         x:808, y:90, W:157, H:135, img:'', desc:'Oficinas. 10.91m × 9.51m = 105m².' },
       { id:'bal5', name:'Balcón',  m2:70,  w:'~',      h:'~',      color:'#84cc16',
@@ -2984,8 +2984,8 @@ const FLOOR_MAP = {
         x:960, y:412, W:97, H:113, img:'aula_gan', desc:'Aula 5. 40m².' },
       { id:'h66', name:'Aula 6', m2:40, w:'6.70m', h:'5.51m', color:'#818cf8',
         x:1058, y:415, W:103, H:110, img:'aula_gan', desc:'Aula 6. 40m².' },
-      { id:'sum6',  name:'SUM',             m2:370, w:'34.08m', h:'10.78m', color:'#0891b2',
-        x:354, y:295, W:156, H:500, img:'g5', desc:'SUM Centro de Capacitación Docente. 34.08m × 10.78m = 370m².' },
+      { id:'sum6',  name:'Patio Interno',    m2:370, w:'34.08m', h:'10.78m', color:'#0891b2',
+        x:354, y:295, W:156, H:500, img:'g5', desc:'Patio Interno. 34.08m × 10.78m = 370m².' },
       { id:'bal6a', name:'Balcón 1',        m2:70,  w:'~',      h:'~',      color:'#84cc16',
         x:200, y:232, W:20, H:621, img:'', desc:'Balcón 70m².' },
       { id:'bal6b', name:'Balcón 2',        m2:55,  w:'~',      h:'~',      color:'#84cc16',
