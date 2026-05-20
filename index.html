@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>CEOJ — Sistema de Gestión.</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -227,6 +227,28 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 /* ── Gantt: scroll horizontal propio ── */
 #ov-gantt,#av-gantt{overflow-x:auto;-webkit-overflow-scrolling:touch}
 
+/* ── Recorrido 360°: Safari safe area ── */
+#v3-wrap{height:calc(100vh - 56px);height:calc(100dvh - 56px)}
+#v3-strip{padding-bottom:calc(9px + env(safe-area-inset-bottom,0px))}
+
+/* ── Planos: popup mobile (bottom-sheet) ── */
+#fp-mob-popup{display:none;position:fixed;inset:0;z-index:500;flex-direction:column;justify-content:flex-end}
+#fp-mob-popup.show{display:flex}
+#fp-mob-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(3px)}
+#fp-mob-sheet{
+  position:relative;background:#fff;border-radius:20px 20px 0 0;
+  max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  animation:sheetUp .28s ease;
+}
+@keyframes sheetUp{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
+#fp-mob-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 6px;position:sticky;top:0;background:#fff;z-index:1;border-bottom:1px solid #f1f5f9}
+#fp-mob-handle{width:36px;height:4px;background:#e2e8f0;border-radius:2px;margin:0 auto 12px}
+#fp-mob-close{background:#f1f5f9;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;color:#64748b;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#fp-mob-title{font-size:16px;font-weight:700;color:#1a2540;flex:1}
+#fp-mob-content{padding:14px 16px 4px}
+@media(min-width:769px){#fp-mob-popup{display:none!important}}
+
 /* ════════════════════════
    BREAKPOINT ≤ 768px
 ════════════════════════ */
@@ -302,6 +324,10 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 
   /* PLANOS SVG — ancho fijo para hacer scroll táctil */
   #fp-svg{width:900px;min-width:100%}
+
+  /* PLANOS — ocultar panel lateral, usar popup */
+  #fp-side{display:none}
+  .pc[style*="flex-direction:row"]{flex-direction:column!important}
 }
 
 /* ════════════════════════
@@ -572,6 +598,19 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 </div>
 
 <!-- 360 -->
+<!-- POPUP MOBILE PLANOS -->
+<div id="fp-mob-popup">
+  <div id="fp-mob-backdrop" onclick="closeFpPopup()"></div>
+  <div id="fp-mob-sheet">
+    <div id="fp-mob-handle"></div>
+    <div id="fp-mob-header">
+      <span id="fp-mob-title">—</span>
+      <button id="fp-mob-close" onclick="closeFpPopup()">✕</button>
+    </div>
+    <div id="fp-mob-content"></div>
+  </div>
+</div>
+
 <div class="pg" id="pg-v360" style="padding:0;overflow:hidden">
   <div id="v3-wrap">
     <div id="v3-hud">
@@ -2983,6 +3022,54 @@ function fpClick(id) {
 
   const tip = document.getElementById('fp-tooltip');
   if (tip) tip.style.display = 'none';
+
+  // En mobile mostrar bottom-sheet popup
+  if (window.innerWidth <= 768) showFpPopup(r, nrKey, imgS);
+}
+
+function showFpPopup(r, nrKey, imgS) {
+  const popup   = document.getElementById('fp-mob-popup');
+  const titleEl = document.getElementById('fp-mob-title');
+  const content = document.getElementById('fp-mob-content');
+  if (!popup) return;
+
+  const floorLabel = FLOOR_MAP[fpCurrent]?.label || '';
+  titleEl.textContent = r.name;
+
+  content.innerHTML = `
+    ${imgS ? `
+      <div style="border-radius:10px;overflow:hidden;margin-bottom:14px;cursor:pointer"
+           onclick="openLb('${imgS}','${r.name}')">
+        <img src="${imgS}" style="width:100%;height:190px;object-fit:cover;display:block" alt="${r.name}">
+        <div style="padding:4px 10px;background:#1a2540;font-size:10px;color:rgba(255,255,255,.5);text-align:center">
+          Tap para ver render completo
+        </div>
+      </div>` : ''}
+    <div style="font-size:12px;color:#94a3b8;margin-bottom:12px">${floorLabel}</div>
+    <div style="display:grid;grid-template-columns:${r.w ? '1fr 1fr' : '1fr'};gap:8px;margin-bottom:14px">
+      ${r.m2 > 0 ? `
+        <div style="background:#f8fafc;border-radius:8px;padding:11px;text-align:center;border:1px solid #e2e8f0">
+          <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Superficie</div>
+          <div style="font-size:26px;font-weight:700;color:#1a2540;font-family:'DM Mono',monospace">${r.m2}</div>
+          <div style="font-size:10px;color:#94a3b8">m²</div>
+        </div>` : ''}
+      ${r.w ? `
+        <div style="background:#f8fafc;border-radius:8px;padding:11px;text-align:center;border:1px solid #e2e8f0">
+          <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Dimensiones</div>
+          <div style="font-size:14px;font-weight:700;color:#1a2540;font-family:'DM Mono',monospace">${r.w}</div>
+          ${r.h ? `<div style="font-size:11px;color:#94a3b8">${r.h}</div>` : ''}
+        </div>` : ''}
+    </div>
+    <div style="font-size:13px;color:#64748b;line-height:1.6;padding:12px;background:#f8fafc;border-radius:8px;border-left:3px solid ${r.color}">${r.desc}</div>
+  `;
+
+  popup.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeFpPopup() {
+  const popup = document.getElementById('fp-mob-popup');
+  if (popup) { popup.classList.remove('show'); document.body.style.overflow = ''; }
 }
 
 let fpCoordsOn = false;
