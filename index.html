@@ -1708,19 +1708,10 @@ document.querySelectorAll('.ni[data-page]').forEach(el => el.addEventListener('c
 // MULTIMEDIA SIDEBAR SUBMENU
 // ============================================================
 function toggleMmMenu() {
-  const sub = eid('mm-submenu-main'), chev = eid('mm-chev-main'), hdr = eid('nav-multimedia');
+  const sub = eid('mm-submenu-main'), chev = eid('mm-chev-main');
   if (!sub) return;
   const open = sub.classList.toggle('open');
   if (chev) chev.classList.toggle('rot', open);
-  if (hdr) hdr.classList.toggle('on', open);
-  // Navigate to multimedia page when opening
-  if (open) {
-    document.querySelectorAll('.pg').forEach(el => el.classList.remove('on'));
-    document.querySelectorAll('.ni[data-page]').forEach(el => el.classList.remove('on'));
-    const pg = eid('pg-multimedia'); if (pg) pg.classList.add('on');
-    showMmGrid();
-    closeSidebar();
-  }
 }
 function toggleMmEtapa(id) {
   const sub = eid('mm-sub-' + id), chev = eid('mm-chev-' + id);
