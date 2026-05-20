@@ -413,6 +413,31 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 .mm-video-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.12);background:#0f172a}
 .mm-video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:10px}
 @media(max-width:600px){.mm-section{padding:16px}.mm-title{font-size:1.3rem}.mm-etapa-h{font-size:1.1rem}.mm-etapa{margin-top:20px;margin-bottom:30px}.mm-single{max-width:100%}}
+/* ── Multimedia sidebar submenu ── */
+.mm-nav-hdr{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;color:#64748b;margin:1px 6px;font-weight:500;transition:all .1s;user-select:none}
+.mm-nav-hdr:hover{background:#f1f5f9;color:#1a2540}
+.mm-nav-hdr.on{background:linear-gradient(135deg,#1a2540,#243060);color:#fff;box-shadow:0 2px 8px rgba(26,37,64,.2)}
+.mm-nav-hdr svg{width:14px;height:14px;flex-shrink:0}
+.mm-chev{margin-left:auto;font-size:13px;line-height:1;transition:transform .22s;display:inline-block;color:#94a3b8}
+.mm-chev.rot{transform:rotate(90deg)}
+.mm-submenu{overflow:hidden;max-height:0;transition:max-height .3s ease}
+.mm-submenu.open{max-height:500px}
+.mm-etapa-row{display:flex;align-items:center;justify-content:space-between;padding:6px 10px 6px 32px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748b;cursor:pointer;user-select:none;border-radius:6px;margin:1px 6px;transition:background .1s,color .1s}
+.mm-etapa-row:hover{background:#f1f5f9;color:#1a2540}
+.mm-sub-items{overflow:hidden;max-height:0;transition:max-height .22s ease}
+.mm-sub-items.open{max-height:160px}
+.mm-video-item{display:flex;align-items:center;gap:6px;padding:6px 10px 6px 42px;font-size:12px;color:#64748b;cursor:pointer;border-left:2px solid transparent;margin:0 6px;border-radius:0 6px 6px 0;transition:background .12s,color .12s,border-color .12s}
+.mm-video-item:before{content:"▶";font-size:9px;opacity:.5;flex-shrink:0}
+.mm-video-item:hover,.mm-video-item.active{background:#eef2ff;color:#1a2540;border-left-color:#0066cc}
+/* ── Multimedia player view ── */
+#mm-player-view{display:none;flex-direction:column;height:100%}
+.mm-player-hdr{display:flex;align-items:center;gap:12px;padding:14px 20px 12px;background:#0f172a;flex-shrink:0}
+.mm-back-btn{background:rgba(255,255,255,.12);border:none;color:#e2e8f0;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap}
+.mm-back-btn:hover{background:rgba(255,255,255,.22)}
+.mm-player-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:#0066cc;color:#fff;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.mm-player-ttl{font-size:15px;font-weight:600;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mm-player-body{flex:1;position:relative;background:#000;min-height:0}
+#mm-player-iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
 </style>
 </head>
 <body>
@@ -495,7 +520,18 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
       <div class="ni" data-page="planos"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1"/><path d="M2 6h12M6 6v8"/></svg><span class="ni-lbl">Planos Interactivos</span><span class="nbadge nb-teal">SVG</span></div>
       <div class="ni" data-page="v360"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><ellipse cx="8" cy="8" rx="3" ry="6"/><path d="M2 8h12"/></svg><span class="ni-lbl">Recorrido 360°</span><span class="nbadge nb-gold">6</span></div>
       <div class="ni" data-page="galeria"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1"/><circle cx="6" cy="7" r="1.5"/><path d="M2 11l3-3 3 3 2-2 4 4"/></svg><span class="ni-lbl">Galería</span></div>
-      <div class="ni" data-page="multimedia"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/><polygon points="6,6 11,8 6,10"/></svg><span class="ni-lbl">Multimedia</span></div>
+      <div class="mm-nav-hdr" id="nav-multimedia" onclick="toggleMmMenu()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/><polygon points="6,6 11,8 6,10"/></svg><span class="ni-lbl">Multimedia</span><span class="mm-chev" id="mm-chev-main">›</span></div>
+      <div class="mm-submenu" id="mm-submenu-main">
+        <div class="mm-etapa-row" id="mm-row-e2" onclick="toggleMmEtapa('e2')"><span>ETAPA 2</span><span class="mm-chev" id="mm-chev-e2">›</span></div>
+        <div class="mm-sub-items" id="mm-sub-e2">
+          <div class="mm-video-item" id="mmv-feNMg_BkvCY" onclick="playMmVideo('feNMg_BkvCY','Video Proyecto','ETAPA 2')">Video Proyecto</div>
+          <div class="mm-video-item" id="mmv-C1n9aPIp6io" onclick="playMmVideo('C1n9aPIp6io','Recorrido Animado','ETAPA 2')">Recorrido Animado</div>
+        </div>
+        <div class="mm-etapa-row" id="mm-row-e1" onclick="toggleMmEtapa('e1')"><span>ETAPA 1</span><span class="mm-chev" id="mm-chev-e1">›</span></div>
+        <div class="mm-sub-items" id="mm-sub-e1">
+          <div class="mm-video-item" id="mmv-dt1UAlPoyo8" onclick="playMmVideo('dt1UAlPoyo8','¿Cómo se hizo San Luis?','ETAPA 1')">¿Cómo se hizo San Luis?</div>
+        </div>
+      </div>
       <div class="ni" data-page="naming"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1"/><path d="M5 8h6M8 5v6"/></svg><span class="ni-lbl">Naming</span></div>
       <div class="ni" onclick="openPres()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="9" rx="1"/><path d="M5 14h6M8 11v3"/></svg><span class="ni-lbl">Presentación</span></div>
       <div class="sb-sec private-only">Donantes</div>
@@ -693,8 +729,22 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 </div>
 
 <!-- MULTIMEDIA -->
-<div class="pg" id="pg-multimedia">
-<!-- ================= SECCIÓN MULTIMEDIA ================= -->
+<div class="pg" id="pg-multimedia" style="flex-direction:column;height:100%;overflow:hidden">
+
+<!-- ── PLAYER VIEW (shown when a video is selected from sidebar) ── -->
+<div id="mm-player-view" style="display:none;flex-direction:column;height:100%">
+  <div class="mm-player-hdr">
+    <button class="mm-back-btn" onclick="showMmGrid()">← Ver todos</button>
+    <span id="mm-player-tag" class="mm-player-tag">ETAPA</span>
+    <span id="mm-player-ttl" class="mm-player-ttl">—</span>
+  </div>
+  <div class="mm-player-body">
+    <iframe id="mm-player-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+</div>
+
+<!-- ── GRID VIEW (default) ── -->
+<div id="mm-grid-view" style="overflow-y:auto;flex:1">
 <section class="mm-section">
     <h2 class="mm-title">Multimedia</h2>
 
@@ -734,7 +784,8 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
         </div>
     </div>
 </section>
-<!-- ================= FIN SECCIÓN MULTIMEDIA ================= -->
+</div>
+
 </div>
 
 <!-- DONANTES -->
@@ -1652,6 +1703,59 @@ function goPage(page) {
   closeSidebar();
 }
 document.querySelectorAll('.ni[data-page]').forEach(el => el.addEventListener('click', () => goPage(el.dataset.page)));
+
+// ============================================================
+// MULTIMEDIA SIDEBAR SUBMENU
+// ============================================================
+function toggleMmMenu() {
+  const sub = eid('mm-submenu-main'), chev = eid('mm-chev-main'), hdr = eid('nav-multimedia');
+  if (!sub) return;
+  const open = sub.classList.toggle('open');
+  if (chev) chev.classList.toggle('rot', open);
+  if (hdr) hdr.classList.toggle('on', open);
+  // Navigate to multimedia page when opening
+  if (open) {
+    document.querySelectorAll('.pg').forEach(el => el.classList.remove('on'));
+    document.querySelectorAll('.ni[data-page]').forEach(el => el.classList.remove('on'));
+    const pg = eid('pg-multimedia'); if (pg) pg.classList.add('on');
+    showMmGrid();
+    closeSidebar();
+  }
+}
+function toggleMmEtapa(id) {
+  const sub = eid('mm-sub-' + id), chev = eid('mm-chev-' + id);
+  if (!sub) return;
+  const open = sub.classList.toggle('open');
+  if (chev) chev.classList.toggle('rot', open);
+}
+function playMmVideo(videoId, title, etapa) {
+  // Activate multimedia page
+  document.querySelectorAll('.pg').forEach(el => el.classList.remove('on'));
+  document.querySelectorAll('.ni[data-page]').forEach(el => el.classList.remove('on'));
+  const pg = eid('pg-multimedia'); if (pg) pg.classList.add('on');
+  const hdr = eid('nav-multimedia'); if (hdr) hdr.classList.add('on');
+  // Mark active video item in sidebar
+  document.querySelectorAll('.mm-video-item').forEach(el => el.classList.remove('active'));
+  const item = eid('mmv-' + videoId); if (item) item.classList.add('active');
+  // Switch to player view
+  const gridView = eid('mm-grid-view'), playerView = eid('mm-player-view');
+  if (!gridView || !playerView) return;
+  gridView.style.display = 'none';
+  playerView.style.display = 'flex';
+  eid('mm-player-tag').textContent = etapa;
+  eid('mm-player-ttl').textContent = title;
+  const iframe = eid('mm-player-iframe');
+  if (iframe) iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1';
+  closeSidebar();
+}
+function showMmGrid() {
+  const iframe = eid('mm-player-iframe');
+  if (iframe) iframe.src = '';
+  const gridView = eid('mm-grid-view'), playerView = eid('mm-player-view');
+  if (playerView) playerView.style.display = 'none';
+  if (gridView) gridView.style.display = 'block';
+  document.querySelectorAll('.mm-video-item').forEach(el => el.classList.remove('active'));
+}
 
 // ============================================================
 // MODALS
