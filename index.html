@@ -247,7 +247,35 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 #fp-mob-close{background:#f1f5f9;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;color:#64748b;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 #fp-mob-title{font-size:16px;font-weight:700;color:#1a2540;flex:1}
 #fp-mob-content{padding:14px 16px 4px}
-@media(min-width:769px){#fp-mob-popup{display:none!important}}
+@media(min-width:769px){#fp-mob-popup{display:none!important}#fp-mob-list{display:none!important}}
+
+/* ── Lista de secciones mobile ── */
+#fp-mob-list{display:none;margin-top:14px}
+@media(max-width:768px){
+  #fp-mob-list{display:block}
+  .fpl-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#1a2540;border-radius:10px 10px 0 0;margin-bottom:1px}
+  .fpl-header-title{font-size:11px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.08em}
+  .fpl-header-total{font-size:16px;font-weight:700;color:#f5c048;font-family:'DM Mono',monospace}
+  .fpl-item{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 12px;background:#fff;
+    border-bottom:1px solid #f1f5f9;
+    cursor:pointer;transition:background .12s;
+    border-left:4px solid transparent;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .fpl-item:first-of-type{border-radius:0}
+  .fpl-item:last-of-type{border-radius:0 0 10px 10px;border-bottom:none}
+  .fpl-item:active{background:#f8fafc}
+  .fpl-item.fpl-active{background:#fef9ee;border-left-color:var(--fpl-color,#c8880a)}
+  .fpl-thumb{width:52px;height:40px;border-radius:6px;object-fit:cover;flex-shrink:0;background:#f1f5f9}
+  .fpl-thumb-empty{width:52px;height:40px;border-radius:6px;flex-shrink:0;background:#f1f5f9;display:flex;align-items:center;justify-content:center}
+  .fpl-body{flex:1;min-width:0}
+  .fpl-name{font-size:13px;font-weight:600;color:#1a2540;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fpl-meta{font-size:11px;color:#94a3b8;margin-top:1px}
+  .fpl-m2{font-size:13px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0}
+  .fpl-arrow{font-size:12px;color:#94a3b8;flex-shrink:0;margin-left:4px}
+}
 
 /* ════════════════════════
    BREAKPOINT ≤ 768px
@@ -558,6 +586,8 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
       <div id="fp-real-wrap" style="display:none">
         <img id="fp-real-img" src="" style="width:100%;border-radius:9px;border:1.5px solid #e2e8f0;display:block" alt="Plano">
       </div>
+      <!-- LISTA MOBILE (solo ≤768px) -->
+      <div id="fp-mob-list"></div>
     </div>
     <!-- SIDE PANEL -->
     <div id="fp-side" style="width:260px;flex-shrink:0;border-left:1px solid #e2e8f0;overflow-y:auto;background:#fff">
@@ -2888,6 +2918,36 @@ function renderFloor(fid) {
       </div>`;
   }
 
+  // Lista mobile de secciones
+  const mobList = document.getElementById('fp-mob-list');
+  if (mobList) {
+    const allRooms = fpGetRooms(fpCurrent);
+    const totalM2 = allRooms.filter(r=>r.m2>0).reduce((a,r)=>a+r.m2,0);
+    const floorNR = NR_FLOOR_MAP[fpCurrent] || {};
+    mobList.innerHTML =
+      `<div class="fpl-header">
+        <span class="fpl-header-title">${d.label || ''} · ${allRooms.length} espacios</span>
+        <span class="fpl-header-total">${totalM2.toLocaleString()} m²</span>
+       </div>` +
+      allRooms.map(r => {
+        const nrK = floorNR[r.id];
+        const img = nrK ? (NR[nrK]||null) : null;
+        return `<div class="fpl-item" id="fpl-${r.id}"
+          style="--fpl-color:${r.color}"
+          onclick="fpClick('${r.id}')">
+          ${img
+            ? `<img class="fpl-thumb" src="${img}" alt="${r.name}">`
+            : `<div class="fpl-thumb-empty"><svg viewBox="0 0 16 16" fill="none" stroke="#cbd5e0" stroke-width="1.5" width="18" height="18"><rect x="2" y="3" width="12" height="10" rx="1"/><circle cx="6" cy="7" r="1.5"/><path d="M2 11l3-3 3 3 2-2 4 4"/></svg></div>`}
+          <div class="fpl-body">
+            <div class="fpl-name">${r.name}</div>
+            ${r.w ? `<div class="fpl-meta">${r.w}${r.h?' · '+r.h:''}</div>` : ''}
+          </div>
+          ${r.m2 > 0 ? `<span class="fpl-m2" style="color:${r.color}">${r.m2} m²</span>` : ''}
+          <span class="fpl-arrow">›</span>
+        </div>`;
+      }).join('');
+  }
+
   // Reset detail panel
   fpSelected = null;
   const nameEl   = document.getElementById('fp-room-name');
@@ -3022,6 +3082,14 @@ function fpClick(id) {
 
   const tip = document.getElementById('fp-tooltip');
   if (tip) tip.style.display = 'none';
+
+  // Actualizar item activo en la lista mobile
+  document.querySelectorAll('.fpl-item').forEach(el => el.classList.remove('fpl-active'));
+  const listItem = document.getElementById('fpl-' + id);
+  if (listItem) {
+    listItem.classList.add('fpl-active');
+    if (window.innerWidth <= 768) listItem.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
 
   // En mobile mostrar bottom-sheet popup
   if (window.innerWidth <= 768) showFpPopup(r, nrKey, imgS);
