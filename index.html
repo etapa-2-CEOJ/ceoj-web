@@ -1380,7 +1380,6 @@ function localRouter(method, path, body) {
 
   // NAMING
   if (path === 'naming' && method === 'GET') {
-    syncNamingLocal();
     return Promise.resolve(DB.get('naming'));
   }
   if (path === 'naming' && method === 'POST') { const n=DB.add('naming',body); return Promise.resolve(n); }
@@ -1499,6 +1498,25 @@ const API = {
     syncNamingLocal();
     console.log('Modo local activado');
   }
+
+  // Load shared content overrides from backend so public mode mirrors private edits
+  try {
+    const cfg = await API.get('config');
+    if (cfg.__gal_ov) {
+      const backOv = JSON.parse(cfg.__gal_ov);
+      Object.assign(galOv, backOv);
+      localStorage.setItem('ceoj_gal_ov', JSON.stringify(galOv));
+      GALLERY_ITEMS.forEach((g, i) => { if (galOv[g.id]) Object.assign(GALLERY_ITEMS[i], galOv[g.id]); });
+    }
+    if (cfg.__fp_ov) {
+      const backFp = JSON.parse(cfg.__fp_ov);
+      Object.assign(fpEditOverrides, backFp);
+      localStorage.setItem(FP_EDIT_KEY, JSON.stringify(fpEditOverrides));
+    }
+    if (cfg.__naming_pub) {
+      namingPublicSnapshot = JSON.parse(cfg.__naming_pub);
+    }
+  } catch(e) {}
 
   // Then: restore session
   const tk = localStorage.getItem('ceoj_token');
@@ -1699,6 +1717,7 @@ function loginSuccess(user) {
   updateBadges();
   goPage('overview');
   toast('Bienvenido, ' + user.name + ' 👋', 'ok');
+  if (!namingPublicSnapshot) pushNamingSnapshot();
 }
 
 function doLogout() {
@@ -2324,7 +2343,7 @@ async function renderDon() {
 async function delDonante(id) {
   const ok = await confirm2('Eliminar donante', '¿Eliminás este donante?');
   if(!ok) return;
-  try { await API.del('donantes/' + id); toast('Eliminado ✓', 'ok'); renderDon(); }
+  try { await API.del('donantes/' + id); toast('Eliminado ✓', 'ok'); pushNamingSnapshot(); renderDon(); }
   catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
@@ -2335,7 +2354,7 @@ async function saveDonante() {
   try {
     if (id) { await API.put('donantes/' + id, data); toast('Donante actualizado ✓', 'ok'); }
     else { await API.post('donantes', data); toast('Donante registrado ✓', 'ok'); }
-    closeModal('donante'); renderDon();
+    closeModal('donante'); pushNamingSnapshot(); renderDon();
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
@@ -2344,7 +2363,11 @@ async function saveDonante() {
 // ============================================================
 async function renderNaming() {
   try {
-    const items = await API.get('naming');
+    let items = await API.get('naming');
+    // In public mode, prefer the admin-published snapshot (source of truth from private)
+    if (isPublicMode() && namingPublicSnapshot && namingPublicSnapshot.length) {
+      items = namingPublicSnapshot;
+    }
     const avail=items.filter(i=>i.status==='available').length, taken=items.filter(i=>i.status==='taken').length;
     const totalAmt=items.reduce((a,i)=>a+(parseFloat(i.amount)||0),0);
     const confirmedAmt=items.filter(i=>i.status!=='available').reduce((a,i)=>a+(parseFloat(i.amount)||0),0);
@@ -2428,10 +2451,18 @@ async function renderNaming() {
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
+async function pushNamingSnapshot() {
+  try {
+    const items = await API.get('naming');
+    namingPublicSnapshot = items;
+    await API.put('config', { __naming_pub: JSON.stringify(items) });
+  } catch(e) {}
+}
+
 async function delNaming(id) {
   const ok = await confirm2('Eliminar espacio', '¿Eliminás este naming?');
   if(!ok) return;
-  try { await API.del('naming/' + id); toast('Eliminado ✓', 'ok'); renderNaming(); }
+  try { await API.del('naming/' + id); toast('Eliminado ✓', 'ok'); pushNamingSnapshot(); renderNaming(); }
   catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
@@ -2442,7 +2473,7 @@ async function saveNaming() {
   try {
     if (id) { await API.put('naming/' + id, data); toast('Espacio actualizado ✓', 'ok'); }
     else { await API.post('naming', data); toast('Espacio agregado ✓', 'ok'); }
-    closeModal('naming'); renderNaming();
+    closeModal('naming'); pushNamingSnapshot(); renderNaming();
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
@@ -2626,6 +2657,7 @@ async function saveGalItem() {
     galOv[id] = ov;
     localStorage.setItem('ceoj_gal_ov', JSON.stringify(galOv));
     Object.assign(GALLERY_ITEMS[staticIdx], ov);
+    API.put('config', { __gal_ov: JSON.stringify(galOv) }).catch(() => {});
     closeModal('galitem'); renderGal(); toast('Imagen actualizada ✓', 'ok');
   } else {
     try {
@@ -3023,6 +3055,7 @@ let fpCurrent  = 'pb';
 let fpSelected = null;
 let namFloor = '';
 let namStatus = '';
+let namingPublicSnapshot = null;
 
 function renderFloor(fid) {
   fpCurrent = fid || 'pb';
@@ -3356,6 +3389,7 @@ const FP_EDIT_KEY = 'fp_room_edits_v3';
 function fpEditPersist() {
   try { localStorage.setItem(FP_EDIT_KEY, JSON.stringify(fpEditOverrides)); }
   catch(e) {}
+  API.put('config', { __fp_ov: JSON.stringify(fpEditOverrides) }).catch(() => {});
 }
 
 // Devuelve los rooms del piso actual con overrides aplicados (copia mutable)
