@@ -822,7 +822,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- NAMING -->
 <div class="pg" id="pg-naming">
   <div class="ph"><div><h1>Naming Opportunities</h1><p>Espacios disponibles para nombramiento perpetuo · Precios ocultos si reservado/confirmado</p></div>
-    <div class="ph-btns"><button class="btn btn-gold btn-sm" onclick="openModal('naming')">+ Espacio</button></div></div>
+    <div class="ph-btns"><button class="btn btn-ghost btn-sm private-only" onclick="forceSyncNaming()" title="Sincroniza estados de naming con donantes y publica al público">↺ Sincronizar</button><button class="btn btn-gold btn-sm" onclick="openModal('naming')">+ Espacio</button></div></div>
   <div class="pc">
     <div class="g4" id="nam-kpis"></div>
     <div id="nam-filter-bar" style="margin-bottom:14px"></div>
@@ -1316,8 +1316,8 @@ function syncNamingLocal() {
   const namings  = DB.get('naming');
   namings.forEach(n => {
     const linked = donantes.filter(d => String(d.naming_id) === String(n.id));
-    const ns = linked.length === 0 ? 'available'
-      : linked.some(d => d.status==='confirmado') ? 'taken' : 'reserved';
+    if (linked.length === 0) return; // No donors linked — respect manual status
+    const ns = linked.some(d => d.status==='confirmado') ? 'taken' : 'reserved';
     if (n.status !== ns) DB.update('naming', n.id, {status: ns});
   });
 }
@@ -1717,7 +1717,7 @@ function loginSuccess(user) {
   updateBadges();
   goPage('overview');
   toast('Bienvenido, ' + user.name + ' 👋', 'ok');
-  if (!namingPublicSnapshot) pushNamingSnapshot();
+  if (!namingPublicSnapshot) pushNamingSnapshot().catch(() => {});
 }
 
 function doLogout() {
@@ -2343,7 +2343,7 @@ async function renderDon() {
 async function delDonante(id) {
   const ok = await confirm2('Eliminar donante', '¿Eliminás este donante?');
   if(!ok) return;
-  try { await API.del('donantes/' + id); toast('Eliminado ✓', 'ok'); pushNamingSnapshot(); renderDon(); }
+  try { await API.del('donantes/' + id); toast('Eliminado ✓', 'ok'); pushNamingSnapshot().catch(()=>{}); renderDon(); }
   catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
@@ -2354,7 +2354,7 @@ async function saveDonante() {
   try {
     if (id) { await API.put('donantes/' + id, data); toast('Donante actualizado ✓', 'ok'); }
     else { await API.post('donantes', data); toast('Donante registrado ✓', 'ok'); }
-    closeModal('donante'); pushNamingSnapshot(); renderDon();
+    closeModal('donante'); pushNamingSnapshot().catch(()=>{}); renderDon();
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
@@ -2363,11 +2363,7 @@ async function saveDonante() {
 // ============================================================
 async function renderNaming() {
   try {
-    let items = await API.get('naming');
-    // In public mode, prefer the admin-published snapshot (source of truth from private)
-    if (isPublicMode() && namingPublicSnapshot && namingPublicSnapshot.length) {
-      items = namingPublicSnapshot;
-    }
+    const items = await API.get('naming');
     const avail=items.filter(i=>i.status==='available').length, taken=items.filter(i=>i.status==='taken').length;
     const totalAmt=items.reduce((a,i)=>a+(parseFloat(i.amount)||0),0);
     const confirmedAmt=items.filter(i=>i.status!=='available').reduce((a,i)=>a+(parseFloat(i.amount)||0),0);
@@ -2452,17 +2448,30 @@ async function renderNaming() {
 }
 
 async function pushNamingSnapshot() {
+  const items = await API.get('naming');
+  namingPublicSnapshot = items;
+  await API.put('config', { __naming_pub: JSON.stringify(items) });
+  return items;
+}
+
+async function forceSyncNaming() {
   try {
-    const items = await API.get('naming');
-    namingPublicSnapshot = items;
-    await API.put('config', { __naming_pub: JSON.stringify(items) });
-  } catch(e) {}
+    if (USE_LOCAL) syncNamingLocal();
+    const items = await pushNamingSnapshot();
+    renderNaming();
+    const taken = items.filter(i => i.status === 'taken').length;
+    const reserved = items.filter(i => i.status === 'reserved').length;
+    const avail = items.filter(i => i.status === 'available').length;
+    toast(`Naming publicado al público ✓ — ${taken} confirmados · ${reserved} reservados · ${avail} disponibles`, 'ok');
+  } catch(e) {
+    toast('Error al sincronizar: ' + e.message, 'err');
+  }
 }
 
 async function delNaming(id) {
   const ok = await confirm2('Eliminar espacio', '¿Eliminás este naming?');
   if(!ok) return;
-  try { await API.del('naming/' + id); toast('Eliminado ✓', 'ok'); pushNamingSnapshot(); renderNaming(); }
+  try { await API.del('naming/' + id); toast('Eliminado ✓', 'ok'); pushNamingSnapshot().catch(()=>{}); renderNaming(); }
   catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
@@ -2473,7 +2482,7 @@ async function saveNaming() {
   try {
     if (id) { await API.put('naming/' + id, data); toast('Espacio actualizado ✓', 'ok'); }
     else { await API.post('naming', data); toast('Espacio agregado ✓', 'ok'); }
-    closeModal('naming'); pushNamingSnapshot(); renderNaming();
+    closeModal('naming'); pushNamingSnapshot().catch(()=>{}); renderNaming();
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
