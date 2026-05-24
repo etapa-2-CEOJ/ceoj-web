@@ -1588,7 +1588,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.46';
+const APP_VERSION = 'v1.0.47';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -3036,15 +3036,18 @@ async function renderDon() {
     const filtered = all.filter(d => (!q||d.name.toLowerCase().includes(q)||(d.naming_name||'').toLowerCase().includes(q)) && (!f||d.status===f));
     const total = all.reduce((a,d) => a+(parseFloat(d.compromiso)||0), 0);
     const pagado = all.reduce((a,d) => a+(parseFloat(d.pagado)||0), 0);
-    const meta = 30000000, pct = Math.min(100, total/meta*100);
-
+    const slN = v => { if(typeof v==='number') return isNaN(v)?0:v; const s=String(v||'').trim(); if(!s) return 0; if(s.includes(',')) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0; return parseFloat(s.replace(/[^0-9.-]/g,''))||0; };
+    const slComp  = (window._sluisRows||[]).reduce((a,r)=>a+slN(r.compromiso),0);
+    const slDeuda = (window._sluisRows||[]).reduce((a,r)=>a+slN(r.deuda),0);
+    const granTotal = total + slComp;
+    const meta = 30000000, pct = Math.min(100, granTotal/meta*100);
     const fmtM = v => { const m = v/1000000; return (m % 1 === 0 ? m.toFixed(0) : m.toFixed(1).replace('.',',')) + 'M'; };
     const fmtDots = v => Math.round(v).toLocaleString('es-AR');
     eid('don-kpis').innerHTML =
-      '<div class="kpi"><div class="kv">USD ' + fmtM(total) + '</div><div class="kl">Total comprometido</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">USD ' + fmtDots(total) + '</div><div class="prog" style="margin-top:4px"><div class="pf" style="width:' + pct.toFixed(0) + '%"></div></div></div>' +
-      '<div class="kpi"><div class="kv">USD ' + fmtM(pagado) + '</div><div class="kl">Total pagado</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">USD ' + fmtDots(pagado) + '</div><div class="kbadge kb-green" style="margin-top:4px">' + Math.round(pagado/(total||1)*100) + '% cobrado</div></div>' +
-      '<div class="kpi"><div class="kv">USD ' + fmtM(total-pagado) + '</div><div class="kl">Saldo pendiente</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">USD ' + fmtDots(total-pagado) + '</div><div class="kbadge kb-red" style="margin-top:4px">Por cobrar</div></div>' +
-      '<div class="kpi"><div class="kv">' + all.length + '</div><div class="kl">Donantes</div><div class="kbadge kb-green">' + all.filter(d=>d.status==='confirmado').length + ' confirmados</div></div>';
+      '<div class="kpi"><div class="kl" style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#c8880a;font-weight:700;margin-bottom:3px">Tucumán</div><div class="kv">USD ' + fmtM(total) + '</div><div class="kl">Comprometido</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">USD ' + fmtDots(total) + '</div></div>' +
+      '<div class="kpi"><div class="kl" style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#0891b2;font-weight:700;margin-bottom:3px">S.Luis</div><div class="kv">USD ' + fmtM(slComp) + '</div><div class="kl">Comprometido</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">USD ' + fmtDots(slComp) + '</div></div>' +
+      '<div class="kpi"><div class="kl" style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#059669;font-weight:700;margin-bottom:3px">Gran Total</div><div class="kv">USD ' + fmtM(granTotal) + '</div><div class="kl">Ambos edificios</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">USD ' + fmtDots(granTotal) + '</div></div>' +
+      '<div class="kpi"><div class="kl" style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#7c3aed;font-weight:700;margin-bottom:3px">Meta USD 30M</div><div class="kv" style="color:#7c3aed">' + pct.toFixed(1) + '%</div><div class="prog" style="margin-top:6px"><div class="pf" style="width:' + pct.toFixed(0) + '%;background:#7c3aed"></div></div><div style="font-size:10px;color:#94a3b8;margin-top:3px">Faltan USD ' + fmtDots(Math.max(0,meta-granTotal)) + '</div></div>';
 
     const bulkMode = !!window._donBulkMode;
     const thead = eid('don-thead');
@@ -4835,9 +4838,10 @@ async function syncSLuis() {
     const rows = json.rows || [];
     const toNum = v => { if(typeof v==='number') return isNaN(v)?0:Math.round(v*100)/100; const s=String(v||'').trim(); if(!s) return 0; if(s.includes(',')) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0; return parseFloat(s.replace(/[^0-9.-]/g,''))||0; };
     rows.sort((a,b) => toNum(b.deuda) - toNum(a.deuda));
+    window._sluisRows = rows;
     const tbody = document.getElementById('sluis-tbody');
     const kpis  = document.getElementById('sluis-kpis');
-    if(!rows.length){ if(tbody) tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:16px">Sin deudores</td></tr>'; return; }
+    if(!rows.length){ if(tbody) tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:16px">Sin deudores</td></tr>'; renderDon(); return; }
     const totComp = rows.reduce((a,r)=>a+toNum(r.compromiso),0);
     const totPag  = rows.reduce((a,r)=>a+toNum(r.pagado),0);
     const totDeuda= rows.reduce((a,r)=>a+toNum(r.deuda),0);
@@ -4852,6 +4856,7 @@ async function syncSLuis() {
       '<div class="kpi" style="flex:1"><div class="kv" style="font-size:16px">USD '+Math.round(totDeuda).toLocaleString('es-AR')+'</div><div class="kl">Total deuda</div></div>' +
       '<div class="kpi" style="flex:1"><div class="kv" style="font-size:16px">'+Math.round(totPag/(totComp||1)*100)+'%</div><div class="kl">Cobrado</div></div>';
     toast('S.Luis: '+rows.length+' deudores cargados ✓','ok');
+    renderDon();
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
