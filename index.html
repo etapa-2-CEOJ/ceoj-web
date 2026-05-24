@@ -1547,7 +1547,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.33';
+const APP_VERSION = 'v1.0.34';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -1756,11 +1756,20 @@ async function supabaseRouter(method, path, body) {
       await SB.rest('PATCH','notifs','id=eq.'+id,{read:true,updated_at:ts()}); return { ok:true };
     }
     if (method === 'PUT') {
-      const rows = await SB.rest('PATCH', table, 'id=eq.'+id, {...body, updated_at:ts()});
-      if (table === 'donantes' && body.naming_id) {
-        const s2n = {confirmado:'taken',reservado:'reserved',proceso:'reserved',negociacion:'available'};
-        await SB.rest('PATCH','naming','id=eq.'+body.naming_id,{status:s2n[body.status]||'available',updated_at:ts()});
+      if (table === 'donantes') {
+        const prev = await SB.rest('GET','donantes','id=eq.'+id+'&select=naming_id');
+        const oldNamingId = prev[0]?.naming_id;
+        await SB.rest('PATCH', table, 'id=eq.'+id, {...body, updated_at:ts()});
+        if (oldNamingId && oldNamingId !== body.naming_id) {
+          await SB.rest('PATCH','naming','id=eq.'+oldNamingId,{status:'available',updated_at:ts()});
+        }
+        if (body.naming_id) {
+          const s2n = {confirmado:'taken',reservado:'reserved',proceso:'reserved',negociacion:'reserved'};
+          await SB.rest('PATCH','naming','id=eq.'+body.naming_id,{status:s2n[body.status]||'reserved',updated_at:ts()});
+        }
+        return {ok:true};
       }
+      const rows = await SB.rest('PATCH', table, 'id=eq.'+id, {...body, updated_at:ts()});
       return (Array.isArray(rows)?rows[0]:rows)||{ok:true};
     }
     if (method === 'DELETE') {
@@ -3036,7 +3045,7 @@ async function saveDonante() {
   try {
     if (id) { await API.put('donantes/' + id, data); toast('Donante actualizado ✓', 'ok'); }
     else { await API.post('donantes', data); toast('Donante registrado ✓', 'ok'); }
-    closeModal('donante'); pushNamingSnapshot().catch(()=>{}); renderDon();
+    closeModal('donante'); pushNamingSnapshot().catch(()=>{}); renderDon(); if(document.querySelector('#pg-naming.on')) renderNaming();
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
