@@ -1588,7 +1588,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.49';
+const APP_VERSION = 'v1.0.50';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -3055,11 +3055,15 @@ async function renderDon() {
       const dj = JSON.stringify(d).replace(/'/g,"&#39;");
       const chk = bulkMode ? '<td style="width:32px"><input type="checkbox" data-id="'+d.id+'" class="don-bulk-cb" onchange="_updDonBulkCount()" style="width:14px;height:14px;cursor:pointer"></td>' : '';
       const acts = bulkMode ? '' : '<td><div style="display:flex;gap:3px"><button class="btn btn-outline btn-xs" onclick=\'openModal("donante",' + dj + ')\'>✎</button><button class="btn btn-danger btn-xs" onclick="delDonante(' + d.id + ')">✕</button></div></td>';
+      const saldoZero = saldo === 0;
+      const cComp  = saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-gold"';
+      const cPag   = saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-green"';
+      const cSaldo = saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-red"';
       return '<tr>' + chk + '<td><strong>' + d.name + '</strong>' + (d.email?'<div style="font-size:10px;color:#94a3b8">'+d.email+'</div>':'') + '</td>' +
         '<td class="td-m">' + (d.naming_name||'—') + '</td>' +
-        '<td class="td-gold">' + fmt(d.compromiso,d.currency) + '</td>' +
-        '<td class="td-green">' + fmt(d.pagado,d.currency) + '</td>' +
-        '<td class="td-red">' + fmt(saldo,d.currency) + '</td>' +
+        '<td '+cComp+'>' + fmt(d.compromiso,d.currency) + '</td>' +
+        '<td '+cPag+'>' + fmt(d.pagado,d.currency) + '</td>' +
+        '<td '+cSaldo+'>' + fmt(saldo,d.currency) + '</td>' +
         '<td>' + badge(d.status) + '</td>' +
         '<td class="td-m">' + (d.date||'--').split('T')[0] + '</td>' +
         acts + '</tr>';
