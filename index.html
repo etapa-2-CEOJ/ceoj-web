@@ -470,15 +470,18 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 .mm-player-body{flex:1;position:relative;background:#000;min-height:0}
 #mm-player-iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
 @media print{
+  @page{margin:15mm 12mm}
   body *{visibility:hidden}
   #print-area,#print-area *{visibility:visible}
-  #print-area{position:fixed;top:0;left:0;width:100%;padding:20px;font-family:'DM Sans',sans-serif}
-  #print-area table{width:100%;border-collapse:collapse;font-size:11px}
-  #print-area th,#print-area td{border:1px solid #e2e8f0;padding:6px 8px;text-align:left}
-  #print-area th{background:#f8fafc;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.05em}
-  #print-area .print-title{font-size:16px;font-weight:700;margin-bottom:4px;color:#1a2540}
-  #print-area .print-sub{font-size:11px;color:#64748b;margin-bottom:14px}
-  #print-area .print-section{font-size:12px;font-weight:700;margin:14px 0 6px;color:#1a2540;border-bottom:2px solid #e2e8f0;padding-bottom:4px}
+  #print-area{position:absolute;top:0;left:0;width:100%;padding:0;font-family:'DM Sans',sans-serif}
+  #print-area table{width:100%;border-collapse:collapse;font-size:10px;page-break-inside:auto}
+  #print-area tr{page-break-inside:avoid;page-break-after:auto}
+  #print-area thead{display:table-header-group}
+  #print-area th,#print-area td{border:1px solid #ccc;padding:5px 7px;text-align:left}
+  #print-area th{background:#f1f5f9!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.05em}
+  #print-area .print-title{font-size:15px;font-weight:700;margin-bottom:3px;color:#1a2540}
+  #print-area .print-sub{font-size:10px;color:#64748b;margin-bottom:12px}
+  #print-area .print-section{font-size:11px;font-weight:700;margin:12px 0 5px;color:#1a2540;border-bottom:2px solid #ccc;padding-bottom:3px;page-break-after:avoid}
 }
 </style>
 </head>
@@ -1601,7 +1604,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.60';
+const APP_VERSION = 'v1.0.61';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
