@@ -469,6 +469,17 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 .mm-player-ttl{font-size:15px;font-weight:600;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mm-player-body{flex:1;position:relative;background:#000;min-height:0}
 #mm-player-iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+@media print{
+  body *{visibility:hidden}
+  #print-area,#print-area *{visibility:visible}
+  #print-area{position:fixed;top:0;left:0;width:100%;padding:20px;font-family:'DM Sans',sans-serif}
+  #print-area table{width:100%;border-collapse:collapse;font-size:11px}
+  #print-area th,#print-area td{border:1px solid #e2e8f0;padding:6px 8px;text-align:left}
+  #print-area th{background:#f8fafc;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.05em}
+  #print-area .print-title{font-size:16px;font-weight:700;margin-bottom:4px;color:#1a2540}
+  #print-area .print-sub{font-size:11px;color:#64748b;margin-bottom:14px}
+  #print-area .print-section{font-size:12px;font-weight:700;margin:14px 0 6px;color:#1a2540;border-bottom:2px solid #e2e8f0;padding-bottom:4px}
+}
 </style>
 </head>
 <body>
@@ -850,7 +861,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- DONANTES -->
 <div class="pg" id="pg-donantes">
   <div class="ph"><div><h1>Portal de Donantes</h1><p>Gestión de donaciones y compromisos · Base de datos en tiempo real</p></div>
-    <div class="ph-btns"><button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button><button class="btn btn-ghost btn-sm" onclick="syncSheetsQuick()" title="Sincronizar con Google Sheets">↻ Sheets</button><button class="btn btn-ghost btn-sm" id="btn-bulk-toggle" onclick="toggleDonBulk()">✎ Edición masiva</button><button class="btn btn-gold" onclick="openModal('donante')">+ Nuevo Donante</button></div></div>
+    <div class="ph-btns"><button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button><button class="btn btn-ghost btn-sm" onclick="printDonantes()">↓ PDF</button><button class="btn btn-ghost btn-sm" onclick="syncSheetsQuick()" title="Sincronizar con Google Sheets">↻ Sheets</button><button class="btn btn-ghost btn-sm" id="btn-bulk-toggle" onclick="toggleDonBulk()">✎ Edición masiva</button><button class="btn btn-gold" onclick="openModal('donante')">+ Nuevo Donante</button></div></div>
   <div id="don-bulk-bar" style="display:none;position:sticky;bottom:16px;z-index:50;margin:0 0 8px;padding:10px 16px;background:#1a2540;border-radius:10px;display:none;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,.3)">
     <span id="don-bulk-count" style="font-size:12px;color:rgba(255,255,255,.7);flex:1">0 seleccionados</span>
     <select id="don-bulk-status" style="padding:5px 10px;border-radius:6px;border:none;font-size:12px;outline:none">
@@ -1590,7 +1601,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.59';
+const APP_VERSION = 'v1.0.60';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -4738,6 +4749,34 @@ function closeSearch() {
 // ============================================================
 // EXPORT CSV
 // ============================================================
+async function printDonantes() {
+  try {
+    const don = await API.get('donantes');
+    don.sort((a,b)=>(a.name||'').localeCompare(b.name||'','es'));
+    const slRows = window._sluisRows || [];
+    const fmtN = v => Math.round(parseFloat(v)||0).toLocaleString('es-AR');
+    const statusLabel = {confirmado:'Confirmado',reservado:'Reservado',proceso:'En proceso',negociacion:'Negociación'};
+    const donRows = don.map(d => {
+      const saldo = (parseFloat(d.compromiso)||0)-(parseFloat(d.pagado)||0);
+      return `<tr><td>${d.name}</td><td>${d.naming_name||'—'}</td><td>USD ${fmtN(d.compromiso)}</td><td>USD ${fmtN(d.pagado)}</td><td>USD ${fmtN(saldo)}</td><td>${statusLabel[d.status]||d.status||'—'}</td></tr>`;
+    }).join('');
+    const slRowsHtml = slRows.map(r => {
+      const toN = v => Math.round(typeof v==='number'?v:parseFloat(String(v||'').replace(/\./g,'').replace(',','.'))||0);
+      return `<tr><td>${r.donante}</td><td>USD ${toN(r.compromiso).toLocaleString('es-AR')}</td><td>USD ${toN(r.pagado).toLocaleString('es-AR')}</td><td>USD ${toN(r.deuda).toLocaleString('es-AR')}</td></tr>`;
+    }).join('');
+    const now = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    let el = document.getElementById('print-area');
+    if(!el){ el = document.createElement('div'); el.id='print-area'; document.body.appendChild(el); }
+    el.innerHTML =
+      `<div class="print-title">Portal de Donantes — CEOJ</div>` +
+      `<div class="print-sub">Generado el ${now}</div>` +
+      `<div class="print-section">Edificio Tucumán (${don.length} donantes)</div>` +
+      `<table><thead><tr><th>Donante</th><th>Naming</th><th>Compromiso</th><th>Pagado</th><th>Saldo</th><th>Estado</th></tr></thead><tbody>${donRows}</tbody></table>` +
+      (slRows.length ? `<div class="print-section">Deudores S.Luis (${slRows.length})</div><table><thead><tr><th>Donante</th><th>Compromiso</th><th>Pagado</th><th>Deuda</th></tr></thead><tbody>${slRowsHtml}</tbody></table>` : '');
+    window.print();
+  } catch(e){ toast('Error al generar PDF: '+e.message,'err'); }
+}
+
 async function exportCSV() {
   try {
     const don = await API.get('donantes');
