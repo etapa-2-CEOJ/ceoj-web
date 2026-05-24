@@ -873,7 +873,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
             </select>
           </div>
         </div>
-        <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Donante</th><th>Naming</th><th>Compromiso</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th>Fecha</th><th></th></tr></thead><tbody id="don-tbody"></tbody></table></div>
+        <div style="overflow-x:auto"><table class="tbl"><thead id="don-thead"><tr><th>Donante</th><th>Naming</th><th>Compromiso</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th>Fecha</th><th></th></tr></thead><tbody id="don-tbody"></tbody></table></div>
       </div>
       <div class="card ct-green"><div class="ch"><span class="ctitle">Captación</span></div><div class="cb" id="don-prog"></div></div>
     </div>
@@ -1581,7 +1581,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.40';
+const APP_VERSION = 'v1.0.41';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -3038,6 +3038,10 @@ async function renderDon() {
       '<div class="kpi"><div class="kv">' + all.length + '</div><div class="kl">Donantes</div><div class="kbadge kb-green">' + all.filter(d=>d.status==='confirmado').length + ' confirmados</div></div>';
 
     const bulkMode = !!window._donBulkMode;
+    const thead = eid('don-thead');
+    if(thead) thead.innerHTML = bulkMode
+      ? '<tr><th style="width:32px"></th><th>Donante</th><th>Naming</th><th>Compromiso</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th>Fecha</th></tr>'
+      : '<tr><th>Donante</th><th>Naming</th><th>Compromiso</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th>Fecha</th><th></th></tr>';
     eid('don-tbody').innerHTML = filtered.length ? filtered.slice().sort((a,b)=>(a.name||'').localeCompare(b.name||'','es')).map(d => {
       const saldo = (parseFloat(d.compromiso)||0) - (parseFloat(d.pagado)||0);
       const dj = JSON.stringify(d).replace(/'/g,"&#39;");
