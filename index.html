@@ -1590,7 +1590,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.54';
+const APP_VERSION = 'v1.0.55';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved) window._sluisRows=JSON.parse(saved); } catch(_) {}
@@ -3041,7 +3041,6 @@ async function renderDon() {
     const filtered = all.filter(d => (!q||d.name.toLowerCase().includes(q)||(d.naming_name||'').toLowerCase().includes(q)) && (!f||d.status===f));
     const total = all.reduce((a,d) => a+(parseFloat(d.compromiso)||0), 0);
     const pagado = all.reduce((a,d) => a+(parseFloat(d.pagado)||0), 0);
-    const meta = 30000000, pct = Math.min(100, total/meta*100);
     const fmtM = v => { const m = v/1000000; return (m % 1 === 0 ? m.toFixed(0) : m.toFixed(1).replace('.',',')) + 'M'; };
     const fmtDots = v => Math.round(v).toLocaleString('es-AR');
     const slRows = window._sluisRows || [];
@@ -3049,6 +3048,7 @@ async function renderDon() {
     const slComp = slRows.reduce((a,r)=>a+slToNum(r.compromiso),0);
     const slPag  = slRows.reduce((a,r)=>a+slToNum(r.pagado),0);
     const slDeuda= slRows.reduce((a,r)=>a+slToNum(r.deuda),0);
+    const meta = 30000000, pct = Math.min(100, (total+slDeuda)/meta*100);
     const slKpis = slRows.length ? (
       '<div style="grid-column:1/-1;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#0055a4;margin-top:8px;margin-bottom:2px">S.Luis</div>' +
       '<div class="kpi kpi-blue"><div class="kv">' + slRows.length + '</div><div class="kl">Deudores</div></div>' +
