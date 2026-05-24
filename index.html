@@ -1588,7 +1588,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.44';
+const APP_VERSION = 'v1.0.45';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -4829,11 +4829,11 @@ async function syncSLuis() {
   if(!url){ toast('Primero sincronizá Tucumán para guardar la URL','info'); return; }
   toast('Conectando con S.Luis...','info');
   try {
-    const r = await fetch(url + '?tab=sluis', {redirect:'follow'});
+    const r = await fetch(url, {redirect:'follow'});
     if(!r.ok) throw new Error('HTTP ' + r.status);
     const json = await r.json();
     if(json.error) throw new Error(json.error);
-    const rows = json.rows || [];
+    const rows = json.sluis || [];
     const toNum = v => { if(typeof v==='number') return isNaN(v)?0:Math.round(v*100)/100; const s=String(v||'').trim(); if(!s) return 0; if(s.includes(',')) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0; return parseFloat(s.replace(/[^0-9.-]/g,''))||0; };
     rows.sort((a,b) => toNum(b.deuda) - toNum(a.deuda));
     const tbody = document.getElementById('sluis-tbody');
@@ -4863,7 +4863,7 @@ async function _doSheetsSync(url, type) {
     if(!r.ok) throw new Error('HTTP ' + r.status);
     const json = await r.json();
     if(json.error) throw new Error(json.error);
-    const rows = json.rows || [];
+    const rows = json.tucuman || json.rows || [];
     if(!rows.length){ toast('La planilla está vacía','err'); return; }
     if(type === 'donantes') {
       await _autoSyncDonantes(rows);
