@@ -848,7 +848,19 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- DONANTES -->
 <div class="pg" id="pg-donantes">
   <div class="ph"><div><h1>Portal de Donantes</h1><p>Gestión de donaciones y compromisos · Base de datos en tiempo real</p></div>
-    <div class="ph-btns"><button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button><button class="btn btn-ghost btn-sm" onclick="syncSheetsQuick()" title="Sincronizar con Google Sheets">↻ Sheets</button><button class="btn btn-ghost btn-sm" onclick="openDonBulk()">✎ Edición masiva</button><button class="btn btn-gold" onclick="openModal('donante')">+ Nuevo Donante</button></div></div>
+    <div class="ph-btns"><button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button><button class="btn btn-ghost btn-sm" onclick="syncSheetsQuick()" title="Sincronizar con Google Sheets">↻ Sheets</button><button class="btn btn-ghost btn-sm" id="btn-bulk-toggle" onclick="toggleDonBulk()">✎ Edición masiva</button><button class="btn btn-gold" onclick="openModal('donante')">+ Nuevo Donante</button></div></div>
+  <div id="don-bulk-bar" style="display:none;position:sticky;bottom:16px;z-index:50;margin:0 0 8px;padding:10px 16px;background:#1a2540;border-radius:10px;display:none;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,.3)">
+    <input type="checkbox" id="don-bulk-all" onchange="toggleAllDonBulk(this.checked)" style="width:15px;height:15px;cursor:pointer;flex-shrink:0">
+    <span id="don-bulk-count" style="font-size:12px;color:rgba(255,255,255,.7);flex:1">0 seleccionados</span>
+    <select id="don-bulk-status" style="padding:5px 10px;border-radius:6px;border:none;font-size:12px;outline:none">
+      <option value="negociacion">Negociación</option>
+      <option value="proceso">En proceso</option>
+      <option value="reservado">Reservado</option>
+      <option value="confirmado">Confirmado</option>
+    </select>
+    <button class="btn btn-gold btn-sm" onclick="applyDonBulk()">Aplicar</button>
+    <button onclick="toggleDonBulk()" style="background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:16px;padding:0 4px">✕</button>
+  </div>
   <div class="pc">
     <div class="g4" id="don-kpis"></div>
     <div class="g21">
@@ -1569,7 +1581,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.39';
+const APP_VERSION = 'v1.0.40';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -3025,20 +3037,20 @@ async function renderDon() {
       '<div class="kpi"><div class="kv">USD ' + ((total-pagado)/1000).toFixed(0) + 'K</div><div class="kl">Saldo pendiente</div><div class="kbadge kb-red">Por cobrar</div></div>' +
       '<div class="kpi"><div class="kv">' + all.length + '</div><div class="kl">Donantes</div><div class="kbadge kb-green">' + all.filter(d=>d.status==='confirmado').length + ' confirmados</div></div>';
 
+    const bulkMode = !!window._donBulkMode;
     eid('don-tbody').innerHTML = filtered.length ? filtered.slice().sort((a,b)=>(a.name||'').localeCompare(b.name||'','es')).map(d => {
       const saldo = (parseFloat(d.compromiso)||0) - (parseFloat(d.pagado)||0);
       const dj = JSON.stringify(d).replace(/'/g,"&#39;");
-      return '<tr><td><strong>' + d.name + '</strong>' + (d.email?'<div style="font-size:10px;color:#94a3b8">'+d.email+'</div>':'') + '</td>' +
+      const chk = bulkMode ? '<td style="width:32px"><input type="checkbox" data-id="'+d.id+'" class="don-bulk-cb" onchange="_updDonBulkCount()" style="width:14px;height:14px;cursor:pointer"></td>' : '';
+      const acts = bulkMode ? '' : '<td><div style="display:flex;gap:3px"><button class="btn btn-outline btn-xs" onclick=\'openModal("donante",' + dj + ')\'>✎</button><button class="btn btn-danger btn-xs" onclick="delDonante(' + d.id + ')">✕</button></div></td>';
+      return '<tr>' + chk + '<td><strong>' + d.name + '</strong>' + (d.email?'<div style="font-size:10px;color:#94a3b8">'+d.email+'</div>':'') + '</td>' +
         '<td class="td-m">' + (d.naming_name||'—') + '</td>' +
         '<td class="td-gold">' + fmt(d.compromiso,d.currency) + '</td>' +
         '<td class="td-green">' + fmt(d.pagado,d.currency) + '</td>' +
         '<td class="td-red">' + fmt(saldo,d.currency) + '</td>' +
         '<td>' + badge(d.status) + '</td>' +
         '<td class="td-m">' + (d.date||'--').split('T')[0] + '</td>' +
-        '<td><div style="display:flex;gap:3px">' +
-        '<button class="btn btn-outline btn-xs" onclick=\'openModal("donante",' + dj + ')\'>✎</button>' +
-        '<button class="btn btn-danger btn-xs" onclick="delDonante(' + d.id + ')">✕</button>' +
-        '</div></td></tr>';
+        acts + '</tr>';
     }).join('') : '<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:20px">Sin resultados</td></tr>';
 
     const bars = ['confirmado','reservado','proceso','negociacion'].map(s => {
@@ -3166,54 +3178,48 @@ async function renderNaming() {
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
-let _dbItems = [];
-async function openDonBulk() {
-  _dbItems = (await API.get('donantes')).sort((a,b)=>(a.name||'').localeCompare(b.name||'','es'));
-  document.getElementById('db-search').value = '';
-  document.getElementById('db-all').checked = false;
-  filterDonBulk();
-  document.getElementById('modal-don-bulk').classList.add('show');
+function toggleDonBulk() {
+  window._donBulkMode = !window._donBulkMode;
+  const bar = eid('don-bulk-bar');
+  const btn = eid('btn-bulk-toggle');
+  bar.style.display = window._donBulkMode ? 'flex' : 'none';
+  if(btn) btn.textContent = window._donBulkMode ? '✕ Cancelar' : '✎ Edición masiva';
+  renderDon();
 }
 
-function _updateSelCount() {
-  const n = document.querySelectorAll('#db-list input[type=checkbox]:checked').length;
-  document.getElementById('db-sel-count').textContent = n + ' seleccionado' + (n===1?'':'s');
+function _updDonBulkCount() {
+  const n = document.querySelectorAll('.don-bulk-cb:checked').length;
+  const el = eid('don-bulk-count');
+  if(el) el.textContent = n + ' seleccionado' + (n===1?'':'s');
+  const allCb = eid('don-bulk-all');
+  const total = document.querySelectorAll('.don-bulk-cb').length;
+  if(allCb) allCb.indeterminate = n > 0 && n < total;
+  if(allCb) allCb.checked = n === total && total > 0;
 }
 
-function toggleAllDon(checked) {
-  document.querySelectorAll('#db-list input[type=checkbox]').forEach(cb => cb.checked = checked);
-  _updateSelCount();
+function toggleAllDonBulk(checked) {
+  document.querySelectorAll('.don-bulk-cb').forEach(cb => cb.checked = checked);
+  _updDonBulkCount();
 }
 
-function filterDonBulk() {
-  const q = (document.getElementById('db-search').value||'').toLowerCase();
-  const visible = q ? _dbItems.filter(d => (d.name||'').toLowerCase().includes(q)) : _dbItems;
-  const stColors = {negociacion:'#94a3b8',proceso:'#0891b2',reservado:'#c8880a',confirmado:'#059669'};
-  const stLabel = {negociacion:'Negociación',proceso:'En proceso',reservado:'Reservado',confirmado:'Confirmado'};
-  document.getElementById('db-list').innerHTML = visible.map(d =>
-    `<label style="display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid #f1f5f9;cursor:pointer" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
-      <input type="checkbox" data-id="${d.id}" onchange="_updateSelCount()" style="width:15px;height:15px;cursor:pointer;flex-shrink:0">
-      <span style="flex:1;font-size:12px;font-weight:500">${d.name}</span>
-      <span style="font-size:11px;font-weight:600;color:${stColors[d.status]||'#94a3b8'}">${stLabel[d.status]||d.status}</span>
-    </label>`
-  ).join('');
-  _updateSelCount();
-}
-
-async function saveDonBulk() {
-  const checked = [...document.querySelectorAll('#db-list input[type=checkbox]:checked')];
+async function applyDonBulk() {
+  const checked = [...document.querySelectorAll('.don-bulk-cb:checked')];
   if (!checked.length) { toast('Seleccioná al menos un donante', 'info'); return; }
-  const newStatus = document.getElementById('db-new-status').value;
+  const newStatus = (eid('don-bulk-status')||{}).value;
   toast('Guardando ' + checked.length + ' cambios...', 'info');
+  const all = await API.get('donantes');
   let ok = 0, err = 0;
   for (const cb of checked) {
-    const orig = _dbItems.find(d => String(d.id) === cb.dataset.id);
+    const orig = all.find(d => String(d.id) === cb.dataset.id);
     if (!orig) continue;
     try { await API.put('donantes/'+orig.id, {status: newStatus, naming_id: orig.naming_id}); ok++; }
     catch(e) { err++; }
   }
   toast(ok + ' donantes actualizados' + (err ? ', ' + err + ' errores' : ''), ok ? 'ok' : 'err');
-  closeModal('don-bulk');
+  window._donBulkMode = false;
+  eid('don-bulk-bar').style.display = 'none';
+  const btn = eid('btn-bulk-toggle');
+  if(btn) btn.textContent = '✎ Edición masiva';
   renderDon();
 }
 
