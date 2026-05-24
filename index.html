@@ -1590,8 +1590,11 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.52';
-document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
+const APP_VERSION = 'v1.0.53';
+document.addEventListener('DOMContentLoaded',()=>{
+  const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
+  try { const saved=localStorage.getItem('sluis_rows'); if(saved) window._sluisRows=JSON.parse(saved); } catch(_) {}
+});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
 const IMGS = {
@@ -4854,6 +4857,7 @@ async function syncSLuis() {
     const toNum = v => { if(typeof v==='number') return isNaN(v)?0:Math.round(v*100)/100; const s=String(v||'').trim(); if(!s) return 0; if(s.includes(',')) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0; return parseFloat(s.replace(/[^0-9.-]/g,''))||0; };
     rows.sort((a,b) => String(a.donante||'').localeCompare(String(b.donante||''),'es'));
     window._sluisRows = rows;
+    try { localStorage.setItem('sluis_rows', JSON.stringify(rows)); } catch(_) {}
     const tbody = document.getElementById('sluis-tbody');
     const kpis  = document.getElementById('sluis-kpis');
     if(!rows.length){ if(tbody) tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:16px">Sin deudores</td></tr>'; renderDon(); return; }
