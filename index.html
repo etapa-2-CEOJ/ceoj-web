@@ -1604,7 +1604,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.65';
+const APP_VERSION = 'v1.0.66';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -2534,7 +2534,7 @@ function _buildNamingOptions(q, selectedId) {
   filtered.forEach(n => {
     const opt = document.createElement('option');
     opt.value = n.id;
-    opt.textContent = n.name + ' (' + (n.floor||'') + ') - USD ' + Number(n.amount).toLocaleString() + ' - ' + (stMap[n.status]||n.status);
+    opt.textContent = n.name + ' (' + (n.floor||'') + ') - USD ' + Number(n.amount).toLocaleString('es-AR') + ' - ' + (stMap[n.status]||n.status);
     if (n.id == prev) opt.selected = true;
     if (n.status==='taken') opt.style.color='#059669';
     else if (n.status==='reserved') opt.style.color='#c8880a';
@@ -2782,7 +2782,7 @@ async function renderOverview() {
     eid('ov-kpis').innerHTML =
       '<div class="kpi"><div class="kv">18.000 <small style="font-size:14px;color:#94a3b8;font-weight:400">m²</small></div><div class="kl">Superficie total</div><div class="kbadge kb-gold">Jun 2026 → Dic 2029</div></div>' +
       '<div class="kpi"><div class="kv">' + gPct + '<small style="font-size:14px;color:#94a3b8;font-weight:400">%</small></div><div class="kl">Avance global</div><div class="prog"><div class="pf pf-teal" style="width:' + gPct + '%"></div></div></div>' +
-      '<div class="kpi"><div class="kv">USD ' + (total/1000).toFixed(0) + 'K</div><div class="kl">Compromisos captados</div><div class="kbadge ' + (pct>=30?'kb-green':'kb-gold') + '">' + pct + '% de meta</div><div class="prog"><div class="pf" style="width:' + pct + '%"></div></div></div>' +
+      '<div class="kpi"><div class="kv">USD ' + Math.round(total).toLocaleString('es-AR') + '</div><div class="kl">Compromisos captados</div><div class="kbadge ' + (pct>=30?'kb-green':'kb-gold') + '">' + pct + '% de meta</div><div class="prog"><div class="pf" style="width:' + pct + '%"></div></div></div>' +
       '<div class="kpi"><div class="kv">' + nDon + '</div><div class="kl">Donantes activos</div><div class="kbadge kb-green">' + donantes.filter(d=>d.status==='confirmado').length + ' confirmados</div></div>';
 
     eid('ov-gantt').innerHTML = etapas.slice(0,6).map(e => {
@@ -2862,7 +2862,7 @@ async function renderNamingPres() {
       const imgSt = rawImgS ? 'width:100%;height:70px;object-fit:cover;display:block' : 'width:100%;height:70px;object-fit:contain;padding:6px;background:rgba(255,255,255,.05);display:block';
       const priceHtml = isPublicMode() ? '' :
         (n.status === 'available'
-          ? '<div style="font-size:17px;font-weight:700;color:#e8a020;font-family:\'DM Mono\',monospace">USD ' + Number(n.amount).toLocaleString() + '</div>'
+          ? '<div style="font-size:17px;font-weight:700;color:#e8a020;font-family:\'DM Mono\',monospace">USD ' + Number(n.amount).toLocaleString('es-AR') + '</div>'
           : '<div style="font-size:13px;font-weight:900;color:' + (n.status==='taken'?'#34d399':'#e8a020') + '">' + (n.status==='taken'?'✅ CONFIRMADO':'🔒 RESERVADO') + '</div>');
       return '<div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:9px;overflow:hidden">' +
         '<img src="' + imgS + '" style="' + imgSt + '" onerror="this.src=document.getElementById(\'tb-logo\').src;this.style.objectFit=\'contain\';this.style.padding=\'6px\';this.onerror=null">' +
@@ -3108,7 +3108,7 @@ async function renderDon() {
       const nd = all.filter(d=>d.status===s), amt = nd.reduce((a,d)=>a+(parseFloat(d.compromiso)||0),0);
       const col = {confirmado:'#059669',reservado:'#c8880a',proceso:'#0891b2',negociacion:'#94a3b8'}[s];
       const lbl = {confirmado:'Confirmados',reservado:'Reservados',proceso:'En proceso',negociacion:'Negociación'}[s];
-      return '<div style="display:flex;align-items:center;gap:7px;padding:7px 9px;background:#f8fafc;border-radius:7px;margin-bottom:5px;border:1px solid #f1f5f9"><div style="width:7px;height:7px;border-radius:50%;background:' + col + ';flex-shrink:0"></div><span style="font-size:12px;font-weight:500;flex:1">' + lbl + '</span><span style="font-size:11px;font-family:\'DM Mono\',monospace;font-weight:700;color:' + col + '">' + nd.length + ' · USD ' + (amt/1000).toFixed(0) + 'K</span></div>';
+      return '<div style="display:flex;align-items:center;gap:7px;padding:7px 9px;background:#f8fafc;border-radius:7px;margin-bottom:5px;border:1px solid #f1f5f9"><div style="width:7px;height:7px;border-radius:50%;background:' + col + ';flex-shrink:0"></div><span style="font-size:12px;font-weight:500;flex:1">' + lbl + '</span><span style="font-size:11px;font-family:\'DM Mono\',monospace;font-weight:700;color:' + col + '">' + nd.length + ' · USD ' + Math.round(amt).toLocaleString('es-AR') + '</span></div>';
     }).join('');
 
     const granTotal = total + slDeuda;
@@ -3151,7 +3151,7 @@ async function renderNaming() {
       '<div class="kpi"><div class="kv" style="color:#0891b2">' + avail + '</div><div class="kl">Disponibles</div></div>' +
       '<div class="kpi"><div class="kv" style="color:#059669">' + taken + '</div><div class="kl">Confirmados</div></div>' +
       (!isPublicMode() ? '<div class="kpi"><div class="kv">USD ' + (totalAmt/1000000).toFixed(1) + 'M</div><div class="kl">Valor total</div></div>' +
-        '<div class="kpi"><div class="kv" style="color:#059669">USD ' + Number(confirmedAmt).toLocaleString() + '</div><div class="kl">Total comprometido</div></div>' : '');
+        '<div class="kpi"><div class="kv" style="color:#059669">USD ' + Number(confirmedAmt).toLocaleString('es-AR') + '</div><div class="kl">Total comprometido</div></div>' : '');
 
     const guessImg = name => {
       const l = name.toLowerCase();
@@ -3223,7 +3223,7 @@ async function renderNaming() {
       return '<div class="nc"><div class="nc-img"><img src="' + imgSrc + '" alt="' + n.name + '" style="' + imgStyle + '" onerror="this.src=document.getElementById(\'tb-logo\').src;this.style.objectFit=\'contain\';this.style.padding=\'16px\';this.style.background=\'#f1f5f9\';this.onerror=null"><div class="nc-ov"></div><div class="nc-floor">' + (n.floor||'') + ' · ' + (n.m2||'—') + '</div>' +
         (isHidden?'<div class="nc-banner ' + n.status + '">' + (n.status==='taken'?'✅ CONFIRMADO':'🔒 RESERVADO') + '</div>':'') +
         '</div><div class="nc-body"><div class="nc-name">' + n.name + '</div><div class="nc-desc">' + (n.description||'').substring(0,80) + (n.description&&n.description.length>80?'…':'') + '</div>' +
-        (isPublicMode() ? '' : (!isHidden?'<div class="nc-price">USD ' + Number(n.amount).toLocaleString() + '</div>':'<div class="nc-price-hidden">Precio no disponible públicamente</div>')) +
+        (isPublicMode() ? '' : (!isHidden?'<div class="nc-price">USD ' + Number(n.amount).toLocaleString('es-AR') + '</div>':'<div class="nc-price-hidden">Precio no disponible públicamente</div>')) +
         '</div><div class="nc-foot">' + badge(n.status) +
         (isAdmin?'<div style="display:flex;gap:4px"><button class="btn btn-outline btn-xs" onclick=\'openModal("naming",' + nj + ')\'>✎</button><button class="btn btn-danger btn-xs" onclick="delNaming(' + n.id + ')">✕</button></div>':'') +
         '</div></div>';
@@ -3940,7 +3940,7 @@ function renderFloor(fid) {
     sumEl.innerHTML = `
       <div style="background:#1a2540;border-radius:8px;padding:10px;text-align:center;margin-bottom:9px">
         <div style="font-size:9px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.07em">Total del nivel</div>
-        <div style="font-size:20px;font-weight:700;color:#f5c048;font-family:'DM Mono',monospace">${total.toLocaleString()} m²</div>
+        <div style="font-size:20px;font-weight:700;color:#f5c048;font-family:'DM Mono',monospace">${total.toLocaleString('es-AR')} m²</div>
       </div>
       ${rooms.map(r => `
         <div onclick="fpClick('${r.id}')"
@@ -3967,7 +3967,7 @@ function renderFloor(fid) {
     mobList.innerHTML =
       `<div class="fpl-header">
         <span class="fpl-header-title">${d.label || ''} · ${allRooms.length} espacios</span>
-        <span class="fpl-header-total">${totalM2.toLocaleString()} m²</span>
+        <span class="fpl-header-total">${totalM2.toLocaleString('es-AR')} m²</span>
        </div>` +
       allRooms.map(r => {
         const nrK = floorNR[r.id];
@@ -4738,7 +4738,7 @@ async function doSearch(q) {
     ]);
     const results = [];
     don.forEach(d => { if(d.name.toLowerCase().includes(q.toLowerCase())) results.push({tag:'Donante',name:d.name,sub:fmt(d.compromiso,d.currency),page:'donantes'}); });
-    naming.forEach(n => { if(n.name.toLowerCase().includes(q.toLowerCase())) results.push({tag:'Naming',name:n.name,sub:'USD '+Number(n.amount).toLocaleString(),page:'naming'}); });
+    naming.forEach(n => { if(n.name.toLowerCase().includes(q.toLowerCase())) results.push({tag:'Naming',name:n.name,sub:'USD '+Number(n.amount).toLocaleString('es-AR'),page:'naming'}); });
     box.innerHTML = results.slice(0,7).map(r =>
       '<div class="sri" onclick="goPage(\''+r.page+'\');closeSearch()"><span class="sri-tag">'+r.tag+'</span><span style="flex:1;font-weight:500">'+r.name+'</span><span style="color:#94a3b8;font-size:11px">'+r.sub+'</span></div>'
     ).join('') || '<div style="padding:10px 12px;font-size:12px;color:#94a3b8">Sin resultados</div>';
