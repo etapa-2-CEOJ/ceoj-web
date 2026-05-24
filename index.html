@@ -1544,7 +1544,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.28';
+const APP_VERSION = 'v1.0.29';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -4720,21 +4720,16 @@ async function _doSheetsSync(url, type) {
 }
 
 async function _autoSyncDonantes(rows) {
-  const col = (row, names) => {
-    for(const n of names) for(const k of Object.keys(row)) if(k.toLowerCase().replace(/\s/g,'').includes(n)) return row[k];
-    return '';
-  };
-  const toNum = v => parseFloat(String(v||'0').replace(/\./g,'').replace(',','.').replace(/[^0-9.-]/g,''))||0;
+  const toNum = v => { if(typeof v==='number') return isNaN(v)?0:Math.round(v*100)/100; const s=String(v||'').trim(); if(!s) return 0; if(s.includes(',')) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0; return parseFloat(s.replace(/[^0-9.-]/g,''))||0; };
 
   const existing = USE_LOCAL ? DB.get('donantes') : (await API.get('donantes').catch(()=>[]));
   let created=0, updated=0, errors=0;
 
   for(const row of rows) {
-    const name = String(col(row,['nombre','name','donante','razonsocial'])||'').trim();
-    if(!name || name.toLowerCase().startsWith('total')) continue;
-    const compromiso = toNum(col(row,['compromiso','monto','total','comprometido']));
-    const pagado     = toNum(col(row,['pago','pagado','abonado','cobrado']));
-    const currency   = String(col(row,['moneda','currency'])||'USD').toUpperCase()||'USD';
+    const name = String(row.donante||'').trim();
+    if(!name || name.toLowerCase().startsWith('total') || name.toLowerCase()==='donante' || name.toLowerCase().includes('donaciones en')) continue;
+    const compromiso = toNum(row.compromiso);
+    const pagado     = toNum(row.pagado);
     const found      = existing.find(d=>d.name.trim().toLowerCase()===name.toLowerCase());
     try {
       if(found) {
@@ -4742,8 +4737,8 @@ async function _autoSyncDonantes(rows) {
         else await API.patch('donantes/'+found.id,{compromiso,pagado});
         updated++;
       } else {
-        if(USE_LOCAL) DB.add('donantes',{name,compromiso,pagado,currency,status:'negociacion',email:'',phone:'',notes:''});
-        else await API.post('donantes',{name,compromiso,pagado,currency,status:'negociacion'});
+        if(USE_LOCAL) DB.add('donantes',{name,compromiso,pagado,currency:'USD',status:'negociacion',email:'',phone:'',notes:''});
+        else await API.post('donantes',{name,compromiso,pagado,currency:'USD',status:'negociacion'});
         created++;
       }
     } catch(e){ errors++; }
