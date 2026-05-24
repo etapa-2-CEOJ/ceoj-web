@@ -848,7 +848,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- DONANTES -->
 <div class="pg" id="pg-donantes">
   <div class="ph"><div><h1>Portal de Donantes</h1><p>Gestión de donaciones y compromisos · Base de datos en tiempo real</p></div>
-    <div class="ph-btns"><button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button><button class="btn btn-ghost btn-sm" onclick="syncSheetsQuick()" title="Sincronizar con Google Sheets">↻ Sheets</button><button class="btn btn-gold" onclick="openModal('donante')">+ Nuevo Donante</button></div></div>
+    <div class="ph-btns"><button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button><button class="btn btn-ghost btn-sm" onclick="syncSheetsQuick()" title="Sincronizar con Google Sheets">↻ Sheets</button><button class="btn btn-ghost btn-sm" onclick="openDonBulk()">✎ Edición masiva</button><button class="btn btn-gold" onclick="openModal('donante')">+ Nuevo Donante</button></div></div>
   <div class="pc">
     <div class="g4" id="don-kpis"></div>
     <div class="g21">
@@ -871,7 +871,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- NAMING -->
 <div class="pg" id="pg-naming">
   <div class="ph"><div><h1>Naming Opportunities</h1><p>Espacios disponibles para nombramiento perpetuo · Precios ocultos si reservado/confirmado</p></div>
-    <div class="ph-btns"><button class="btn btn-ghost btn-sm private-only" onclick="forceSyncNaming()" title="Sincroniza estados de naming con donantes y publica al público">↺ Sincronizar</button><button class="btn btn-ghost btn-sm private-only" onclick="openNamingBulk()">✎ Edición masiva</button><button class="btn btn-gold btn-sm" onclick="openModal('naming')">+ Espacio</button></div></div>
+    <div class="ph-btns"><button class="btn btn-ghost btn-sm private-only" onclick="forceSyncNaming()" title="Sincroniza estados de naming con donantes y publica al público">↺ Sincronizar</button><button class="btn btn-gold btn-sm" onclick="openModal('naming')">+ Espacio</button></div></div>
   <div class="pc">
     <div class="g4" id="nam-kpis"></div>
     <div id="nam-filter-bar" style="margin-bottom:14px"></div>
@@ -1467,26 +1467,25 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
   <div class="mf"><button class="btn btn-ghost" onclick="closeModal('naming')">Cancelar</button><button class="btn btn-gold" onclick="saveNaming()">Guardar</button></div>
 </div></div>
 
-<div class="overlay" id="modal-naming-bulk" style="align-items:flex-start;padding:20px;overflow-y:auto"><div class="modal" style="max-width:640px;width:100%;margin:auto">
-  <div class="mh"><span class="mh-title">Edición masiva — Estado</span><button class="mh-close" onclick="closeModal('naming-bulk')">&#x2715;</button></div>
+<div class="overlay" id="modal-don-bulk" style="align-items:flex-start;padding:20px;overflow-y:auto"><div class="modal" style="max-width:640px;width:100%;margin:auto">
+  <div class="mh"><span class="mh-title">Edición masiva — Estado de donantes</span><button class="mh-close" onclick="closeModal('don-bulk')">&#x2715;</button></div>
   <div class="mb" style="padding:0">
     <div style="padding:10px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0">
-      <input type="text" id="nb-search" placeholder="Filtrar espacios..." oninput="filterNamingBulk()" style="width:100%;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;box-sizing:border-box">
+      <input type="text" id="db-search" placeholder="Filtrar donantes..." oninput="filterDonBulk()" style="width:100%;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;box-sizing:border-box">
     </div>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:12px">
         <thead><tr style="background:#f1f5f9;text-align:left">
-          <th style="padding:8px 12px;font-weight:600;color:#64748b">Espacio</th>
-          <th style="padding:8px 12px;font-weight:600;color:#64748b">Piso</th>
+          <th style="padding:8px 12px;font-weight:600;color:#64748b">Donante</th>
           <th style="padding:8px 12px;font-weight:600;color:#64748b">Estado</th>
         </tr></thead>
-        <tbody id="nb-tbody"></tbody>
+        <tbody id="db-tbody"></tbody>
       </table>
     </div>
   </div>
   <div class="mf">
-    <button class="btn btn-ghost" onclick="closeModal('naming-bulk')">Cancelar</button>
-    <button class="btn btn-gold" onclick="saveNamingBulk()">Guardar todo</button>
+    <button class="btn btn-ghost" onclick="closeModal('don-bulk')">Cancelar</button>
+    <button class="btn btn-gold" onclick="saveDonBulk()">Guardar todo</button>
   </div>
 </div></div>
 
@@ -1570,7 +1569,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.36';
+const APP_VERSION = 'v1.0.37';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -3167,49 +3166,47 @@ async function renderNaming() {
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
-let _nbItems = [];
-async function openNamingBulk() {
-  _nbItems = await API.get('naming');
-  document.getElementById('nb-search').value = '';
-  filterNamingBulk();
-  document.getElementById('modal-naming-bulk').classList.add('on');
+let _dbItems = [];
+async function openDonBulk() {
+  _dbItems = (await API.get('donantes')).sort((a,b)=>(a.name||'').localeCompare(b.name||'','es'));
+  document.getElementById('db-search').value = '';
+  filterDonBulk();
+  document.getElementById('modal-don-bulk').classList.add('on');
 }
 
-function filterNamingBulk() {
-  const q = (document.getElementById('nb-search').value||'').toLowerCase();
-  const visible = q ? _nbItems.filter(n => (n.name||'').toLowerCase().includes(q) || (n.floor||'').toLowerCase().includes(q)) : _nbItems;
-  const stOpts = [['available','Disponible'],['reserved','Reservado'],['taken','Confirmado']];
-  document.getElementById('nb-tbody').innerHTML = visible.map(n =>
+function filterDonBulk() {
+  const q = (document.getElementById('db-search').value||'').toLowerCase();
+  const visible = q ? _dbItems.filter(d => (d.name||'').toLowerCase().includes(q)) : _dbItems;
+  const stOpts = [['negociacion','Negociación'],['proceso','En proceso'],['reservado','Reservado'],['confirmado','Confirmado']];
+  document.getElementById('db-tbody').innerHTML = visible.map(d =>
     `<tr style="border-bottom:1px solid #f1f5f9">
-      <td style="padding:8px 12px;font-weight:500">${n.name}</td>
-      <td style="padding:8px 12px;color:#64748b">${n.floor||'—'}</td>
+      <td style="padding:8px 12px;font-weight:500">${d.name}</td>
       <td style="padding:8px 12px">
-        <select data-id="${n.id}" style="padding:4px 8px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:11px;outline:none;background:#fff">
-          ${stOpts.map(([v,l]) => `<option value="${v}"${n.status===v?' selected':''}>${l}</option>`).join('')}
+        <select data-id="${d.id}" style="padding:4px 8px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:11px;outline:none;background:#fff">
+          ${stOpts.map(([v,l]) => `<option value="${v}"${d.status===v?' selected':''}>${l}</option>`).join('')}
         </select>
       </td>
     </tr>`
   ).join('');
 }
 
-async function saveNamingBulk() {
-  const selects = document.querySelectorAll('#nb-tbody select');
+async function saveDonBulk() {
+  const selects = document.querySelectorAll('#db-tbody select');
   const changed = [];
   selects.forEach(sel => {
-    const orig = _nbItems.find(n => String(n.id) === sel.dataset.id);
-    if (orig && sel.value !== orig.status) changed.push({id: sel.dataset.id, status: sel.value});
+    const orig = _dbItems.find(d => String(d.id) === sel.dataset.id);
+    if (orig && sel.value !== orig.status) changed.push({id: sel.dataset.id, status: sel.value, naming_id: orig.naming_id});
   });
   if (!changed.length) { toast('Sin cambios', 'info'); return; }
   toast('Guardando ' + changed.length + ' cambios...', 'info');
   let ok = 0, err = 0;
   for (const c of changed) {
-    try { await SB.rest('PATCH','naming','id=eq.'+c.id,{status:c.status,updated_at:new Date().toISOString()}); ok++; }
+    try { await API.put('donantes/'+c.id, {status: c.status, naming_id: c.naming_id}); ok++; }
     catch(e) { err++; }
   }
-  toast('Guardado: ' + ok + ' espacios actualizados' + (err ? ', ' + err + ' errores' : ''), ok ? 'ok' : 'err');
-  closeModal('naming-bulk');
-  pushNamingSnapshot().catch(()=>{});
-  renderNaming();
+  toast(ok + ' donantes actualizados' + (err ? ', ' + err + ' errores' : ''), ok ? 'ok' : 'err');
+  closeModal('don-bulk');
+  renderDon();
 }
 
 async function pushNamingSnapshot() {
