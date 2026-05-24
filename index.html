@@ -1604,7 +1604,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.61';
+const APP_VERSION = 'v1.0.62';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -1701,7 +1701,7 @@ const SB = {
   },
   async rest(method, table, query, body) {
     const url = SB_URL + '/rest/v1/' + table + (query ? '?' + query : '');
-    const opts = { method, headers: this.hdrs(!!body) };
+    const opts = { method, headers: this.hdrs(!!body), cache: 'no-store' };
     if (body) opts.body = JSON.stringify(body);
     const r = await fetch(url, opts);
     const text = await r.text();
