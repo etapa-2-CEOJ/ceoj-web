@@ -225,7 +225,7 @@ body:not(.private-mode) .private-only{display:none!important}
 .tl-done{background:#c8880a}.tl-active{background:#059669;box-shadow:0 0 0 3px #d1fae5}.tl-pend{background:#e2e8f0;border:2px solid #cbd5e0}
 input[type=range]{appearance:none;-webkit-appearance:none;width:100%;height:4px;background:#f1f5f9;border-radius:2px;outline:none;border:none}
 input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:#c8880a;cursor:pointer}
-@media(max-width:900px){#sidebar{display:none}.g4{grid-template-columns:1fr 1fr}.g3,.g2,.g21{grid-template-columns:1fr}}
+@media(max-width:900px){#sidebar{display:none}.g4{grid-template-columns:1fr 1fr}.g3,.g2,.g21{grid-template-columns:1fr}.av-prog-grid{grid-template-columns:1fr!important}.av-prog-grid #av-etapas{max-height:none!important}}
 
 .spinner{width:18px;height:18px;border:2px solid #f1f5f9;border-top-color:#c8880a;border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -629,7 +629,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
     <div class="card" style="background:linear-gradient(135deg,#0d1525,#111e36)">
       <div class="ch"><span class="ctitle">Progreso de Construcción</span></div>
       <div class="cb" style="padding:12px">
-        <div style="display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start">
+        <div class="av-prog-grid" style="display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start">
           <div id="av-building"></div>
           <div id="av-etapas" style="overflow-y:auto;max-height:480px;padding-right:4px"></div>
         </div>
@@ -1604,7 +1604,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.67';
+const APP_VERSION = 'v1.0.68';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
