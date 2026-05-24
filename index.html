@@ -876,6 +876,14 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
       </div>
       <div class="card ct-green"><div class="ch"><span class="ctitle">Captación</span></div><div class="cb" id="don-prog"></div></div>
     </div>
+    <div class="card" style="margin-top:16px">
+      <div class="ch">
+        <span class="ctitle">Deudores — Edificio S.Luis</span>
+        <button class="btn btn-ghost btn-sm" onclick="syncSLuis()" title="Sincronizar con Google Sheets">↻ Sheets</button>
+      </div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Donante</th><th>Compromiso</th><th>Pagado</th><th>Deuda</th></tr></thead><tbody id="sluis-tbody"><tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:20px">Sincronizá para ver los datos</td></tr></tbody></table></div>
+      <div id="sluis-kpis" style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap"></div>
+    </div>
   </div>
 </div>
 
@@ -1580,7 +1588,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.43';
+const APP_VERSION = 'v1.0.44';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -4812,8 +4820,40 @@ async function syncSheets() {
 
 async function syncSheetsQuick() {
   const url = localStorage.getItem('ceoj_sheets_url') || '';
-  if(!url){ toast('Configurá la URL del Apps Script en Configuración → Google Sheets','info'); return; }
+  if(!url){ toast('Configurá la URL del Apps Script en Importar Datos → Google Sheets','info'); return; }
   await _doSheetsSync(url, 'donantes');
+}
+
+async function syncSLuis() {
+  const url = localStorage.getItem('ceoj_sheets_url') || '';
+  if(!url){ toast('Primero sincronizá Tucumán para guardar la URL','info'); return; }
+  toast('Conectando con S.Luis...','info');
+  try {
+    const r = await fetch(url + '?tab=sluis', {redirect:'follow'});
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const json = await r.json();
+    if(json.error) throw new Error(json.error);
+    const rows = json.rows || [];
+    const toNum = v => { if(typeof v==='number') return isNaN(v)?0:Math.round(v*100)/100; const s=String(v||'').trim(); if(!s) return 0; if(s.includes(',')) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0; return parseFloat(s.replace(/[^0-9.-]/g,''))||0; };
+    rows.sort((a,b) => toNum(b.deuda) - toNum(a.deuda));
+    const tbody = document.getElementById('sluis-tbody');
+    const kpis  = document.getElementById('sluis-kpis');
+    if(!rows.length){ if(tbody) tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:16px">Sin deudores</td></tr>'; return; }
+    const totComp = rows.reduce((a,r)=>a+toNum(r.compromiso),0);
+    const totPag  = rows.reduce((a,r)=>a+toNum(r.pagado),0);
+    const totDeuda= rows.reduce((a,r)=>a+toNum(r.deuda),0);
+    if(tbody) tbody.innerHTML = rows.map(r =>
+      '<tr><td><strong>'+String(r.donante)+'</strong></td>' +
+      '<td class="td-gold">USD '+toNum(r.compromiso).toLocaleString('es-AR')+'</td>' +
+      '<td class="td-green">USD '+toNum(r.pagado).toLocaleString('es-AR')+'</td>' +
+      '<td class="td-red">USD '+toNum(r.deuda).toLocaleString('es-AR')+'</td></tr>'
+    ).join('');
+    if(kpis) kpis.innerHTML =
+      '<div class="kpi" style="flex:1"><div class="kv" style="font-size:16px">'+rows.length+'</div><div class="kl">Deudores</div></div>' +
+      '<div class="kpi" style="flex:1"><div class="kv" style="font-size:16px">USD '+Math.round(totDeuda).toLocaleString('es-AR')+'</div><div class="kl">Total deuda</div></div>' +
+      '<div class="kpi" style="flex:1"><div class="kv" style="font-size:16px">'+Math.round(totPag/(totComp||1)*100)+'%</div><div class="kl">Cobrado</div></div>';
+    toast('S.Luis: '+rows.length+' deudores cargados ✓','ok');
+  } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
 async function _doSheetsSync(url, type) {
