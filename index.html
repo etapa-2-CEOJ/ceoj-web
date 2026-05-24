@@ -1590,10 +1590,10 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.58';
+const APP_VERSION = 'v1.0.59';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
-  try { const saved=localStorage.getItem('sluis_rows'); if(saved) window._sluisRows=JSON.parse(saved); } catch(_) {}
+  try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
 });
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -4847,6 +4847,26 @@ async function syncSheetsQuick() {
   await _doSheetsSync(url, 'donantes');
 }
 
+function renderSLuis() {
+  const rows = window._sluisRows || [];
+  const toNum = v => { if(typeof v==='number') return isNaN(v)?0:Math.round(v*100)/100; const s=String(v||'').trim(); if(!s) return 0; if(s.includes(',')) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0; return parseFloat(s.replace(/[^0-9.-]/g,''))||0; };
+  const tbody = document.getElementById('sluis-tbody');
+  const kpis  = document.getElementById('sluis-kpis');
+  if(!rows.length){ if(tbody) tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:16px">Sincronizá para ver los datos</td></tr>'; return; }
+  if(tbody) tbody.innerHTML = rows.map(r => {
+    const deuda = toNum(r.deuda);
+    const saldoZero = deuda === 0;
+    const cComp = saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-gold"';
+    const cPag  = saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-green"';
+    const cDeuda= saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-red"';
+    return '<tr><td><strong>'+String(r.donante)+'</strong></td>' +
+      '<td '+cComp+'>USD '+Math.round(toNum(r.compromiso)).toLocaleString('es-AR')+'</td>' +
+      '<td '+cPag+'>USD '+Math.round(toNum(r.pagado)).toLocaleString('es-AR')+'</td>' +
+      '<td '+cDeuda+'>USD '+Math.round(deuda).toLocaleString('es-AR')+'</td></tr>';
+  }).join('');
+  if(kpis) kpis.innerHTML = '';
+}
+
 async function syncSLuis() {
   const url = 'https://script.google.com/macros/s/AKfycbwVJdHnvU3hP6JedFy2jWESijbmBf3JS6YUa-L1vRH39424LXbK0nsVliuHAQpzeFyxdg/exec';
   toast('Conectando con S.Luis...','info');
@@ -4856,28 +4876,10 @@ async function syncSLuis() {
     const json = await r.json();
     if(json.error) throw new Error(json.error);
     const rows = json.rows || [];
-    const toNum = v => { if(typeof v==='number') return isNaN(v)?0:Math.round(v*100)/100; const s=String(v||'').trim(); if(!s) return 0; if(s.includes(',')) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0; return parseFloat(s.replace(/[^0-9.-]/g,''))||0; };
     rows.sort((a,b) => String(a.donante||'').localeCompare(String(b.donante||''),'es'));
     window._sluisRows = rows;
     try { localStorage.setItem('sluis_rows', JSON.stringify(rows)); } catch(_) {}
-    const tbody = document.getElementById('sluis-tbody');
-    const kpis  = document.getElementById('sluis-kpis');
-    if(!rows.length){ if(tbody) tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:16px">Sin deudores</td></tr>'; renderDon(); return; }
-    const totComp = rows.reduce((a,r)=>a+toNum(r.compromiso),0);
-    const totPag  = rows.reduce((a,r)=>a+toNum(r.pagado),0);
-    const totDeuda= rows.reduce((a,r)=>a+toNum(r.deuda),0);
-    if(tbody) tbody.innerHTML = rows.map(r => {
-      const deuda = toNum(r.deuda);
-      const saldoZero = deuda === 0;
-      const cComp = saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-gold"';
-      const cPag  = saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-green"';
-      const cDeuda= saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-red"';
-      return '<tr><td><strong>'+String(r.donante)+'</strong></td>' +
-        '<td '+cComp+'>USD '+Math.round(toNum(r.compromiso)).toLocaleString('es-AR')+'</td>' +
-        '<td '+cPag+'>USD '+Math.round(toNum(r.pagado)).toLocaleString('es-AR')+'</td>' +
-        '<td '+cDeuda+'>USD '+Math.round(deuda).toLocaleString('es-AR')+'</td></tr>';
-    }).join('');
-    if(kpis) kpis.innerHTML = '';
+    renderSLuis();
     toast('S.Luis: '+rows.length+' deudores cargados ✓','ok');
     renderDon();
   } catch(e){ toast('Error: '+e.message,'err'); }
