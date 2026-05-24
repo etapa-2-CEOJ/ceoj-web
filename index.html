@@ -1604,7 +1604,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.62';
+const APP_VERSION = 'v1.0.63';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -1684,6 +1684,7 @@ const NR = {
   'aula_p6': 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/renders/aula_p6.jpg',
   'terraza': 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/renders/terraza.jpg',
   'aula_p45': 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/renders/aula_p45.jpg',
+  'fachada_tucuman': 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/renders/fachada_tucuman.png',
 };
 // ============================================================
 // ============================================================
@@ -2580,6 +2581,8 @@ const GALLERY_ITEMS = [
   { id:'g_aula_p6',    title:'Aula',                floor:'P6',  piso:'P6',  cat:'Educativo',  m2:45,   img:'aula_p6',       desc:'Aula Piso 6. ~7m × ~6m = 45m².' },
   // Terraza
   { id:'g_ter',        title:'Terraza',             floor:'Terraza', piso:'Terraza', cat:'Patios', m2:1350, img:'terraza', desc:'Terraza. 41.75m × 10.15m = 1.350m².' },
+  // Exterior
+  { id:'g_fachada_tuc', title:'Edificio Tucuman',   floor:'Exterior', piso:'Exterior', cat:'Exterior', img:'fachada_tucuman', desc:'Gan nenas y nenes, Primaria & Seminario chicas' },
 ];
 // ── Gallery local overrides (saved by admin in private mode) ──
 let galOv = {};
@@ -3152,6 +3155,7 @@ async function renderNaming() {
 
     const guessImg = name => {
       const l = name.toLowerCase();
+      if(l.includes('tucum')||l.includes('aguero')||l.includes('agüero')) return NR['fachada_tucuman']||'';
       if(l.includes('gimnasio'))                         return NR['gimnasio_ss2']||'';
       if(l.includes('fiesta')||l.includes('salón'))      return NR['salon_ss2_a']||'';
       if(l.includes('terraza'))                          return NR['terraza']||'';
