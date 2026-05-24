@@ -1436,7 +1436,10 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
       <div class="fl"><label>Monto pagado</label><input class="fi" type="number" id="m-don-pag" oninput="calcSaldo()"></div>
     </div>
     <div class="saldo-box"><span style="font-size:12px;color:#64748b;font-weight:600">Saldo a pagar:</span><span style="font-size:17px;font-weight:700;font-family:'DM Mono',monospace" id="m-don-saldo">USD 0</span></div>
-    <div class="fl"><label>Naming / Espacio</label><select class="fi" id="m-don-naming"><option value="">-- Sin naming asignado --</option></select></div>
+    <div class="fl"><label>Naming / Espacio</label>
+      <input class="fi" type="text" id="m-don-naming-search" placeholder="Buscar espacio..." oninput="filterNamingDd()" autocomplete="off" style="margin-bottom:4px">
+      <select class="fi" id="m-don-naming" size="5" style="height:auto;min-height:90px"><option value="">-- Sin naming asignado --</option></select>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="fl"><label>Estado *</label><select class="fi" id="m-don-status"><option value="negociacion">Negociación</option><option value="proceso">En proceso</option><option value="reservado">Reservado</option><option value="confirmado">Confirmado</option></select></div>
       <div class="fl"><label>Fecha</label><input class="fi" type="date" id="m-don-date"></div>
@@ -1544,7 +1547,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.32';
+const APP_VERSION = 'v1.0.33';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -2440,22 +2443,38 @@ function calcSaldo() {
   if(el) { el.textContent = fmt(saldo, cur); el.style.color = saldo > 0 ? '#dc2626' : '#059669'; }
 }
 
+let _namingDdItems = [];
+
 async function populateNamingDd(selectedId) {
   const sel = eid('m-don-naming'); if(!sel) return;
-  sel.innerHTML = '<option value="">-- Sin naming asignado --</option>';
+  const search = eid('m-don-naming-search');
+  if(search) search.value = '';
   try {
-    const items = await API.get('naming');
-    items.forEach(n => {
-      const opt = document.createElement('option');
-      opt.value = n.id;
-      const stMap = { available:'Disponible', reserved:'Reservado', taken:'Confirmado' };
-      opt.textContent = n.name + ' (' + (n.floor||'') + ') - USD ' + Number(n.amount).toLocaleString() + ' - ' + (stMap[n.status]||n.status);
-      if (n.id == selectedId) opt.selected = true;
-      if (n.status==='taken') opt.style.color='#059669';
-      else if (n.status==='reserved') opt.style.color='#c8880a';
-      sel.appendChild(opt);
-    });
+    _namingDdItems = await API.get('naming');
+    _buildNamingOptions('', selectedId);
   } catch(e) {}
+}
+
+function _buildNamingOptions(q, selectedId) {
+  const sel = eid('m-don-naming'); if(!sel) return;
+  const stMap = { available:'Disponible', reserved:'Reservado', taken:'Confirmado' };
+  const filtered = q ? _namingDdItems.filter(n => n.name.toLowerCase().includes(q.toLowerCase()) || (n.floor||'').toLowerCase().includes(q.toLowerCase())) : _namingDdItems;
+  const prev = selectedId !== undefined ? selectedId : sel.value;
+  sel.innerHTML = '<option value="">-- Sin naming asignado --</option>';
+  filtered.forEach(n => {
+    const opt = document.createElement('option');
+    opt.value = n.id;
+    opt.textContent = n.name + ' (' + (n.floor||'') + ') - USD ' + Number(n.amount).toLocaleString() + ' - ' + (stMap[n.status]||n.status);
+    if (n.id == prev) opt.selected = true;
+    if (n.status==='taken') opt.style.color='#059669';
+    else if (n.status==='reserved') opt.style.color='#c8880a';
+    sel.appendChild(opt);
+  });
+}
+
+function filterNamingDd() {
+  const q = (eid('m-don-naming-search')||{}).value || '';
+  _buildNamingOptions(q);
 }
 
 
