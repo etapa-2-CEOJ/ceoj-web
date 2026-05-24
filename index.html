@@ -1590,7 +1590,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.53';
+const APP_VERSION = 'v1.0.54';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved) window._sluisRows=JSON.parse(saved); } catch(_) {}
@@ -4871,9 +4871,9 @@ async function syncSLuis() {
       const cPag  = saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-green"';
       const cDeuda= saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-red"';
       return '<tr><td><strong>'+String(r.donante)+'</strong></td>' +
-        '<td '+cComp+'>USD '+toNum(r.compromiso).toLocaleString('es-AR')+'</td>' +
-        '<td '+cPag+'>USD '+toNum(r.pagado).toLocaleString('es-AR')+'</td>' +
-        '<td '+cDeuda+'>USD '+deuda.toLocaleString('es-AR')+'</td></tr>';
+        '<td '+cComp+'>USD '+Math.round(toNum(r.compromiso)).toLocaleString('es-AR')+'</td>' +
+        '<td '+cPag+'>USD '+Math.round(toNum(r.pagado)).toLocaleString('es-AR')+'</td>' +
+        '<td '+cDeuda+'>USD '+Math.round(deuda).toLocaleString('es-AR')+'</td></tr>';
     }).join('');
     if(kpis) kpis.innerHTML = '';
     toast('S.Luis: '+rows.length+' deudores cargados ✓','ok');
