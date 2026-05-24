@@ -848,7 +848,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- DONANTES -->
 <div class="pg" id="pg-donantes">
   <div class="ph"><div><h1>Portal de Donantes</h1><p>Gestión de donaciones y compromisos · Base de datos en tiempo real</p></div>
-    <div class="ph-btns"><button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button><button class="btn btn-gold" onclick="openModal('donante')">+ Nuevo Donante</button></div></div>
+    <div class="ph-btns"><button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button><button class="btn btn-ghost btn-sm" onclick="syncSheetsQuick()" title="Sincronizar con Google Sheets">↻ Sheets</button><button class="btn btn-gold" onclick="openModal('donante')">+ Nuevo Donante</button></div></div>
   <div class="pc">
     <div class="g4" id="don-kpis"></div>
     <div class="g21">
@@ -923,10 +923,10 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
         <button class="btn btn-ghost btn-sm" onclick="dlTemplate('avance')" style="width:100%;margin-top:8px">↓ Plantilla CSV</button>
       </div></div>
       <div class="card ct-green"><div class="ch"><span class="ctitle">Google Sheets</span></div><div class="cb">
-        <p style="font-size:12px;color:#64748b;margin-bottom:11px;line-height:1.6">Compartí el sheet como CSV público y pegá la URL.</p>
-        <div class="fl"><label>URL Google Sheets (CSV)</label><input class="fi" type="text" id="sheets-url" placeholder="https://docs.google.com/spreadsheets/..."></div>
+        <p style="font-size:12px;color:#64748b;margin-bottom:11px;line-height:1.6">Pegá la URL del Apps Script (privado). Los datos se sincronizan directo a la base sin exponer la planilla.</p>
+        <div class="fl"><label>URL del Apps Script</label><input class="fi" type="text" id="sheets-url" placeholder="https://script.google.com/macros/s/.../exec?token=..."></div>
         <div class="fl"><label>Tipo</label><select class="fi" id="sheets-type"><option value="donantes">Donantes</option><option value="avance">Avance de obra</option></select></div>
-        <button class="btn btn-sm" onclick="syncSheets()" style="width:100%;background:#059669;color:#fff;border:none">↻ Sincronizar</button>
+        <button class="btn btn-sm" onclick="syncSheets()" style="width:100%;background:#059669;color:#fff;border:none">↻ Sincronizar ahora</button>
         <div id="sheets-log" style="margin-top:8px;font-size:11px;color:#059669;display:none"></div>
       </div></div>
     </div>
@@ -1544,7 +1544,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.26';
+const APP_VERSION = 'v1.0.27';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -4686,19 +4686,70 @@ async function confirmImport() {
 async function syncSheets() {
   const url = (document.getElementById('sheets-url')||{}).value||'';
   const type = (document.getElementById('sheets-type')||{}).value||'donantes';
-  if(!url){ toast('Ingresá la URL de Google Sheets','err'); return; }
-  toast('Conectando...','info');
+  if(!url){ toast('Ingresá la URL del Apps Script','err'); return; }
+  await _doSheetsSync(url, type);
+  const log = document.getElementById('sheets-log');
+  if(log){ log.style.display='block'; log.textContent='Última sync: '+new Date().toLocaleString('es-AR'); }
+}
+
+async function syncSheetsQuick() {
+  const url = localStorage.getItem('ceoj_sheets_url') || '';
+  if(!url){ toast('Configurá la URL del Apps Script en Configuración → Google Sheets','info'); return; }
+  await _doSheetsSync(url, 'donantes');
+}
+
+async function _doSheetsSync(url, type) {
+  toast('Conectando con Google Sheets...','info');
   try {
-    const r = await fetch(url);
-    if(!r.ok) throw new Error('No se pudo acceder');
-    const text = await r.text();
-    const parsed = parseCSV(text);
-    _impBuf = {type, rows:parsed.rows, headers:parsed.headers};
-    showImpPreview(type, parsed.headers, parsed.rows);
-    const log = document.getElementById('sheets-log');
-    if(log){ log.style.display='block'; log.textContent='Última sincronización: '+new Date().toLocaleString('es-AR'); }
-    toast('Datos cargados ✓','ok');
-  } catch(e){ toast('Error: '+e.message+'. Verificá que la URL sea pública (CSV).','err'); }
+    const r = await fetch(url, {redirect:'follow'});
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const json = await r.json();
+    if(json.error) throw new Error(json.error);
+    const rows = json.rows || [];
+    if(!rows.length){ toast('La planilla está vacía','err'); return; }
+    if(type === 'donantes') {
+      await _autoSyncDonantes(rows);
+    } else {
+      const headers = rows.length ? Object.keys(rows[0]) : [];
+      _impBuf = {type, rows, headers};
+      showImpPreview(type, headers, rows);
+      toast('Datos cargados ✓','ok');
+    }
+    localStorage.setItem('ceoj_sheets_url', url);
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+async function _autoSyncDonantes(rows) {
+  const col = (row, names) => {
+    for(const n of names) for(const k of Object.keys(row)) if(k.toLowerCase().replace(/\s/g,'').includes(n)) return row[k];
+    return '';
+  };
+  const toNum = v => parseFloat(String(v||'0').replace(/[^0-9.-]/g,''))||0;
+
+  const existing = USE_LOCAL ? DB.get('donantes') : (await API.get('donantes').catch(()=>[]));
+  let created=0, updated=0, errors=0;
+
+  for(const row of rows) {
+    const name = String(col(row,['nombre','name','donante','razonsocial'])||'').trim();
+    if(!name) continue;
+    const compromiso = toNum(col(row,['compromiso','monto','total','comprometido']));
+    const pagado     = toNum(col(row,['pago','pagado','abonado','cobrado']));
+    const currency   = String(col(row,['moneda','currency'])||'USD').toUpperCase()||'USD';
+    const found      = existing.find(d=>d.name.trim().toLowerCase()===name.toLowerCase());
+    try {
+      if(found) {
+        if(USE_LOCAL) DB.upd('donantes',found.id,{compromiso,pagado});
+        else await API.patch('donantes/'+found.id,{compromiso,pagado});
+        updated++;
+      } else {
+        if(USE_LOCAL) DB.add('donantes',{name,compromiso,pagado,currency,status:'negociacion',email:'',phone:'',notes:''});
+        else await API.post('donantes',{name,compromiso,pagado,currency,status:'negociacion'});
+        created++;
+      }
+    } catch(e){ errors++; }
+  }
+  toast('Sync completo: '+updated+' actualizados, '+created+' nuevos'+(errors?', '+errors+' errores':''),'ok');
+  renderDon();
 }
 
 function dlTemplate(type) {
