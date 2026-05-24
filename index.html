@@ -1544,7 +1544,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.31';
+const APP_VERSION = 'v1.0.32';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -4724,7 +4724,10 @@ async function _autoSyncDonantes(rows) {
 
   const validRows = rows.filter(row => {
     const name = String(row.donante||'').trim();
-    return name && !name.toLowerCase().startsWith('total') && name.toLowerCase()!=='donante' && !name.toLowerCase().includes('donaciones en');
+    if(!name || name.toLowerCase().startsWith('total') || name.toLowerCase()==='donante' || name.toLowerCase().includes('donaciones en')) return false;
+    const compromiso = toNum(row.compromiso);
+    const pagado = toNum(row.pagado);
+    return compromiso > 0 || pagado > 0;
   });
 
   if(!validRows.length){ toast('No se encontraron donantes en la planilla','err'); return; }
