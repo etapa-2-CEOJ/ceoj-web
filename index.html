@@ -973,71 +973,364 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
     </div>
   </div>
   <div class="p-slides" id="p-slides">
-    <div class="p-slide on" id="ps-1" style="background:linear-gradient(135deg,#060C1A,#1a2540 50%,#080E20);text-align:center">
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 35% 50%,rgba(200,136,10,.1),transparent 60%)"></div>
+
+    <!-- ── SLIDE 1: HERO ─────────────────────────────────────── -->
+    <div class="p-slide on" id="ps-1" style="background:linear-gradient(150deg,#060C1A 0%,#0f1a35 50%,#080E20 100%);text-align:center;overflow:hidden">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(200,136,10,.13),transparent 55%),radial-gradient(ellipse at 70% 70%,rgba(26,37,64,.5),transparent 60%)"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#e8a020 40%,#c8880a 60%,transparent)"></div>
+      <div style="position:relative;max-width:700px">
+        <img id="prs-logo" src="" style="height:80px;filter:brightness(0) invert(1);margin-bottom:20px;opacity:.92" alt="">
+        <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(232,160,32,.65);margin-bottom:12px;font-weight:700">Jabad Lubavitch Argentina</div>
+        <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,4.5vw,54px);color:#fff;font-weight:700;line-height:1.08;margin-bottom:8px">Centro Educativo<br><span style="color:#e8a020">Oholey Jinuj</span></h1>
+        <div style="font-size:14px;color:rgba(255,255,255,.35);margin-bottom:28px;letter-spacing:.08em">ETAPA 2 &nbsp;·&nbsp; PROYECTO CONSTRUCCIÓN</div>
+        <div style="display:flex;gap:0;justify-content:center;border:1px solid rgba(232,160,32,.2);border-radius:10px;overflow:hidden;max-width:560px;margin:0 auto">
+          <div style="flex:1;padding:14px 8px;border-right:1px solid rgba(232,160,32,.15)"><div style="font-size:22px;font-weight:800;color:#e8a020">18.000</div><div style="font-size:8px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;margin-top:3px">m² totales</div></div>
+          <div style="flex:1;padding:14px 8px;border-right:1px solid rgba(232,160,32,.15)"><div id="p-alumnos" style="font-size:22px;font-weight:800;color:#e8a020">1.300</div><div style="font-size:8px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;margin-top:3px">alumnos</div></div>
+          <div style="flex:1;padding:14px 8px;border-right:1px solid rgba(232,160,32,.15)"><div style="font-size:22px;font-weight:800;color:#e8a020">9</div><div style="font-size:8px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;margin-top:3px">niveles</div></div>
+          <div style="flex:1;padding:14px 8px;border-right:1px solid rgba(232,160,32,.15)"><div style="font-size:22px;font-weight:800;color:#e8a020">Jun 2026</div><div style="font-size:8px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;margin-top:3px">inicio</div></div>
+          <div style="flex:1;padding:14px 8px"><div style="font-size:22px;font-weight:800;color:#e8a020">Dic 2029</div><div style="font-size:8px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;margin-top:3px">entrega</div></div>
+        </div>
+        <div style="margin-top:18px;font-size:11px;color:rgba(255,255,255,.2)">Tucumán 3177 / Agüero 841, CABA</div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 2: LA PROMESA ────────────────────────────────── -->
+    <div class="p-slide" id="ps-2" style="background:#08060F;text-align:center">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(200,136,10,.08),transparent 60%)"></div>
+      <div style="position:relative;max-width:820px">
+        <div style="font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:rgba(232,160,32,.6);margin-bottom:16px;font-weight:700">Nuestra misión</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(24px,4vw,46px);color:#fff;line-height:1.15;margin-bottom:30px">Un espacio donde cada alumno<br><span style="color:#e8a020">descubre su identidad judía</span></h2>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:800px">
+          <div style="padding:28px 20px;border:1px solid rgba(200,136,10,.25);border-radius:12px;background:rgba(200,136,10,.06)">
+            <div style="font-size:36px;margin-bottom:10px">📚</div>
+            <div style="font-size:14px;font-weight:700;color:#e8a020;margin-bottom:6px">Educación</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.45);line-height:1.7">Maternal, Jardín Gan, Escuela Primaria y Seminario bajo un mismo techo</div>
+          </div>
+          <div style="padding:28px 20px;border:1px solid rgba(8,145,178,.25);border-radius:12px;background:rgba(8,145,178,.06)">
+            <div style="font-size:36px;margin-bottom:10px">🤝</div>
+            <div style="font-size:14px;font-weight:700;color:#38bdf8;margin-bottom:6px">Comunidad</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.45);line-height:1.7">Salones de eventos, gimnasio y espacios de encuentro para toda la comunidad Anash</div>
+          </div>
+          <div style="padding:28px 20px;border:1px solid rgba(5,150,105,.25);border-radius:12px;background:rgba(5,150,105,.06)">
+            <div style="font-size:36px;margin-bottom:10px">✡️</div>
+            <div style="font-size:14px;font-weight:700;color:#34d399;margin-bottom:6px">Legado</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.45);line-height:1.7">Un legado permanente que trasciende generaciones de la comunidad judía</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 3: LOS NÚMEROS ───────────────────────────────── -->
+    <div class="p-slide" id="ps-3" style="background:linear-gradient(135deg,#0a0f1e,#111827);text-align:center">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(232,160,32,.4),transparent)"></div>
+      <div style="position:relative;max-width:860px;width:100%">
+        <div style="font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:rgba(232,160,32,.6);margin-bottom:18px;font-weight:700">El proyecto en números</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+          <div style="padding:28px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#c8880a,#e8a020)"></div>
+            <div style="font-size:52px;font-weight:900;color:#e8a020;line-height:1;letter-spacing:-2px">18K</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;text-transform:uppercase;letter-spacing:.1em">metros cuadrados</div>
+          </div>
+          <div style="padding:28px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#0891b2,#38bdf8)"></div>
+            <div id="p-alumnos2" style="font-size:52px;font-weight:900;color:#38bdf8;line-height:1;letter-spacing:-2px">1.300</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;text-transform:uppercase;letter-spacing:.1em">alumnos</div>
+          </div>
+          <div style="padding:28px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#059669,#34d399)"></div>
+            <div style="font-size:52px;font-weight:900;color:#34d399;line-height:1">9</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;text-transform:uppercase;letter-spacing:.1em">niveles</div>
+          </div>
+          <div style="padding:28px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#7c3aed,#8b5cf6)"></div>
+            <div style="font-size:52px;font-weight:900;color:#a78bfa;line-height:1">122</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;text-transform:uppercase;letter-spacing:.1em">espacios con naming</div>
+          </div>
+          <div style="padding:28px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#dc2626,#f87171)"></div>
+            <div style="font-size:52px;font-weight:900;color:#fca5a5;line-height:1">6</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;text-transform:uppercase;letter-spacing:.1em">etapas de obra</div>
+          </div>
+          <div style="padding:28px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#c8880a,#fbbf24)"></div>
+            <div style="font-size:52px;font-weight:900;color:#fbbf24;line-height:1;font-size:38px">2029</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;text-transform:uppercase;letter-spacing:.1em">entrega del edificio</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 4: EL EDIFICIO ───────────────────────────────── -->
+    <div class="p-slide" id="ps-4" style="background:#08060F">
+      <div style="position:relative;width:100%;max-width:920px">
+        <div style="font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:rgba(232,160,32,.6);margin-bottom:14px;font-weight:700;text-align:center">El edificio nivel a nivel</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(90deg,rgba(200,136,10,.15),rgba(200,136,10,.05));border-radius:8px;border-left:3px solid #e8a020">
+            <div style="min-width:110px;font-size:10px;font-weight:700;color:#e8a020;text-transform:uppercase;letter-spacing:.06em">Terraza</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7)">Sector Multideportes · <span style="color:#e8a020;font-weight:600">1.350 m²</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,255,255,.04);border-radius:8px;border-left:3px solid #8b5cf6">
+            <div style="min-width:110px;font-size:10px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.06em">Piso 6</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7)">Seminario · Biblioteca / Lounge · 12 aulas</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,255,255,.04);border-radius:8px;border-left:3px solid #8b5cf6">
+            <div style="min-width:110px;font-size:10px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.06em">Piso 5</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7)">Primaria / Seminario · 12 aulas</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,255,255,.04);border-radius:8px;border-left:3px solid #0891b2">
+            <div style="min-width:110px;font-size:10px;font-weight:700;color:#38bdf8;text-transform:uppercase;letter-spacing:.06em">Piso 4</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7)">Escuela Primaria · 12 aulas · Oficinas administrativas</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,255,255,.04);border-radius:8px;border-left:3px solid #059669">
+            <div style="min-width:110px;font-size:10px;font-weight:700;color:#34d399;text-transform:uppercase;letter-spacing:.06em">Pisos 2–3</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7)">Jardín de Infantes Gan · 26 aulas · Balcón <span style="color:#34d399;font-weight:600">210 m²</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,255,255,.04);border-radius:8px;border-left:3px solid #059669">
+            <div style="min-width:110px;font-size:10px;font-weight:700;color:#34d399;text-transform:uppercase;letter-spacing:.06em">Piso 1</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7)">Maternal · Centro Capacitación Docente <span style="color:#34d399;font-weight:600">380 m²</span> · 6 aulas</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,255,255,.04);border-radius:8px;border-left:3px solid #c8880a">
+            <div style="min-width:110px;font-size:10px;font-weight:700;color:#e8a020;text-transform:uppercase;letter-spacing:.06em">Planta Baja</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7)">Hall / SUM <span style="color:#e8a020;font-weight:600">615 m²</span> · Comedor <span style="color:#e8a020;font-weight:600">420 m²</span> · Patio exterior <span style="color:#e8a020;font-weight:600">985 m²</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,255,255,.04);border-radius:8px;border-left:3px solid #64748b">
+            <div style="min-width:110px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em">Subsuelo 1</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7)">Recepción Salón <span style="color:#94a3b8;font-weight:600">230 m²</span> · SUM Capacitación · Cocina Escuela</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,255,255,.04);border-radius:8px;border-left:3px solid #64748b">
+            <div style="min-width:110px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em">Subsuelo 2</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7)">Gimnasio <span style="color:#94a3b8;font-weight:600">405 m²</span> · Salón de Fiestas <span style="color:#94a3b8;font-weight:600">1.050 m²</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 5: EDUCACIÓN ─────────────────────────────────── -->
+    <div class="p-slide" id="ps-5" style="background:#F0F4F8">
+      <div style="width:100%;max-width:900px">
+        <div style="font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:#c8880a;margin-bottom:14px;font-weight:700;text-align:center">Niveles educativos</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+          <div style="border-radius:12px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.1)">
+            <img id="prs-edu1" src="" style="width:100%;height:150px;object-fit:cover" alt="">
+            <div style="padding:14px;background:#fff">
+              <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#c8880a;font-weight:700;margin-bottom:4px">Maternal</div>
+              <div style="font-size:13px;font-weight:700;color:#1a2540;margin-bottom:4px">Piso 1</div>
+              <div style="font-size:11px;color:#64748b;line-height:1.5">6 aulas · Lactario · Dirección General</div>
+            </div>
+          </div>
+          <div style="border-radius:12px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.1)">
+            <img id="prs-edu2" src="" style="width:100%;height:150px;object-fit:cover" alt="">
+            <div style="padding:14px;background:#fff">
+              <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#059669;font-weight:700;margin-bottom:4px">Jardín Gan</div>
+              <div style="font-size:13px;font-weight:700;color:#1a2540;margin-bottom:4px">Pisos 2 y 3</div>
+              <div style="font-size:11px;color:#64748b;line-height:1.5">26 aulas · Gimnasio · Balcón 210 m²</div>
+            </div>
+          </div>
+          <div style="border-radius:12px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.1)">
+            <img id="prs-edu3" src="" style="width:100%;height:150px;object-fit:cover" alt="">
+            <div style="padding:14px;background:#fff">
+              <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#0891b2;font-weight:700;margin-bottom:4px">Primaria</div>
+              <div style="font-size:13px;font-weight:700;color:#1a2540;margin-bottom:4px">Pisos 4 y 5</div>
+              <div style="font-size:11px;color:#64748b;line-height:1.5">24 aulas · Oficinas administrativas</div>
+            </div>
+          </div>
+          <div style="border-radius:12px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.1)">
+            <img id="prs-edu4" src="" style="width:100%;height:150px;object-fit:cover" alt="">
+            <div style="padding:14px;background:#fff">
+              <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#7c3aed;font-weight:700;margin-bottom:4px">Seminario</div>
+              <div style="font-size:13px;font-weight:700;color:#1a2540;margin-bottom:4px">Pisos 5 y 6</div>
+              <div style="font-size:11px;color:#64748b;line-height:1.5">15 aulas · Biblioteca / Lounge</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 6: ESPACIOS COMUNITARIOS ─────────────────────── -->
+    <div class="p-slide" id="ps-6" style="background:#08060F;text-align:center">
+      <div style="position:relative;width:100%;max-width:900px">
+        <div style="font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:rgba(232,160,32,.6);margin-bottom:14px;font-weight:700">Espacios comunitarios</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto;gap:8px">
+          <div style="position:relative;border-radius:10px;overflow:hidden;grid-row:span 2">
+            <img id="prs-com1" src="" style="width:100%;height:300px;object-fit:cover" alt="">
+            <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,6,15,.9) 0%,transparent 50%)"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;padding:18px 14px;text-align:left">
+              <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#e8a020;font-weight:700;margin-bottom:4px">Salón de Fiestas</div>
+              <div style="font-size:22px;font-weight:800;color:#fff">1.050 m²</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px">Bodas · Bar/Bat Mitzvá · Eventos Anash</div>
+            </div>
+          </div>
+          <div style="position:relative;border-radius:10px;overflow:hidden">
+            <img id="prs-com2" src="" style="width:100%;height:143px;object-fit:cover" alt="">
+            <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,6,15,.9),transparent 60%)"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;padding:12px;text-align:left">
+              <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#e8a020;font-weight:700;margin-bottom:2px">Gimnasio</div>
+              <div style="font-size:18px;font-weight:800;color:#fff">405 m²</div>
+            </div>
+          </div>
+          <div style="position:relative;border-radius:10px;overflow:hidden">
+            <img id="prs-com3" src="" style="width:100%;height:143px;object-fit:cover" alt="">
+            <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,6,15,.9),transparent 60%)"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;padding:12px;text-align:left">
+              <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#e8a020;font-weight:700;margin-bottom:2px">Recepción</div>
+              <div style="font-size:18px;font-weight:800;color:#fff">230 m²</div>
+            </div>
+          </div>
+          <div style="position:relative;border-radius:10px;overflow:hidden">
+            <img id="prs-com4" src="" style="width:100%;height:143px;object-fit:cover" alt="">
+            <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,6,15,.9),transparent 60%)"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;padding:12px;text-align:left">
+              <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#e8a020;font-weight:700;margin-bottom:2px">Patio exterior</div>
+              <div style="font-size:18px;font-weight:800;color:#fff">985 m²</div>
+            </div>
+          </div>
+          <div style="position:relative;border-radius:10px;overflow:hidden">
+            <img id="prs-com5" src="" style="width:100%;height:143px;object-fit:cover" alt="">
+            <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,6,15,.9),transparent 60%)"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;padding:12px;text-align:left">
+              <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#e8a020;font-weight:700;margin-bottom:2px">Terraza deportiva</div>
+              <div style="font-size:18px;font-weight:800;color:#fff">1.350 m²</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 7: RENDERS ───────────────────────────────────── -->
+    <div class="p-slide" id="ps-7" style="background:#060C1A;text-align:center">
+      <div style="position:relative;width:100%;max-width:920px">
+        <div style="font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:rgba(232,160,32,.6);margin-bottom:14px;font-weight:700">Recorrido visual del proyecto</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:190px 190px;gap:6px;border-radius:12px;overflow:hidden">
+          <div id="prs-ren1" style="background:#1a2540;grid-column:span 2;overflow:hidden"><img id="prs-ri1" src="" style="width:100%;height:100%;object-fit:cover" alt=""></div>
+          <div id="prs-ren2" style="background:#1a2540;overflow:hidden"><img id="prs-ri2" src="" style="width:100%;height:100%;object-fit:cover" alt=""></div>
+          <div id="prs-ren3" style="background:#1a2540;overflow:hidden"><img id="prs-ri3" src="" style="width:100%;height:100%;object-fit:cover" alt=""></div>
+          <div id="prs-ren4" style="background:#1a2540;overflow:hidden"><img id="prs-ri4" src="" style="width:100%;height:100%;object-fit:cover" alt=""></div>
+          <div id="prs-ren5" style="background:#1a2540;overflow:hidden"><img id="prs-ri5" src="" style="width:100%;height:100%;object-fit:cover" alt=""></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 8: CRONOGRAMA ────────────────────────────────── -->
+    <div class="p-slide" id="ps-8" style="background:#08060F">
+      <div style="position:relative;width:100%;max-width:820px">
+        <div style="font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:rgba(232,160,32,.6);margin-bottom:18px;font-weight:700;text-align:center">Cronograma de obra 2025–2029</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="min-width:36px;height:36px;border-radius:50%;background:#059669;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">✓</div>
+            <div style="flex:1;padding:12px 16px;background:rgba(5,150,105,.12);border:1px solid rgba(5,150,105,.3);border-radius:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="font-size:12px;font-weight:700;color:#34d399">1 · Proyecto Ejecutivo</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.3);background:rgba(5,150,105,.3);padding:2px 8px;border-radius:10px">COMPLETADO</div>
+              </div>
+              <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:3px">Ene 2025 → May 2026</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="min-width:36px;height:36px;border-radius:50%;background:#e8a020;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;animation:pulse-gold 2s infinite">▶</div>
+            <div style="flex:1;padding:12px 16px;background:rgba(200,136,10,.12);border:1px solid rgba(200,136,10,.4);border-radius:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="font-size:12px;font-weight:700;color:#e8a020">2 · Estructura SS1 y PB</div>
+                <div style="font-size:10px;color:#e8a020;background:rgba(200,136,10,.25);padding:2px 8px;border-radius:10px">EN CURSO · 15%</div>
+              </div>
+              <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:3px">Jun 2026 → Nov 2026</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="min-width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:rgba(255,255,255,.4);flex-shrink:0">3</div>
+            <div style="flex:1;padding:12px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5)">3 · Estructura pisos 1–3</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.25)">Dic 2026 → Jun 2027</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="min-width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:rgba(255,255,255,.4);flex-shrink:0">4</div>
+            <div style="flex:1;padding:12px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5)">4 · Estructura pisos 4–6</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.25)">Jul 2027 → Dic 2027</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="min-width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:rgba(255,255,255,.4);flex-shrink:0">5</div>
+            <div style="flex:1;padding:12px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5)">5 · Terminaciones y equipamiento</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.25)">Ene 2028 → Jun 2029</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="min-width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:rgba(255,255,255,.4);flex-shrink:0">6</div>
+            <div style="flex:1;padding:12px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5)">6 · Habilitación y entrega</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.25)">Jul 2029 → Dic 2029</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 9: NAMING ────────────────────────────────────── -->
+    <div class="p-slide" id="ps-9" style="background:linear-gradient(135deg,#120E08,#1c1408);text-align:center">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 20%,rgba(200,136,10,.1),transparent 60%)"></div>
+      <div style="position:relative;max-width:820px;width:100%">
+        <div style="font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:rgba(232,160,32,.6);margin-bottom:10px;font-weight:700">Oportunidad de naming</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(22px,3.5vw,38px);color:#fff;margin-bottom:6px">Perpetuá tu nombre<br><span style="color:#e8a020">en el CEOJ</span></h2>
+        <p style="font-size:12px;color:rgba(255,255,255,.35);margin-bottom:22px">122 espacios disponibles para nombramiento · Tu legado visible por generaciones</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+          <div style="padding:18px 12px;border:1px solid rgba(200,136,10,.3);border-radius:10px;background:rgba(200,136,10,.06)">
+            <div style="font-size:28px;font-weight:800;color:#e8a020;margin-bottom:4px">2</div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);line-height:1.4">Edificios</div>
+          </div>
+          <div style="padding:18px 12px;border:1px solid rgba(200,136,10,.3);border-radius:10px;background:rgba(200,136,10,.06)">
+            <div style="font-size:28px;font-weight:800;color:#e8a020;margin-bottom:4px">55</div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);line-height:1.4">Aulas</div>
+          </div>
+          <div style="padding:18px 12px;border:1px solid rgba(200,136,10,.3);border-radius:10px;background:rgba(200,136,10,.06)">
+            <div style="font-size:28px;font-weight:800;color:#e8a020;margin-bottom:4px">8</div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);line-height:1.4">Salones y SUM</div>
+          </div>
+          <div style="padding:18px 12px;border:1px solid rgba(200,136,10,.3);border-radius:10px;background:rgba(200,136,10,.06)">
+            <div style="font-size:28px;font-weight:800;color:#e8a020;margin-bottom:4px">57</div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);line-height:1.4">Oficinas y otros</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(255,255,255,.05);border-radius:20px;border:1px solid rgba(255,255,255,.1)"><span style="color:#e8a020">●</span><span style="font-size:11px;color:rgba(255,255,255,.6)">Edificios completos</span></div>
+          <div style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(255,255,255,.05);border-radius:20px;border:1px solid rgba(255,255,255,.1)"><span style="color:#38bdf8">●</span><span style="font-size:11px;color:rgba(255,255,255,.6)">Pisos completos</span></div>
+          <div style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(255,255,255,.05);border-radius:20px;border:1px solid rgba(255,255,255,.1)"><span style="color:#34d399">●</span><span style="font-size:11px;color:rgba(255,255,255,.6)">Aulas individuales</span></div>
+          <div style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(255,255,255,.05);border-radius:20px;border:1px solid rgba(255,255,255,.1)"><span style="color:#a78bfa">●</span><span style="font-size:11px;color:rgba(255,255,255,.6)">Espacios especiales</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 10: CIERRE ───────────────────────────────────── -->
+    <div class="p-slide" id="ps-10" style="background:linear-gradient(150deg,#060C1A 0%,#0f1a35 60%,#060C1A 100%);text-align:center;overflow:hidden">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(200,136,10,.15),transparent 55%)"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#e8a020 40%,#c8880a 60%,transparent)"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(232,160,32,.3) 40%,rgba(200,136,10,.3) 60%,transparent)"></div>
       <div style="position:relative;max-width:680px">
-        <img src="data:image/png;base64,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" style="height:72px;filter:brightness(0) invert(1);margin-bottom:18px" alt="">
-        <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(232,160,32,.8);margin-bottom:10px;font-weight:700">Jabad Lubavitch Argentina</div>
-        <h1 style="font-family:'Playfair Display',serif;font-size:clamp(30px,5vw,58px);color:#fff;font-weight:700;line-height:1.05;margin-bottom:10px">Centro Educativo<br><span style="color:#e8a020">Oholey Jinuj</span><br><span style="font-size:.55em;font-style:italic;color:rgba(255,255,255,.45)">Etapa 2 · Proyecto Construcción</span></h1>
-        <p style="font-size:13px;color:rgba(255,255,255,.35);margin-bottom:24px">Tucumán 3177 / Agüero 841, CABA</p>
-        <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap">
-          <div style="text-align:center"><div style="font-size:26px;font-weight:700;color:#e8a020">18.000</div><div style="font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;margin-top:2px">m² totales</div></div>
-          <div style="text-align:center"><div id="p-alumnos" style="font-size:26px;font-weight:700;color:#e8a020">1.300</div><div style="font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;margin-top:2px">alumnos</div></div>
-          <div style="text-align:center"><div style="font-size:26px;font-weight:700;color:#e8a020">USD 30M</div><div style="font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;margin-top:2px">inversión</div></div>
-          <div style="text-align:center"><div style="font-size:26px;font-weight:700;color:#e8a020">Jun 2026</div><div style="font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;margin-top:2px">inicio</div></div>
-          <div style="text-align:center"><div style="font-size:26px;font-weight:700;color:#e8a020">Dic 2029</div><div style="font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;margin-top:2px">finalización</div></div>
+        <img id="prs-logo2" src="" style="height:60px;filter:brightness(0) invert(1);margin-bottom:20px;opacity:.7" alt="">
+        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,48px);color:#fff;line-height:1.15;margin-bottom:12px">
+          <span style="color:#e8a020">Construyamos juntos</span><br>el futuro de nuestra comunidad
+        </h2>
+        <p style="font-size:13px;color:rgba(255,255,255,.4);line-height:1.8;margin-bottom:30px;max-width:500px;margin-left:auto;margin-right:auto">
+          Cada espacio del CEOJ Etapa 2 es una oportunidad de dejar una huella permanente en la historia educativa de la comunidad Anash de Buenos Aires.
+        </p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:540px;margin:0 auto 28px">
+          <div style="text-align:center;padding:16px 8px;border:1px solid rgba(232,160,32,.2);border-radius:10px;background:rgba(232,160,32,.05)"><div id="p-alumnos3" style="font-size:32px;font-weight:900;color:#e8a020">1.300</div><div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-top:3px">Alumnos</div></div>
+          <div style="text-align:center;padding:16px 8px;border:1px solid rgba(56,189,248,.2);border-radius:10px;background:rgba(56,189,248,.05)"><div style="font-size:32px;font-weight:900;color:#38bdf8">18K</div><div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-top:3px">m²</div></div>
+          <div style="text-align:center;padding:16px 8px;border:1px solid rgba(52,211,153,.2);border-radius:10px;background:rgba(52,211,153,.05)"><div style="font-size:32px;font-weight:900;color:#34d399">∞</div><div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-top:3px">Generaciones</div></div>
         </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.2);letter-spacing:.06em">Tucumán 3177 / Agüero 841, CABA &nbsp;·&nbsp; Jabad Lubavitch Argentina</div>
       </div>
     </div>
-    <div class="p-slide" id="ps-2" style="background:linear-gradient(135deg,#1a2540,#243060);text-align:center">
-      <div style="font-size:10px;font-weight:700;color:rgba(232,160,32,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Los Espacios</div>
-      <h2 style="font-family:'Playfair Display',serif;font-size:34px;color:#fff;margin-bottom:4px">9 niveles · 18.000 m²</h2>
-      <p style="font-size:12px;color:rgba(255,255,255,.3);margin-bottom:20px">Subsuelo 2 hasta Terraza</p>
-      <div id="p-spaces-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px;width:100%;max-width:880px"></div>
-    </div>
-    <div class="p-slide" id="ps-3" style="background:#F0F2F7">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;width:100%;max-width:900px">
-        <div style="border-radius:12px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.15)"><img id="p-fachada" src="" style="width:100%;height:320px;object-fit:cover" alt=""></div>
-        <div>
-          <div style="font-size:10px;font-weight:700;color:#c8880a;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">El Proyecto</div>
-          <h2 style="font-family:'Playfair Display',serif;font-size:26px;color:#1a2540;margin-bottom:10px">Un nuevo hogar para la educación judía</h2>
-          <p style="font-size:13px;color:#64748b;line-height:1.8;margin-bottom:14px">La Etapa 2 completa el Centro Educativo Oholey Jinuj, sumándose al Jeider ya inaugurado en San Luis 3168.</p>
-          <div style="display:flex;flex-direction:column;gap:7px" id="p-features-list"></div>
-        </div>
-      </div>
-    </div>
-    <div class="p-slide" id="ps-4" style="background:#08060F;text-align:center">
-      <div style="font-size:10px;font-weight:700;color:rgba(232,160,32,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px">Recorrido Visual</div>
-      <div id="p-renders-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:180px 180px;gap:5px;width:100%;max-width:900px"></div>
-    </div>
-    <div class="p-slide" id="ps-5" style="background:#08060F;text-align:center">
-      <div style="font-size:10px;font-weight:700;color:rgba(232,160,32,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px">Espacios Educativos</div>
-      <div id="p-edu-grid" style="display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:168px 168px;gap:5px;width:100%;max-width:900px"></div>
-    </div>
-    <div class="p-slide" id="ps-6" style="background:linear-gradient(135deg,#120E08,#1a1408);text-align:center">
-      <div style="font-size:10px;font-weight:700;color:rgba(232,160,32,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Naming Opportunities</div>
-      <h2 style="font-family:'Playfair Display',serif;font-size:30px;color:#fff;margin-bottom:4px">Perpetuá tu legado en el CEOJ</h2>
-      <p style="font-size:12px;color:rgba(255,255,255,.3);margin-bottom:20px">Cada espacio es una oportunidad de nombramiento para generaciones</p>
-      <div id="p-naming-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:780px"></div>
-    </div>
-    <div class="p-slide" id="ps-7" style="background:#F0F2F7;text-align:center">
-      <div style="font-size:10px;font-weight:700;color:#c8880a;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Campaña de Donaciones</div>
-      <h2 style="font-size:28px;font-weight:700;color:#1a2540;margin-bottom:4px">USD 30.000.000 · Meta de construcción</h2>
-      <p style="font-size:13px;color:#94a3b8;margin-bottom:22px">Cada donación es un ladrillo en el futuro educativo de la comunidad</p>
-      <div class="g3" style="max-width:800px">
-        <div class="private-only" style="background:#fff;border-radius:12px;padding:22px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.08);border-top:4px solid #c8880a"><div id="p-captado" style="font-size:36px;font-weight:700;color:#1a2540">--</div><div style="font-size:11px;color:#94a3b8;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">USD captados</div></div>
-        <div style="background:#fff;border-radius:12px;padding:22px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.08);border-top:4px solid #059669"><div id="p-ndon" style="font-size:36px;font-weight:700;color:#1a2540">--</div><div style="font-size:11px;color:#94a3b8;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Donantes</div></div>
-        <div style="background:#fff;border-radius:12px;padding:22px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.08);border-top:4px solid #0891b2"><div id="p-nombrados" style="font-size:36px;font-weight:700;color:#1a2540">--</div><div style="font-size:11px;color:#94a3b8;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Espacios nombrados</div></div>
-      </div>
-    </div>
-    <div class="p-slide" id="ps-8" style="background:linear-gradient(135deg,#1a2540,#0a1828);text-align:center">
-      <div style="margin-bottom:22px"><div style="font-size:10px;letter-spacing:.18em;color:rgba(232,160,32,.7);text-transform:uppercase;margin-bottom:6px;font-weight:700">Tu inversión · Su impacto</div><h2 style="font-family:'Playfair Display',serif;font-size:34px;color:#fff">El legado que construimos juntos</h2></div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:780px">
-        <div style="text-align:center;padding:24px 12px;background:rgba(200,136,10,.12);border:1.5px solid rgba(200,136,10,.25);border-radius:10px"><div id="p-alumnos2" style="font-size:44px;font-weight:700;color:#e8a020">1.300</div><div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:4px;line-height:1.5">Alumnos que recibirán educación judía de excelencia</div></div>
-        <div style="text-align:center;padding:24px 12px;background:rgba(8,145,178,.12);border:1.5px solid rgba(8,145,178,.25);border-radius:10px"><div style="font-size:44px;font-weight:700;color:#38bdf8">18k</div><div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:4px;line-height:1.5">m² de espacios educativos de nivel institucional</div></div>
-        <div style="text-align:center;padding:24px 12px;background:rgba(5,150,105,.12);border:1.5px solid rgba(5,150,105,.25);border-radius:10px"><div style="font-size:44px;font-weight:700;color:#34d399">∞</div><div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:4px;line-height:1.5">Generaciones de la comunidad Anash</div></div>
-      </div>
-    </div>
+
   </div>
   <div class="p-bottom"><div class="p-dots" id="p-dots"></div><span style="font-size:10px;color:rgba(255,255,255,.2);cursor:pointer" onclick="closePres()">ESC · Salir</span></div>
 </div>
@@ -1170,7 +1463,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.9';
+const APP_VERSION = 'v1.0.10';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'data:image/png;base64,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';
 const IMGS = {
@@ -1888,7 +2181,7 @@ function roleName(r) { return { admin:'Administrador', marketing:'Marketing', do
 // NAVIGATION
 // ============================================================
 let v360inited = false;
-const PAGE_RENDERS = { overview: renderOverview, avance: renderAvance, galeria: renderGal, multimedia: () => {}, donantes: renderDon, naming: renderNaming, usuarios: renderUsr, notif: renderNotif, perfil: renderPerfil, planos: () => renderFloor('pb'), config: renderConfig, pres: () => { goSlide(0); renderOverview(); } };
+const PAGE_RENDERS = { overview: renderOverview, avance: renderAvance, galeria: renderGal, multimedia: () => {}, donantes: renderDon, naming: renderNaming, usuarios: renderUsr, notif: renderNotif, perfil: renderPerfil, planos: () => renderFloor('pb'), config: renderConfig, pres: () => { goSlide(0); renderOverview(); renderPresImages(); } };
 
 function toggleSidebar() {
   const sb = eid('sidebar'), ov = eid('sb-overlay');
@@ -4192,8 +4485,27 @@ function dlTemplate(type) {
 // PRESENTATION
 // ============================================================
 let pSlide = 0;
-const TOTAL_SLIDES = 8;
+const TOTAL_SLIDES = 10;
 
+function renderPresImages() {
+  const si = (id, src) => { const el = document.getElementById(id); if (el) el.src = src; };
+  si('prs-logo',  LOGO_SRC);
+  si('prs-logo2', LOGO_SRC);
+  si('prs-edu1', NR['maternal_p1']);
+  si('prs-edu2', NR['aula_gan']);
+  si('prs-edu3', NR['aula_p45']);
+  si('prs-edu4', NR['aula_p6']);
+  si('prs-com1', NR['hall_sum_pb']);
+  si('prs-com2', NR['gimnasio_ss2']);
+  si('prs-com3', NR['recep_ss1']);
+  si('prs-com4', NR['patio_pb']);
+  si('prs-com5', NR['terraza']);
+  si('prs-ri1',  NR['hall_salon_pb']);
+  si('prs-ri2',  NR['sum_p2']);
+  si('prs-ri3',  NR['salon_ss2_a']);
+  si('prs-ri4',  NR['balcon_p2']);
+  si('prs-ri5',  NR['centro_edu_p1']);
+}
 function openPres() {
   goPage('pres');
   document.getElementById('pg-pres').classList.add('fullscreen');
