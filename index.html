@@ -1569,7 +1569,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.37';
+const APP_VERSION = 'v1.0.38';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -3171,7 +3171,7 @@ async function openDonBulk() {
   _dbItems = (await API.get('donantes')).sort((a,b)=>(a.name||'').localeCompare(b.name||'','es'));
   document.getElementById('db-search').value = '';
   filterDonBulk();
-  document.getElementById('modal-don-bulk').classList.add('on');
+  document.getElementById('modal-don-bulk').classList.add('show');
 }
 
 function filterDonBulk() {
