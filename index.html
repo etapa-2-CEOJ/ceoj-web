@@ -606,7 +606,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- OVERVIEW -->
 <div class="pg" id="pg-overview">
   <div class="ph"><div><h1>Resumen General</h1><p id="ov-sub">CEOJ Etapa 2 · Tucumán 3177 / Agüero 841, CABA · Jun 2026 → Dic 2029</p></div>
-    <div class="ph-btns"><button class="btn btn-ghost btn-sm" onclick="goPage('galeria')">Galería</button><button class="btn btn-gold" onclick="openPres()">&#9654; Presentar</button></div></div>
+    <div class="ph-btns"><button class="btn btn-ghost btn-sm" id="btn-ov-refresh" onclick="renderOverview()" title="Actualizar datos">↻ Actualizar</button><button class="btn btn-ghost btn-sm" onclick="goPage('galeria')">Galería</button><button class="btn btn-gold" onclick="openPres()">&#9654; Presentar</button></div></div>
   <div class="pc">
     <div class="g4" id="ov-kpis"></div>
     <div class="g21">
@@ -1604,7 +1604,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.66';
+const APP_VERSION = 'v1.0.67';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -2385,6 +2385,7 @@ function closeSidebar() {
   document.body.style.overflow = '';
 }
 
+let _ovRefreshTimer = null;
 function goPage(page) {
   document.querySelectorAll('.pg').forEach(el => el.classList.remove('on'));
   document.querySelectorAll('.ni[data-page]').forEach(el => el.classList.remove('on'));
@@ -2393,12 +2394,19 @@ function goPage(page) {
   if (PAGE_RENDERS[page]) PAGE_RENDERS[page]();
   v3active = (page === 'v360');
   if (page === 'v360') setTimeout(initV360, 80);
+  clearInterval(_ovRefreshTimer);
+  if (page === 'overview') _ovRefreshTimer = setInterval(renderOverview, 60000);
   closeSidebar();
 }
 document.querySelectorAll('.ni[data-page]').forEach(el => el.addEventListener('click', () => goPage(el.dataset.page)));
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { v3active = false; }
-  else { if (document.querySelector('#pg-v360.on')) v3active = true; }
+  if (document.hidden) {
+    v3active = false;
+    clearInterval(_ovRefreshTimer); _ovRefreshTimer = null;
+  } else {
+    if (document.querySelector('#pg-v360.on')) v3active = true;
+    if (document.querySelector('#pg-overview.on')) { renderOverview(); _ovRefreshTimer = setInterval(renderOverview, 60000); }
+  }
 });
 
 // ============================================================
@@ -2768,6 +2776,8 @@ function nrImg(key) {
 // OVERVIEW
 // ============================================================
 async function renderOverview() {
+  const btn = eid('btn-ov-refresh');
+  if (btn) { btn.disabled = true; btn.textContent = '↻ …'; }
   try {
     const [stats, etapas, novs, donantes, gallery] = await Promise.all([
       API.get('stats'), API.get('etapas'), API.get('novedades'),
@@ -2814,7 +2824,11 @@ async function renderOverview() {
     const pnm= eid('p-nombrados');  if(pnm) pnm.textContent = parseInt(stats.naming?.taken)||0;
 
     buildPresSlides(donantes, GALLERY_ITEMS, etapas);
-  } catch(e) { toast('Error cargando datos: ' + e.message, 'err'); }
+    if (btn) { btn.disabled = false; btn.textContent = '↻ Actualizar'; }
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = '↻ Actualizar'; }
+    toast('Error cargando datos: ' + e.message, 'err');
+  }
 }
 
 function buildPresSlides(donantes, gallery, etapas) {
