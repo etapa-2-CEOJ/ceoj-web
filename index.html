@@ -1590,7 +1590,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.51';
+const APP_VERSION = 'v1.0.52';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -3047,13 +3047,13 @@ async function renderDon() {
     const slPag  = slRows.reduce((a,r)=>a+slToNum(r.pagado),0);
     const slDeuda= slRows.reduce((a,r)=>a+slToNum(r.deuda),0);
     const slKpis = slRows.length ? (
-      '<div style="width:100%;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#0055a4;margin-top:8px;margin-bottom:2px">S.Luis</div>' +
+      '<div style="grid-column:1/-1;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#0055a4;margin-top:8px;margin-bottom:2px">S.Luis</div>' +
       '<div class="kpi kpi-blue"><div class="kv">' + slRows.length + '</div><div class="kl">Deudores</div></div>' +
       '<div class="kpi kpi-blue"><div class="kv">USD ' + fmtM(slDeuda) + '</div><div class="kl">Total deuda</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">USD ' + fmtDots(slDeuda) + '</div></div>' +
       '<div class="kpi kpi-blue"><div class="kv">' + Math.round(slPag/(slComp||1)*100) + '%</div><div class="kl">Cobrado</div><div class="kbadge kb-green" style="margin-top:4px">USD ' + fmtM(slPag) + '</div></div>'
     ) : '';
     eid('don-kpis').innerHTML =
-      '<div style="width:100%;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#c026d3;margin-bottom:2px">Tucumán</div>' +
+      '<div style="grid-column:1/-1;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#c026d3;margin-bottom:2px">Tucumán</div>' +
       '<div class="kpi kpi-fuchsia"><div class="kv">USD ' + fmtM(total) + '</div><div class="kl">Total comprometido</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">USD ' + fmtDots(total) + '</div><div class="prog" style="margin-top:4px"><div class="pf" style="width:' + pct.toFixed(0) + '%"></div></div></div>' +
       '<div class="kpi kpi-fuchsia"><div class="kv">USD ' + fmtM(pagado) + '</div><div class="kl">Total pagado</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">USD ' + fmtDots(pagado) + '</div><div class="kbadge kb-green" style="margin-top:4px">' + Math.round(pagado/(total||1)*100) + '% cobrado</div></div>' +
       '<div class="kpi kpi-fuchsia"><div class="kv">USD ' + fmtM(total-pagado) + '</div><div class="kl">Saldo pendiente</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">USD ' + fmtDots(total-pagado) + '</div><div class="kbadge kb-red" style="margin-top:4px">Por cobrar</div></div>' +
