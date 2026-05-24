@@ -1604,7 +1604,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.63';
+const APP_VERSION = 'v1.0.64';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -3155,7 +3155,6 @@ async function renderNaming() {
 
     const guessImg = name => {
       const l = name.toLowerCase();
-      if(l.includes('tucum')||l.includes('aguero')||l.includes('agüero')) return NR['fachada_tucuman']||'';
       if(l.includes('gimnasio'))                         return NR['gimnasio_ss2']||'';
       if(l.includes('fiesta')||l.includes('salón'))      return NR['salon_ss2_a']||'';
       if(l.includes('terraza'))                          return NR['terraza']||'';
