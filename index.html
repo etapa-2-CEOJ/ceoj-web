@@ -1544,7 +1544,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.29';
+const APP_VERSION = 'v1.0.30';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -4722,28 +4722,34 @@ async function _doSheetsSync(url, type) {
 async function _autoSyncDonantes(rows) {
   const toNum = v => { if(typeof v==='number') return isNaN(v)?0:Math.round(v*100)/100; const s=String(v||'').trim(); if(!s) return 0; if(s.includes(',')) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0; return parseFloat(s.replace(/[^0-9.-]/g,''))||0; };
 
-  const existing = USE_LOCAL ? DB.get('donantes') : (await API.get('donantes').catch(()=>[]));
-  let created=0, updated=0, errors=0;
-
-  for(const row of rows) {
+  const validRows = rows.filter(row => {
     const name = String(row.donante||'').trim();
-    if(!name || name.toLowerCase().startsWith('total') || name.toLowerCase()==='donante' || name.toLowerCase().includes('donaciones en')) continue;
+    return name && !name.toLowerCase().startsWith('total') && name.toLowerCase()!=='donante' && !name.toLowerCase().includes('donaciones en');
+  });
+
+  if(!validRows.length){ toast('No se encontraron donantes en la planilla','err'); return; }
+
+  toast('Sincronizando '+validRows.length+' donantes...','info');
+
+  // Borrar todos los donantes existentes y recrear desde Sheets
+  if(USE_LOCAL) {
+    DB.set('donantes', []);
+  } else {
+    await SB.rest('DELETE','donantes','id=neq.00000000-0000-0000-0000-000000000000');
+  }
+
+  let created=0, errors=0;
+  for(const row of validRows) {
+    const name = String(row.donante).trim();
     const compromiso = toNum(row.compromiso);
     const pagado     = toNum(row.pagado);
-    const found      = existing.find(d=>d.name.trim().toLowerCase()===name.toLowerCase());
     try {
-      if(found) {
-        if(USE_LOCAL) DB.upd('donantes',found.id,{compromiso,pagado});
-        else await API.patch('donantes/'+found.id,{compromiso,pagado});
-        updated++;
-      } else {
-        if(USE_LOCAL) DB.add('donantes',{name,compromiso,pagado,currency:'USD',status:'negociacion',email:'',phone:'',notes:''});
-        else await API.post('donantes',{name,compromiso,pagado,currency:'USD',status:'negociacion'});
-        created++;
-      }
+      if(USE_LOCAL) DB.add('donantes',{name,compromiso,pagado,currency:'USD',status:'negociacion',email:'',phone:'',notes:''});
+      else await SB.rest('POST','donantes','',{name,compromiso,pagado,currency:'USD',status:'negociacion'});
+      created++;
     } catch(e){ errors++; }
   }
-  toast('Sync completo: '+updated+' actualizados, '+created+' nuevos'+(errors?', '+errors+' errores':''),'ok');
+  toast('Sync completo: '+created+' donantes importados'+(errors?', '+errors+' errores':''),'ok');
   renderDon();
 }
 
