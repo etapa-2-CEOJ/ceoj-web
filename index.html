@@ -850,7 +850,6 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
   <div class="ph"><div><h1>Portal de Donantes</h1><p>Gestión de donaciones y compromisos · Base de datos en tiempo real</p></div>
     <div class="ph-btns"><button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button><button class="btn btn-ghost btn-sm" onclick="syncSheetsQuick()" title="Sincronizar con Google Sheets">↻ Sheets</button><button class="btn btn-ghost btn-sm" id="btn-bulk-toggle" onclick="toggleDonBulk()">✎ Edición masiva</button><button class="btn btn-gold" onclick="openModal('donante')">+ Nuevo Donante</button></div></div>
   <div id="don-bulk-bar" style="display:none;position:sticky;bottom:16px;z-index:50;margin:0 0 8px;padding:10px 16px;background:#1a2540;border-radius:10px;display:none;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,.3)">
-    <input type="checkbox" id="don-bulk-all" onchange="toggleAllDonBulk(this.checked)" style="width:15px;height:15px;cursor:pointer;flex-shrink:0">
     <span id="don-bulk-count" style="font-size:12px;color:rgba(255,255,255,.7);flex:1">0 seleccionados</span>
     <select id="don-bulk-status" style="padding:5px 10px;border-radius:6px;border:none;font-size:12px;outline:none">
       <option value="negociacion">Negociación</option>
@@ -1581,7 +1580,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.41';
+const APP_VERSION = 'v1.0.42';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -3040,7 +3039,7 @@ async function renderDon() {
     const bulkMode = !!window._donBulkMode;
     const thead = eid('don-thead');
     if(thead) thead.innerHTML = bulkMode
-      ? '<tr><th style="width:32px"></th><th>Donante</th><th>Naming</th><th>Compromiso</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th>Fecha</th></tr>'
+      ? '<tr><th style="width:32px"><input type="checkbox" id="don-bulk-all" onchange="toggleAllDonBulk(this.checked)" style="width:14px;height:14px;cursor:pointer" title="Seleccionar todos"></th><th>Donante</th><th>Naming</th><th>Compromiso</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th>Fecha</th></tr>'
       : '<tr><th>Donante</th><th>Naming</th><th>Compromiso</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th>Fecha</th><th></th></tr>';
     eid('don-tbody').innerHTML = filtered.length ? filtered.slice().sort((a,b)=>(a.name||'').localeCompare(b.name||'','es')).map(d => {
       const saldo = (parseFloat(d.compromiso)||0) - (parseFloat(d.pagado)||0);
