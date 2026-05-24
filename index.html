@@ -542,6 +542,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
     <div id="sb-overlay" onclick="closeSidebar()"></div>
     <nav id="sidebar">
       <button class="sb-pin-btn" id="sb-pin-btn" title="Colapsar menú" onclick="toggleSidebarPin()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h12M2 12h12"/></svg></button>
+      <div class="ni" data-page="pres"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8.5L8 2l6 6.5"/><path d="M4 7.5V13h3v-3h2v3h3V7.5"/></svg><span class="ni-lbl">Menú</span></div>
       <div class="sb-sec private-only">Principal</div>
       <div class="ni private-only" data-page="overview" id="nav-overview"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg><span class="ni-lbl">Resumen</span></div>
       
@@ -564,7 +565,6 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
         </div>
       </div>
       <div class="ni" data-page="naming"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1"/><path d="M5 8h6M8 5v6"/></svg><span class="ni-lbl">Naming</span></div>
-      <div class="ni" data-page="pres"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="9" rx="1"/><path d="M5 14h6M8 11v3"/></svg><span class="ni-lbl">Presentación</span></div>
       <div class="sb-sec private-only">Donantes</div>
       <div class="ni private-only" data-page="donantes"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3c-2 0-4 1.5-4 3.5C4 9 8 13 8 13s4-4 4-6.5C12 4.5 10 3 8 3z"/></svg><span class="ni-lbl">Donantes</span><span class="nbadge nb-red" id="sb-don" style="display:none"></span></div>
       <div class="sb-sec private-only">Sistema</div>
@@ -1544,7 +1544,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.24';
+const APP_VERSION = 'v1.0.25';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
