@@ -1547,7 +1547,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.34';
+const APP_VERSION = 'v1.0.35';
 document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;});
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/estructura.jpg';
@@ -3118,7 +3118,13 @@ async function renderNaming() {
     const filtered = items.filter(n =>
       (!namFloor || n.floor === namFloor) &&
       (!namStatus || n.status === namStatus)
-    );
+    ).sort((a, b) => {
+      const aT = (a.name||'').toLowerCase().includes('tucum');
+      const bT = (b.name||'').toLowerCase().includes('tucum');
+      if (aT && !bT) return -1;
+      if (!aT && bT) return 1;
+      return (a.name||'').localeCompare(b.name||'', 'es');
+    });
     const isAdmin = CU && CU.role === 'admin';
     const logoSrc = (document.getElementById('tb-logo') && document.getElementById('tb-logo').src) || '';
     eid('nam-grid').innerHTML = filtered.map(n => {
