@@ -223,6 +223,21 @@ body:not(.private-mode) .private-only{display:none!important}
 .tl-item{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid #f1f5f9}.tl-item:last-child{border-bottom:none}
 .tl-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
 .tl-done{background:#c8880a}.tl-active{background:#059669;box-shadow:0 0 0 3px #d1fae5}.tl-pend{background:#e2e8f0;border:2px solid #cbd5e0}
+.nv-carousel{position:relative;margin-top:6px;border-radius:8px;overflow:hidden;background:#0a0e1a}
+.nv-carousel-track{display:flex;transition:transform .3s ease}
+.nv-carousel-slide{flex:0 0 100%;min-width:100%}
+.nv-carousel-slide img{width:100%;max-height:220px;object-fit:cover;display:block}
+.nv-car-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;z-index:2;line-height:1}
+.nv-car-btn.prev{left:6px}.nv-car-btn.next{right:6px}
+.nv-car-dots{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:5px}
+.nv-car-dots span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.45);cursor:pointer;display:block}
+.nv-car-dots span.active{background:#fff}
+.img-up-area{border:2px dashed #cbd5e0;border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:border-color .2s}
+.img-up-area:hover{border-color:#c8880a}
+.img-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.img-tw{position:relative;width:64px;height:64px;flex-shrink:0}
+.img-tw img{width:64px;height:64px;object-fit:cover;border-radius:6px;display:block}
+.img-tw-del{position:absolute;top:-5px;right:-5px;background:#ef4444;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
 input[type=range]{appearance:none;-webkit-appearance:none;width:100%;height:4px;background:#f1f5f9;border-radius:2px;outline:none;border:none}
 input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:#c8880a;cursor:pointer}
 @media(max-width:900px){#sidebar{display:none}.g4{grid-template-columns:1fr 1fr}.g3,.g2,.g21{grid-template-columns:1fr}.av-prog-grid{grid-template-columns:1fr!important}.av-prog-grid #av-etapas{max-height:none!important}}
@@ -1549,6 +1564,13 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
     </div>
     <div class="fl"><label>Descripción</label><textarea class="fi" id="m-nv-desc" style="min-height:64px;resize:vertical"></textarea></div>
     <div class="fl"><label>Tipo</label><select class="fi" id="m-nv-type"><option value="hito">Hito importante</option><option value="avance">Avance de obra</option><option value="documento">Documento</option><option value="otro">Otro</option></select></div>
+    <div class="fl"><label>Imágenes (opcional)</label>
+      <div class="img-up-area" onclick="document.getElementById('m-nv-files').click()">
+        <span style="color:#94a3b8;font-size:13px">📷 Tocá para agregar imágenes</span>
+      </div>
+      <input type="file" id="m-nv-files" accept="image/*" multiple style="display:none" onchange="nvAddImages(this)">
+      <div class="img-thumbs" id="m-nv-thumbs"></div>
+    </div>
   </div>
   <div class="mf"><button class="btn btn-ghost" onclick="closeModal('novedad')">Cancelar</button><button class="btn btn-gold" onclick="saveNovedad()">Guardar</button></div>
 </div></div>
@@ -1603,7 +1625,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.74';
+const APP_VERSION = 'v1.0.75';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -2491,6 +2513,7 @@ function openModal(name, data) {
   if (name === 'novedad') {
     eid('m-nv-title').value = ''; eid('m-nv-desc').value = ''; eid('m-nv-type').value = 'hito';
     eid('m-nv-date').value = new Date().toISOString().split('T')[0];
+    _nvImages = []; nvRenderThumbs();
   }
   if (name === 'usuario') {
     eid('m-usr-title').textContent = data.id ? 'Editar Usuario' : 'Nuevo Usuario';
@@ -3011,9 +3034,15 @@ async function renderAvance() {
       '</div>';
     }).join('');
 
-    eid('av-novs').innerHTML = novs.map(n =>
-      '<div class="tl-item"><div class="tl-dot ' + (n.type==='hito'?'tl-done':'tl-active') + '"></div><div><div style="font-size:12px;font-weight:600;color:#1a2540">' + n.title + '</div><p style="font-size:11px;color:#94a3b8">' + (n.description||'') + '</p></div><div style="margin-left:auto;font-size:10px;color:#94a3b8;white-space:nowrap">' + (n.date||'').split('T')[0] + '</div></div>'
-    ).join('') || '<div class="empty"><div class="empty-icon">📋</div><p>Sin novedades</p></div>';
+    eid('av-novs').innerHTML = novs.map((n, idx) => {
+      let imgs = []; try { if (n.images) imgs = JSON.parse(n.images); } catch(_) {}
+      return '<div class="tl-item" style="flex-direction:column;gap:0"><div style="display:flex;gap:9px;align-items:flex-start">' +
+        '<div class="tl-dot ' + (n.type==='hito'?'tl-done':'tl-active') + '" style="margin-top:4px;flex-shrink:0"></div>' +
+        '<div style="flex:1"><div style="font-size:12px;font-weight:600;color:#1a2540">' + n.title + '</div>' +
+        '<p style="font-size:11px;color:#94a3b8">' + (n.description||'') + '</p></div>' +
+        '<div style="font-size:10px;color:#94a3b8;white-space:nowrap">' + (n.date||'').split('T')[0] + '</div>' +
+        '</div>' + buildNvCarousel('nvc'+idx, imgs) + '</div>';
+    }).join('') || '<div class="empty"><div class="empty-icon">📋</div><p>Sin novedades</p></div>';
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
@@ -3488,13 +3517,82 @@ async function saveEtapa() {
   } catch(e){toast('Error: '+e.message,'err');}
 }
 
+// ── Novedad image helpers ──────────────────────────────────────
+let _nvImages = [];
+
+function nvAddImages(input) {
+  Array.from(input.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => compressImage(e.target.result, 900, 0.72, url => { _nvImages.push(url); nvRenderThumbs(); });
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function compressImage(src, maxW, quality, cb) {
+  const img = new Image();
+  img.onload = () => {
+    const ratio = Math.min(1, maxW / img.width);
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.width * ratio); c.height = Math.round(img.height * ratio);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    cb(c.toDataURL('image/jpeg', quality));
+  };
+  img.src = src;
+}
+
+function nvRenderThumbs() {
+  const el = eid('m-nv-thumbs'); if (!el) return;
+  el.innerHTML = _nvImages.map((url, i) =>
+    '<div class="img-tw"><img src="' + url + '"><button class="img-tw-del" onclick="nvDelImg(' + i + ')">✕</button></div>'
+  ).join('');
+}
+
+function nvDelImg(i) { _nvImages.splice(i, 1); nvRenderThumbs(); }
+
+function buildNvCarousel(id, imgs) {
+  if (!imgs || !imgs.length) return '';
+  if (imgs.length === 1) return '<div style="margin-top:6px;border-radius:8px;overflow:hidden"><img src="' + imgs[0] + '" style="width:100%;max-height:220px;object-fit:cover;display:block"></div>';
+  const slides = imgs.map(url => '<div class="nv-carousel-slide"><img src="' + url + '"></div>').join('');
+  const dots = imgs.map((_, i) => '<span' + (i===0?' class="active"':'') + ' onclick="nvCarSlide(\''+id+'\','+i+')"></span>').join('');
+  return '<div class="nv-carousel" id="' + id + '" data-idx="0">' +
+    '<div class="nv-carousel-track">' + slides + '</div>' +
+    '<button class="nv-car-btn prev" onclick="nvCarPrev(\''+id+'\')">&#8249;</button>' +
+    '<button class="nv-car-btn next" onclick="nvCarNext(\''+id+'\')">&#8250;</button>' +
+    '<div class="nv-car-dots" id="' + id + '-dots">' + dots + '</div></div>';
+}
+
+function nvCarSlide(id, idx) {
+  const el = eid(id); if (!el) return;
+  const track = el.querySelector('.nv-carousel-track');
+  const total = track.children.length;
+  idx = ((idx % total) + total) % total;
+  el.dataset.idx = idx;
+  track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+  el.querySelectorAll('.nv-car-dots span').forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+
+function nvCarPrev(id) { const el = eid(id); if (el) nvCarSlide(id, +el.dataset.idx - 1); }
+function nvCarNext(id) { const el = eid(id); if (el) nvCarSlide(id, +el.dataset.idx + 1); }
+// ───────────────────────────────────────────────────────────────
+
 async function saveNovedad() {
   const title = fv('m-nv-title').trim();
   if (!title) { toast('El título es obligatorio', 'err'); return; }
   try {
-    await API.post('novedades', {title, description: fv('m-nv-desc'), date: fv('m-nv-date')||null, type: fv('m-nv-type')});
+    const payload = {title, description: fv('m-nv-desc'), date: fv('m-nv-date')||null, type: fv('m-nv-type')};
+    if (_nvImages.length) payload.images = JSON.stringify(_nvImages);
+    await API.post('novedades', payload);
     toast('Novedad guardada ✓', 'ok'); closeModal('novedad'); renderAvance();
-  } catch(e){toast('Error: '+e.message,'err');}
+  } catch(e) {
+    if (_nvImages.length && (e.message||'').toLowerCase().includes('images')) {
+      toast('Columna "images" faltante — guardando sin imágenes', 'err');
+      try {
+        await API.post('novedades', {title, description: fv('m-nv-desc'), date: fv('m-nv-date')||null, type: fv('m-nv-type')});
+        closeModal('novedad'); renderAvance();
+      } catch(e2) { toast('Error: '+e2.message,'err'); }
+    } else { toast('Error: '+e.message,'err'); }
+  }
 }
 
 async function saveGalItem() {
