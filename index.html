@@ -225,7 +225,13 @@ body:not(.private-mode) .private-only{display:none!important}
 .tl-done{background:#c8880a}.tl-active{background:#059669;box-shadow:0 0 0 3px #d1fae5}.tl-pend{background:#e2e8f0;border:2px solid #cbd5e0}
 /* Novedades grid de cards */
 .nov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:2px}
-.nov-card{background:#fff;border-radius:10px;border:1px solid #e2e8f0;overflow:hidden;display:flex;flex-direction:column}
+.nov-card{background:#fff;border-radius:10px;border:1px solid #e2e8f0;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.nov-card-actions{position:absolute;top:7px;right:7px;display:flex;gap:5px;opacity:0;transition:opacity .18s;z-index:3}
+.nov-card:hover .nov-card-actions{opacity:1}
+.nov-act-btn{width:28px;height:28px;border-radius:6px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;backdrop-filter:blur(4px)}
+.nov-act-edit{background:rgba(255,255,255,.88)}
+.nov-act-del{background:rgba(239,68,68,.85);color:#fff}
+.nov-month-hdr{grid-column:1/-1;background:linear-gradient(90deg,#c8880a,#e9a422);color:#fff;font-size:14px;font-weight:700;padding:9px 16px;border-radius:8px;letter-spacing:.5px;text-transform:uppercase}
 .nov-card-img{height:140px;background:#f1f5f9;overflow:hidden;flex-shrink:0}
 .nov-card-img img{width:100%;height:100%;object-fit:cover;display:block}
 .nov-card-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#cbd5e0;font-size:36px}
@@ -1577,8 +1583,8 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 </div></div>
 
 <div class="overlay" id="modal-novedad"><div class="modal">
-  <div class="mh"><span class="mh-title">Nueva Novedad</span><button class="mh-close" onclick="closeModal('novedad')">&#x2715;</button></div>
-  <div class="mb">
+  <div class="mh"><span class="mh-title" id="m-nv-modal-title">Nueva Novedad</span><button class="mh-close" onclick="closeModal('novedad')">&#x2715;</button></div>
+  <div class="mb"><input type="hidden" id="m-nv-id">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="fl"><label>Título *</label><input class="fi" type="text" id="m-nv-title"></div>
       <div class="fl"><label>Fecha</label><input class="fi" type="date" id="m-nv-date"></div>
@@ -1659,7 +1665,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.76';
+const APP_VERSION = 'v1.0.77';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -2545,6 +2551,7 @@ function openModal(name, data) {
     eid('m-et-pct').value = data.pct || 0; eid('m-et-pct-lbl').textContent = (data.pct||0) + '%';
   }
   if (name === 'novedad') {
+    eid('m-nv-id').value = ''; eid('m-nv-modal-title').textContent = 'Nueva Novedad';
     eid('m-nv-title').value = ''; eid('m-nv-desc').value = ''; eid('m-nv-type').value = 'hito';
     eid('m-nv-date').value = new Date().toISOString().split('T')[0];
     _nvImages = []; nvRenderThumbs();
@@ -3069,7 +3076,15 @@ async function renderAvance() {
     }).join('');
 
     window._novsCache = novs;
-    eid('av-novs').innerHTML = novs.length ? '<div class="nov-grid">' + novs.map((n, idx) => {
+    const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    let lastMonth = '', gridItems = '';
+    novs.forEach((n, idx) => {
+      const d = n.date ? new Date(n.date + 'T12:00:00') : null;
+      const monthKey = d ? MESES[d.getMonth()] + ' ' + d.getFullYear() : 'Sin fecha';
+      if (monthKey !== lastMonth) {
+        gridItems += '<div class="nov-month-hdr">' + monthKey + '</div>';
+        lastMonth = monthKey;
+      }
       let imgs = []; try { if (n.images) imgs = JSON.parse(n.images); } catch(_) {}
       const cover = imgs.length
         ? '<div class="nov-card-img"><img src="' + imgs[0] + '" loading="lazy"></div>'
@@ -3077,15 +3092,21 @@ async function renderAvance() {
       const badge = '<span class="nov-badge ' + (n.type||'otro') + '">' + (n.type==='hito'?'Hito':n.type==='avance'?'Avance':n.type==='documento'?'Documento':'Otro') + '</span>';
       const desc = (n.description||'').replace(/</g,'&lt;');
       const date = (n.date||'').split('T')[0];
-      return '<div class="nov-card">' + cover +
+      const actions = '<div class="nov-card-actions private-only">' +
+        '<button class="nov-act-btn nov-act-edit" title="Editar" onclick="openNovEdit(' + idx + ')">✏️</button>' +
+        '<button class="nov-act-btn nov-act-del" title="Eliminar" onclick="delNov(\'' + n.id + '\',\'' + n.title.replace(/'/g,"\\'") + '\')">🗑️</button>' +
+        '</div>';
+      gridItems += '<div class="nov-card">' + actions + cover +
         '<div class="nov-card-body">' +
         '<div class="nov-card-title">' + n.title + '</div>' +
         '<div class="nov-card-desc">' + desc + '</div>' +
         '<div class="nov-card-meta">' + badge + '<span class="nov-card-date">' + date + '</span></div>' +
         '<button class="nov-card-btn" onclick="openNovDet(' + idx + ')">+ info</button>' +
         '</div></div>';
-    }).join('') + '</div>'
-    : '<div class="empty"><div class="empty-icon">📋</div><p>Sin novedades</p></div>';
+    });
+    eid('av-novs').innerHTML = novs.length
+      ? '<div class="nov-grid">' + gridItems + '</div>'
+      : '<div class="empty"><div class="empty-icon">📋</div><p>Sin novedades</p></div>';
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
@@ -3618,6 +3639,27 @@ function nvCarSlide(id, idx) {
 function nvCarPrev(id) { const el = eid(id); if (el) nvCarSlide(id, +el.dataset.idx - 1); }
 function nvCarNext(id) { const el = eid(id); if (el) nvCarSlide(id, +el.dataset.idx + 1); }
 
+function openNovEdit(idx) {
+  const n = (window._novsCache || [])[idx]; if (!n) return;
+  let imgs = []; try { if (n.images) imgs = JSON.parse(n.images); } catch(_) {}
+  eid('m-nv-id').value = n.id;
+  eid('m-nv-modal-title').textContent = 'Editar Novedad';
+  eid('m-nv-title').value = n.title || '';
+  eid('m-nv-desc').value = n.description || '';
+  eid('m-nv-type').value = n.type || 'hito';
+  eid('m-nv-date').value = (n.date||'').split('T')[0];
+  _nvImages = imgs.slice(); nvRenderThumbs();
+  eid('modal-novedad').classList.add('show');
+}
+
+async function delNov(id, title) {
+  if (!confirm('¿Seguro que querés eliminar "' + title + '"?')) return;
+  try {
+    await API.del('novedades/' + id);
+    toast('Novedad eliminada ✓', 'ok'); renderAvance();
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
 function openNovDet(idx) {
   const n = (window._novsCache || [])[idx]; if (!n) return;
   let imgs = []; try { if (n.images) imgs = JSON.parse(n.images); } catch(_) {}
@@ -3639,16 +3681,19 @@ function openNovDet(idx) {
 async function saveNovedad() {
   const title = fv('m-nv-title').trim();
   if (!title) { toast('El título es obligatorio', 'err'); return; }
+  const id = fv('m-nv-id');
   try {
     const payload = {title, description: fv('m-nv-desc'), date: fv('m-nv-date')||null, type: fv('m-nv-type')};
     if (_nvImages.length) payload.images = JSON.stringify(_nvImages);
-    await API.post('novedades', payload);
-    toast('Novedad guardada ✓', 'ok'); closeModal('novedad'); renderAvance();
+    if (id) { await API.put('novedades/'+id, payload); toast('Novedad actualizada ✓','ok'); }
+    else     { await API.post('novedades', payload);    toast('Novedad guardada ✓','ok'); }
+    closeModal('novedad'); renderAvance();
   } catch(e) {
     if (_nvImages.length && (e.message||'').toLowerCase().includes('images')) {
       toast('Columna "images" faltante — guardando sin imágenes', 'err');
       try {
-        await API.post('novedades', {title, description: fv('m-nv-desc'), date: fv('m-nv-date')||null, type: fv('m-nv-type')});
+        const p2 = {title, description: fv('m-nv-desc'), date: fv('m-nv-date')||null, type: fv('m-nv-type')};
+        if (id) await API.put('novedades/'+id, p2); else await API.post('novedades', p2);
         closeModal('novedad'); renderAvance();
       } catch(e2) { toast('Error: '+e2.message,'err'); }
     } else { toast('Error: '+e.message,'err'); }
