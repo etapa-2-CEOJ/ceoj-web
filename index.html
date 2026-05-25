@@ -904,7 +904,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 
 <!-- NAMING -->
 <div class="pg" id="pg-naming">
-  <div class="ph"><div><h1>Naming Opportunities</h1><p>Espacios disponibles para nombramiento perpetuo · Precios ocultos si reservado/confirmado</p></div>
+  <div class="ph"><div><h1>Naming Opportunities</h1><p>Espacios disponibles para nombramiento perpetuo</p></div>
     <div class="ph-btns"><button class="btn btn-ghost btn-sm private-only" onclick="forceSyncNaming()" title="Sincroniza estados de naming con donantes y publica al público">↺ Sincronizar</button><button class="btn btn-gold btn-sm private-only" onclick="openModal('naming')">+ Espacio</button></div></div>
   <div class="pc">
     <div class="g4" id="nam-kpis"></div>
@@ -1603,7 +1603,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.73';
+const APP_VERSION = 'v1.0.74';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
