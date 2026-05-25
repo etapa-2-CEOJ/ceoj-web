@@ -1666,7 +1666,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.80';
+const APP_VERSION = 'v1.0.81';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -2956,21 +2956,33 @@ async function renderNamingPres() {
 // ============================================================
 // AVANCE
 // ============================================================
-// Polygon coords in original image space (1274 × 716 px)
-// Order per zone: top-left, top-right, bottom-right, bottom-left
-// Use CAL button (admin) to hover and read exact coordinates → send to Claude to refine
-const BLDG_FLOORS = [
-  { label:'Azotea', etapa:'Estructura S/Azotea',       pts:[ [80,90],  [640,145],[640,193],[80,144] ] },
-  { label:'Piso 6', etapa:'Estructura S/6° Piso',      pts:[ [80,144], [640,193],[640,241],[80,197] ] },
-  { label:'Piso 5', etapa:'Estructura S/5° Piso',      pts:[ [80,197], [640,241],[640,289],[80,251] ] },
-  { label:'Piso 4', etapa:'Estructura S/4° Piso',      pts:[ [80,251], [640,289],[640,337],[80,305] ] },
-  { label:'Piso 3', etapa:'Estructura S/3° Piso',      pts:[ [80,305], [640,337],[640,385],[80,359] ] },
-  { label:'Piso 2', etapa:'Estructura S/2° Piso',      pts:[ [80,359], [640,385],[640,433],[80,413] ] },
-  { label:'Piso 1', etapa:'Estructura S/1° Piso',      pts:[ [80,413], [640,433],[640,481],[80,467] ] },
-  { label:'PB',     etapa:'Estructura S/Planta Baja',  pts:[ [80,467], [640,481],[640,529],[80,521] ] },
-  { label:'1SS',    etapa:'Estructura S/1° Subsuelo',  pts:[ [80,521], [640,529],[640,577],[80,575] ] },
-  { label:'2SS',    etapa:'Estructura S/2° Subsuelo',  pts:[ [80,575], [640,577],[640,625],[80,625] ] },
-];
+// Slab lines calibrated from CAL mode (image 1274×716)
+// Bottom ref (2SS floor): left(549,686) right(1079,285)
+// Top ref (Azotea top):   left(222,101) right(923,28)
+// 11 slab lines interpolated linearly → 10 floor zones
+const BLDG_FLOORS = (function() {
+  const BL=[549,686], BR=[1079,285], TL=[222,101], TR=[923,28], N=10;
+  const lr = (a,b,t) => Math.round(a + (b-a)*t);
+  const slabs = Array.from({length:N+1}, (_,i) => ({
+    l: [lr(BL[0],TL[0],i/N), lr(BL[1],TL[1],i/N)],
+    r: [lr(BR[0],TR[0],i/N), lr(BR[1],TR[1],i/N)]
+  }));
+  return [
+    { label:'Azotea', etapa:'Estructura S/Azotea'      },
+    { label:'Piso 6', etapa:'Estructura S/6° Piso'     },
+    { label:'Piso 5', etapa:'Estructura S/5° Piso'     },
+    { label:'Piso 4', etapa:'Estructura S/4° Piso'     },
+    { label:'Piso 3', etapa:'Estructura S/3° Piso'     },
+    { label:'Piso 2', etapa:'Estructura S/2° Piso'     },
+    { label:'Piso 1', etapa:'Estructura S/1° Piso'     },
+    { label:'PB',     etapa:'Estructura S/Planta Baja' },
+    { label:'1SS',    etapa:'Estructura S/1° Subsuelo' },
+    { label:'2SS',    etapa:'Estructura S/2° Subsuelo' },
+  ].map((f, i) => {
+    const top = slabs[N-i], bot = slabs[N-i-1];
+    return { ...f, pts:[top.l, top.r, bot.r, bot.l] }; // TL,TR,BR,BL
+  });
+})();
 
 function renderBuilding(etapas) {
   const el = eid('av-building');
