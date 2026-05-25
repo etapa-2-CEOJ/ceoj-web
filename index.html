@@ -1604,7 +1604,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.69';
+const APP_VERSION = 'v1.0.70';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -2899,14 +2899,16 @@ function renderBuilding(etapas) {
 
   // Approximate vertical position (% from top) of each floor slab in the 3D image
   const floors = [
-    { label:'Azotea', etapa:'Estructura S/Azotea',      top:2,  h:11 },
-    { label:'Piso 6', etapa:'Estructura S/6° Piso',     top:13, h:11 },
-    { label:'Piso 5', etapa:'Estructura S/5° Piso',     top:24, h:11 },
-    { label:'Piso 4', etapa:'Estructura S/4° Piso',     top:35, h:11 },
-    { label:'Piso 3', etapa:'Estructura S/3° Piso',     top:46, h:11 },
-    { label:'Piso 2', etapa:'Estructura S/2° Piso',     top:57, h:12 },
-    { label:'Piso 1', etapa:'Estructura S/1° Piso',     top:69, h:12 },
-    { label:'PB',     etapa:'Estructura S/Planta Baja', top:81, h:14 },
+    { label:'Azotea', etapa:'Estructura S/Azotea',      top:2,  h:9 },
+    { label:'Piso 6', etapa:'Estructura S/6° Piso',     top:11, h:9 },
+    { label:'Piso 5', etapa:'Estructura S/5° Piso',     top:20, h:9 },
+    { label:'Piso 4', etapa:'Estructura S/4° Piso',     top:29, h:9 },
+    { label:'Piso 3', etapa:'Estructura S/3° Piso',     top:38, h:9 },
+    { label:'Piso 2', etapa:'Estructura S/2° Piso',     top:47, h:9 },
+    { label:'Piso 1', etapa:'Estructura S/1° Piso',     top:56, h:9 },
+    { label:'PB',     etapa:'Estructura S/Planta Baja', top:65, h:10 },
+    { label:'1SS',    etapa:'Estructura S/Subsuelo 1',  top:75, h:10 },
+    { label:'2SS',    etapa:'Estructura S/Subsuelo 2',  top:85, h:10 },
   ];
 
   const foundPct = Math.round((pct('Tareas Preliminares') + pct('Movimiento de Suelos') + pct('Estructura Fundaciones')) / 3);
