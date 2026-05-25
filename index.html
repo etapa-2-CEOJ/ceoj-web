@@ -1666,7 +1666,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.83';
+const APP_VERSION = 'v1.0.84';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -2956,119 +2956,76 @@ async function renderNamingPres() {
 // ============================================================
 // AVANCE
 // ============================================================
-// Solo borde frontal calibrado en CAL mode (imagen 1274×716)
-// Ancla inferior (2SS):  izq(546,690) der(914,445)
-// Ancla superior (Azot): izq(521,208) der(772,112)
-// 11 líneas interpoladas → 10 bandas paralelas consistentes
-const BLDG_FLOORS = (function() {
-  const Li=[521,208], Ri=[772,112];
-  const Lf=[546,690], Rf=[914,445];
-  const N=9, lr=(a,b,t)=>Math.round(a+(b-a)*t);
-  const sl=Array.from({length:N+2},(_,i)=>({
-    l:[lr(Li[0],Lf[0],i/N), lr(Li[1],Lf[1],i/N)],
-    r:[lr(Ri[0],Rf[0],i/N), lr(Ri[1],Rf[1],i/N)]
-  }));
-  return [
-    { label:'Azotea', etapa:'Estructura S/Azotea'      },
-    { label:'Piso 6', etapa:'Estructura S/6° Piso'     },
-    { label:'Piso 5', etapa:'Estructura S/5° Piso'     },
-    { label:'Piso 4', etapa:'Estructura S/4° Piso'     },
-    { label:'Piso 3', etapa:'Estructura S/3° Piso'     },
-    { label:'Piso 2', etapa:'Estructura S/2° Piso'     },
-    { label:'Piso 1', etapa:'Estructura S/1° Piso'     },
-    { label:'PB',     etapa:'Estructura S/Planta Baja' },
-    { label:'1SS',    etapa:'Estructura S/1° Subsuelo' },
-    { label:'2SS',    etapa:'Estructura S/2° Subsuelo' },
-  ].map((f,i)=>({ ...f, pts:[sl[i].l, sl[i].r, sl[i+1].r, sl[i+1].l] }));
-})();
-
 function renderBuilding(etapas) {
   const el = eid('av-building');
   if (!el) return;
-  const getPct = (name) => parseInt((etapas.find(e => e.name === name) || {}).pct) || 0;
-  const isAdmin = CU && CU.role === 'admin';
+  const pct = (name) => parseInt((etapas.find(e => e.name === name) || {}).pct) || 0;
 
-  let svgFills = '', svgLines = '', labels = '';
+  const floors = [
+    { label:'Azotea', etapa:'Estructura S/Azotea',      top:2,  h:9 },
+    { label:'Piso 6', etapa:'Estructura S/6° Piso',     top:11, h:9 },
+    { label:'Piso 5', etapa:'Estructura S/5° Piso',     top:20, h:9 },
+    { label:'Piso 4', etapa:'Estructura S/4° Piso',     top:29, h:9 },
+    { label:'Piso 3', etapa:'Estructura S/3° Piso',     top:38, h:9 },
+    { label:'Piso 2', etapa:'Estructura S/2° Piso',     top:47, h:9 },
+    { label:'Piso 1', etapa:'Estructura S/1° Piso',     top:56, h:9 },
+    { label:'PB',     etapa:'Estructura S/Planta Baja', top:65, h:10 },
+    { label:'1SS',    etapa:'Estructura S/1° Subsuelo', top:75, h:10 },
+    { label:'2SS',    etapa:'Estructura S/2° Subsuelo', top:85, h:10 },
+  ];
 
-  BLDG_FLOORS.forEach(f => {
-    const pct  = getPct(f.etapa);
-    const done = pct >= 100, active = pct > 0 && !done;
-    const ptStr = f.pts.map(p => p.join(',')).join(' ');
+  const foundPct = Math.round((pct('Tareas Preliminares') + pct('Movimiento de Suelos') + pct('Estructura Fundaciones')) / 3);
+  let colorBands = '', lines = '', labels = '';
 
-    // Coloured polygon fill — screen blend so structure shows through
-    if (pct > 0) {
+  floors.forEach(f => {
+    const p = pct(f.etapa);
+    const done = p >= 100, active = p > 0 && !done;
+
+    if (p > 0) {
       const rgb = done ? '52,211,153' : '232,160,32';
-      const op  = (0.18 + (pct / 100) * 0.28).toFixed(2);
-      svgFills += `<polygon points="${ptStr}" fill="rgba(${rgb},${op})" style="mix-blend-mode:screen"/>`;
+      const op  = (0.12 + (p / 100) * 0.22).toFixed(2);
+      colorBands += `<div style="position:absolute;left:0;right:0;top:${f.top}%;height:${f.h}%;
+        background:rgba(${rgb},${op});mix-blend-mode:screen;pointer-events:none"></div>`;
     }
 
-    // Slab divider line at bottom edge (BL → BR)
-    const [bl, br] = [f.pts[3], f.pts[2]];
-    const lc = done ? 'rgba(52,211,153,.9)' : active ? 'rgba(232,160,32,.9)' : 'rgba(255,255,255,.12)';
-    svgLines += `<line x1="${bl[0]}" y1="${bl[1]}" x2="${br[0]}" y2="${br[1]}"
-      stroke="${lc}" stroke-width="${pct > 0 ? 2 : 1}"/>`;
+    const lc   = done ? 'rgba(52,211,153,.85)' : active ? 'rgba(232,160,32,.85)' : 'rgba(255,255,255,.1)';
+    const glow = p > 0 ? (done ? '0 0 8px rgba(52,211,153,.6),0 0 18px rgba(52,211,153,.3)'
+                                : '0 0 8px rgba(232,160,32,.6),0 0 18px rgba(232,160,32,.3)') : 'none';
+    lines += `<div style="position:absolute;left:0;right:0;top:${f.top + f.h}%;height:1.5px;
+      background:${lc};box-shadow:${glow};pointer-events:none"></div>`;
 
-    // Label (positioned at mid-left-edge, converted to %)
-    const midY = (f.pts[0][1] + f.pts[3][1]) / 2;
     const tc = done ? '#34d399' : active ? '#e8a020' : 'rgba(255,255,255,.28)';
-    const ts = pct > 0 ? (done ? 'text-shadow:0 0 10px rgba(52,211,153,.8)' : 'text-shadow:0 0 10px rgba(232,160,32,.8)') : '';
-    labels += `<div style="position:absolute;right:9px;top:${(midY/716*100).toFixed(1)}%;transform:translateY(-50%);
+    const ts = p > 0 ? (done ? 'text-shadow:0 0 10px rgba(52,211,153,.8)'
+                              : 'text-shadow:0 0 10px rgba(232,160,32,.8)') : '';
+    labels += `<div style="position:absolute;right:9px;top:${f.top + f.h/2}%;transform:translateY(-50%);
       pointer-events:none;text-align:right;line-height:1.25">
       <div style="font-size:9.5px;font-weight:700;font-family:'DM Mono',monospace;color:${tc};${ts}">${f.label}</div>
-      ${pct > 0 ? `<div style="font-size:8px;font-family:'DM Mono',monospace;color:${tc};opacity:.8">${pct}%</div>` : ''}
+      ${p > 0 ? `<div style="font-size:8px;font-family:'DM Mono',monospace;color:${tc};opacity:.8">${p}%</div>` : ''}
     </div>`;
   });
 
-  const foundPct = Math.round((getPct('Tareas Preliminares') + getPct('Movimiento de Suelos') + getPct('Estructura Fundaciones')) / 3);
   const foundBar = foundPct > 0
     ? `<div style="position:absolute;bottom:0;left:0;right:0;padding:5px 11px;
-        background:linear-gradient(transparent,rgba(5,8,16,.75));font-size:8px;
-        font-family:'DM Mono',monospace;letter-spacing:.15em;
+        background:linear-gradient(transparent,rgba(5,8,16,.75));
+        font-size:8px;font-family:'DM Mono',monospace;letter-spacing:.15em;
         color:${foundPct>=100?'#34d399':'#e8a020'}">FUNDACIONES · ${foundPct}%</div>` : '';
 
-  const calBtn = isAdmin
-    ? `<div id="bld-cal-btn" onclick="bldCalToggle()" style="position:absolute;top:6px;left:92px;
-        background:rgba(0,0,0,.55);color:rgba(255,255,255,.4);font-size:8px;
-        font-family:'DM Mono',monospace;padding:2px 8px;border-radius:4px;cursor:pointer;
-        letter-spacing:.1em;z-index:10">CAL OFF</div>
-       <div id="bld-cal-xy" style="display:none;position:absolute;top:6px;right:8px;
-        background:rgba(0,0,0,.75);color:#facc15;font-size:11px;font-family:'DM Mono',monospace;
-        padding:3px 8px;border-radius:4px;pointer-events:none;z-index:10">0,0</div>` : '';
-
-  el.innerHTML = `<div id="bld-wrap" style="position:relative;border-radius:12px;overflow:hidden;
-    background:#060a14;box-shadow:0 20px 56px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.07)">
-    <img src="${ESTRUCTURA_SRC}" alt="Estructura CEOJ" style="width:100%;display:block;
-      filter:invert(1) brightness(0.72) contrast(1.2) saturate(0)">
-    <svg style="position:absolute;inset:0;width:100%;height:100%"
-         viewBox="0 0 1274 716" preserveAspectRatio="none" pointer-events="none">
-      ${svgFills}${svgLines}
-    </svg>
-    <div style="position:absolute;inset:0;background:linear-gradient(150deg,
-      rgba(6,10,20,.3) 0%,transparent 18%,transparent 82%,rgba(6,10,20,.45) 100%);
-      pointer-events:none"></div>
-    <div style="position:absolute;inset:0">${labels}</div>
-    <div style="position:absolute;top:9px;left:12px;font-size:7px;font-family:'DM Mono',monospace;
-      color:rgba(255,255,255,.3);letter-spacing:.22em;text-transform:uppercase;
-      pointer-events:none">CEOJ · ESTRUCTURA</div>
-    ${foundBar}${calBtn}
-  </div>`;
-
-  if (isAdmin) {
-    const wrap = eid('bld-wrap');
-    if (wrap) wrap.addEventListener('mousemove', e => {
-      const xy = eid('bld-cal-xy'); if (!xy || xy.style.display === 'none') return;
-      const r = wrap.getBoundingClientRect();
-      xy.textContent = Math.round((e.clientX-r.left)/r.width*1274) + ',' + Math.round((e.clientY-r.top)/r.height*716);
-    });
-  }
-}
-
-function bldCalToggle() {
-  const xy = eid('bld-cal-xy'), btn = eid('bld-cal-btn'); if (!xy || !btn) return;
-  const on = xy.style.display === 'none';
-  xy.style.display = on ? 'block' : 'none';
-  btn.textContent = on ? 'CAL ON' : 'CAL OFF';
-  btn.style.color = on ? '#facc15' : 'rgba(255,255,255,.4)';
+  el.innerHTML =
+    `<div style="position:relative;border-radius:12px;overflow:hidden;background:#060a14;
+      box-shadow:0 20px 56px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.07)">
+      <img src="${ESTRUCTURA_SRC}" alt="Estructura CEOJ" style="width:100%;display:block;
+        filter:invert(1) brightness(0.72) contrast(1.2) saturate(0)">
+      <div style="position:absolute;inset:0;background:linear-gradient(150deg,
+        rgba(6,10,20,.3) 0%,transparent 18%,transparent 82%,rgba(6,10,20,.45) 100%);
+        pointer-events:none"></div>
+      <div style="position:absolute;inset:0;pointer-events:none">${colorBands}</div>
+      <div style="position:absolute;inset:0;pointer-events:none">${lines}</div>
+      <div style="position:absolute;inset:0">${labels}</div>
+      <div style="position:absolute;top:9px;left:12px;font-size:7px;
+        font-family:'DM Mono',monospace;color:rgba(255,255,255,.3);letter-spacing:.22em;
+        text-transform:uppercase;pointer-events:none">CEOJ · ESTRUCTURA</div>
+      ${foundBar}
+    </div>`;
 }
 
 
