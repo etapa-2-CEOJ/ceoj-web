@@ -223,6 +223,27 @@ body:not(.private-mode) .private-only{display:none!important}
 .tl-item{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid #f1f5f9}.tl-item:last-child{border-bottom:none}
 .tl-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
 .tl-done{background:#c8880a}.tl-active{background:#059669;box-shadow:0 0 0 3px #d1fae5}.tl-pend{background:#e2e8f0;border:2px solid #cbd5e0}
+/* Novedades grid de cards */
+.nov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:2px}
+.nov-card{background:#fff;border-radius:10px;border:1px solid #e2e8f0;overflow:hidden;display:flex;flex-direction:column}
+.nov-card-img{height:140px;background:#f1f5f9;overflow:hidden;flex-shrink:0}
+.nov-card-img img{width:100%;height:100%;object-fit:cover;display:block}
+.nov-card-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#cbd5e0;font-size:36px}
+.nov-card-body{padding:11px 12px 10px;flex:1;display:flex;flex-direction:column;gap:5px}
+.nov-card-title{font-size:12px;font-weight:700;color:#1a2540;line-height:1.3}
+.nov-card-desc{font-size:11px;color:#64748b;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+.nov-card-meta{display:flex;align-items:center;justify-content:space-between;margin-top:2px}
+.nov-card-date{font-size:10px;color:#94a3b8}
+.nov-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;text-transform:uppercase;letter-spacing:.3px}
+.nov-badge.hito{background:#fef3c7;color:#92400e}
+.nov-badge.avance{background:#d1fae5;color:#065f46}
+.nov-badge.documento{background:#dbeafe;color:#1e40af}
+.nov-badge.otro{background:#f1f5f9;color:#64748b}
+.nov-card-btn{margin-top:8px;width:100%;padding:6px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;font-size:11px;font-weight:600;color:#1a2540;cursor:pointer;transition:background .15s}
+.nov-card-btn:hover{background:#e2e8f0}
+.modal-lg{max-width:620px}
+@media(max-width:760px){.nov-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.nov-grid{grid-template-columns:1fr}}
 .nv-carousel{position:relative;margin-top:6px;border-radius:8px;overflow:hidden;background:#0a0e1a}
 .nv-carousel-track{display:flex;transition:transform .3s ease}
 .nv-carousel-slide{flex:0 0 100%;min-width:100%}
@@ -650,7 +671,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
         </div>
       </div>
     </div>
-    <div class="card"><div class="ch"><span class="ctitle">Novedades e Hitos</span></div><div class="cb" id="av-novs" style="max-height:300px;overflow-y:auto"></div></div>
+    <div class="card"><div class="ch"><span class="ctitle">Novedades e Hitos</span></div><div class="cb" id="av-novs"></div></div>
     <div class="card ct-gold private-only"><div class="ch"><span class="ctitle">Gantt detallado</span></div><div class="cb" id="av-gantt"></div></div>
   </div>
 </div>
@@ -1575,6 +1596,19 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
   <div class="mf"><button class="btn btn-ghost" onclick="closeModal('novedad')">Cancelar</button><button class="btn btn-gold" onclick="saveNovedad()">Guardar</button></div>
 </div></div>
 
+<div class="overlay" id="modal-nov-det"><div class="modal modal-lg">
+  <div class="mh"><span class="mh-title" id="nd-title"></span><button class="mh-close" onclick="closeModal('nov-det')">&#x2715;</button></div>
+  <div class="mb" style="padding-top:0">
+    <div id="nd-carousel"></div>
+    <div style="display:flex;align-items:center;gap:8px;margin:12px 0 6px">
+      <span id="nd-badge" class="nov-badge"></span>
+      <span id="nd-date" style="font-size:11px;color:#94a3b8"></span>
+    </div>
+    <p id="nd-desc" style="font-size:13px;color:#374151;line-height:1.6;white-space:pre-wrap"></p>
+  </div>
+  <div class="mf"><button class="btn btn-ghost" onclick="closeModal('nov-det')">Cerrar</button></div>
+</div></div>
+
 <div class="overlay" id="modal-usuario"><div class="modal">
   <div class="mh"><span class="mh-title" id="m-usr-title">Nuevo Usuario</span><button class="mh-close" onclick="closeModal('usuario')">&#x2715;</button></div>
   <div class="mb">
@@ -1625,7 +1659,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.75';
+const APP_VERSION = 'v1.0.76';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -3034,15 +3068,24 @@ async function renderAvance() {
       '</div>';
     }).join('');
 
-    eid('av-novs').innerHTML = novs.map((n, idx) => {
+    window._novsCache = novs;
+    eid('av-novs').innerHTML = novs.length ? '<div class="nov-grid">' + novs.map((n, idx) => {
       let imgs = []; try { if (n.images) imgs = JSON.parse(n.images); } catch(_) {}
-      return '<div class="tl-item" style="flex-direction:column;gap:0"><div style="display:flex;gap:9px;align-items:flex-start">' +
-        '<div class="tl-dot ' + (n.type==='hito'?'tl-done':'tl-active') + '" style="margin-top:4px;flex-shrink:0"></div>' +
-        '<div style="flex:1"><div style="font-size:12px;font-weight:600;color:#1a2540">' + n.title + '</div>' +
-        '<p style="font-size:11px;color:#94a3b8">' + (n.description||'') + '</p></div>' +
-        '<div style="font-size:10px;color:#94a3b8;white-space:nowrap">' + (n.date||'').split('T')[0] + '</div>' +
-        '</div>' + buildNvCarousel('nvc'+idx, imgs) + '</div>';
-    }).join('') || '<div class="empty"><div class="empty-icon">📋</div><p>Sin novedades</p></div>';
+      const cover = imgs.length
+        ? '<div class="nov-card-img"><img src="' + imgs[0] + '" loading="lazy"></div>'
+        : '<div class="nov-card-img"><div class="nov-card-img-ph">🏗️</div></div>';
+      const badge = '<span class="nov-badge ' + (n.type||'otro') + '">' + (n.type==='hito'?'Hito':n.type==='avance'?'Avance':n.type==='documento'?'Documento':'Otro') + '</span>';
+      const desc = (n.description||'').replace(/</g,'&lt;');
+      const date = (n.date||'').split('T')[0];
+      return '<div class="nov-card">' + cover +
+        '<div class="nov-card-body">' +
+        '<div class="nov-card-title">' + n.title + '</div>' +
+        '<div class="nov-card-desc">' + desc + '</div>' +
+        '<div class="nov-card-meta">' + badge + '<span class="nov-card-date">' + date + '</span></div>' +
+        '<button class="nov-card-btn" onclick="openNovDet(' + idx + ')">+ info</button>' +
+        '</div></div>';
+    }).join('') + '</div>'
+    : '<div class="empty"><div class="empty-icon">📋</div><p>Sin novedades</p></div>';
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
@@ -3574,6 +3617,23 @@ function nvCarSlide(id, idx) {
 
 function nvCarPrev(id) { const el = eid(id); if (el) nvCarSlide(id, +el.dataset.idx - 1); }
 function nvCarNext(id) { const el = eid(id); if (el) nvCarSlide(id, +el.dataset.idx + 1); }
+
+function openNovDet(idx) {
+  const n = (window._novsCache || [])[idx]; if (!n) return;
+  let imgs = []; try { if (n.images) imgs = JSON.parse(n.images); } catch(_) {}
+  eid('nd-title').textContent = n.title;
+  eid('nd-desc').textContent = n.description || '';
+  eid('nd-date').textContent = (n.date||'').split('T')[0];
+  const badge = eid('nd-badge');
+  badge.textContent = n.type==='hito'?'Hito':n.type==='avance'?'Avance':n.type==='documento'?'Documento':'Otro';
+  badge.className = 'nov-badge ' + (n.type||'otro');
+  eid('nd-carousel').innerHTML = imgs.length > 1
+    ? buildNvCarousel('nd-car', imgs)
+    : imgs.length === 1
+      ? '<div style="border-radius:8px;overflow:hidden;margin-bottom:4px"><img src="' + imgs[0] + '" style="width:100%;max-height:340px;object-fit:cover;display:block"></div>'
+      : '';
+  eid('modal-nov-det').classList.add('show');
+}
 // ───────────────────────────────────────────────────────────────
 
 async function saveNovedad() {
