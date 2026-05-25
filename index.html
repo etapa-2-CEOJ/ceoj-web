@@ -231,7 +231,7 @@ body:not(.private-mode) .private-only{display:none!important}
 .nov-act-btn{width:28px;height:28px;border-radius:6px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;backdrop-filter:blur(4px)}
 .nov-act-edit{background:rgba(255,255,255,.88)}
 .nov-act-del{background:rgba(239,68,68,.85);color:#fff}
-.nov-month-hdr{grid-column:1/-1;background:linear-gradient(90deg,#c8880a,#e9a422);color:#fff;font-size:14px;font-weight:700;padding:9px 16px;border-radius:8px;letter-spacing:.5px;text-transform:uppercase}
+.nov-card-hdr{background:linear-gradient(90deg,#c8880a,#e9a422);color:#fff;font-size:13px;font-weight:700;padding:8px 14px;letter-spacing:.4px;text-transform:uppercase;line-height:1.2}
 .nov-card-img{height:140px;background:#f1f5f9;overflow:hidden;flex-shrink:0}
 .nov-card-img img{width:100%;height:100%;object-fit:cover;display:block}
 .nov-card-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#cbd5e0;font-size:36px}
@@ -1591,6 +1591,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
     </div>
     <div class="fl"><label>Descripción</label><textarea class="fi" id="m-nv-desc" style="min-height:64px;resize:vertical"></textarea></div>
     <div class="fl"><label>Tipo</label><select class="fi" id="m-nv-type"><option value="hito">Hito importante</option><option value="avance">Avance de obra</option><option value="documento">Documento</option><option value="otro">Otro</option></select></div>
+    <div class="fl"><label>Encabezado (ej: Mayo 2026)</label><input class="fi" type="text" id="m-nv-header" placeholder="Opcional — se muestra en barra dorada sobre la imagen"></div>
     <div class="fl"><label>Imágenes (opcional)</label>
       <div class="img-up-area" onclick="document.getElementById('m-nv-files').click()">
         <span style="color:#94a3b8;font-size:13px">📷 Tocá para agregar imágenes</span>
@@ -1665,7 +1666,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.77';
+const APP_VERSION = 'v1.0.78';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -2553,7 +2554,7 @@ function openModal(name, data) {
   if (name === 'novedad') {
     eid('m-nv-id').value = ''; eid('m-nv-modal-title').textContent = 'Nueva Novedad';
     eid('m-nv-title').value = ''; eid('m-nv-desc').value = ''; eid('m-nv-type').value = 'hito';
-    eid('m-nv-date').value = new Date().toISOString().split('T')[0];
+    eid('m-nv-date').value = new Date().toISOString().split('T')[0]; eid('m-nv-header').value = '';
     _nvImages = []; nvRenderThumbs();
   }
   if (name === 'usuario') {
@@ -3076,16 +3077,9 @@ async function renderAvance() {
     }).join('');
 
     window._novsCache = novs;
-    const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-    let lastMonth = '', gridItems = '';
-    novs.forEach((n, idx) => {
-      const d = n.date ? new Date(n.date + 'T12:00:00') : null;
-      const monthKey = d ? MESES[d.getMonth()] + ' ' + d.getFullYear() : 'Sin fecha';
-      if (monthKey !== lastMonth) {
-        gridItems += '<div class="nov-month-hdr">' + monthKey + '</div>';
-        lastMonth = monthKey;
-      }
+    eid('av-novs').innerHTML = novs.length ? '<div class="nov-grid">' + novs.map((n, idx) => {
       let imgs = []; try { if (n.images) imgs = JSON.parse(n.images); } catch(_) {}
+      const hdrBar = n.header ? '<div class="nov-card-hdr">' + n.header + '</div>' : '';
       const cover = imgs.length
         ? '<div class="nov-card-img"><img src="' + imgs[0] + '" loading="lazy"></div>'
         : '<div class="nov-card-img"><div class="nov-card-img-ph">🏗️</div></div>';
@@ -3096,17 +3090,15 @@ async function renderAvance() {
         '<button class="nov-act-btn nov-act-edit" title="Editar" onclick="openNovEdit(' + idx + ')">✏️</button>' +
         '<button class="nov-act-btn nov-act-del" title="Eliminar" onclick="delNov(\'' + n.id + '\',\'' + n.title.replace(/'/g,"\\'") + '\')">🗑️</button>' +
         '</div>';
-      gridItems += '<div class="nov-card">' + actions + cover +
+      return '<div class="nov-card">' + actions + hdrBar + cover +
         '<div class="nov-card-body">' +
         '<div class="nov-card-title">' + n.title + '</div>' +
         '<div class="nov-card-desc">' + desc + '</div>' +
         '<div class="nov-card-meta">' + badge + '<span class="nov-card-date">' + date + '</span></div>' +
         '<button class="nov-card-btn" onclick="openNovDet(' + idx + ')">+ info</button>' +
         '</div></div>';
-    });
-    eid('av-novs').innerHTML = novs.length
-      ? '<div class="nov-grid">' + gridItems + '</div>'
-      : '<div class="empty"><div class="empty-icon">📋</div><p>Sin novedades</p></div>';
+    }).join('') + '</div>'
+    : '<div class="empty"><div class="empty-icon">📋</div><p>Sin novedades</p></div>';
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
@@ -3648,6 +3640,7 @@ function openNovEdit(idx) {
   eid('m-nv-desc').value = n.description || '';
   eid('m-nv-type').value = n.type || 'hito';
   eid('m-nv-date').value = (n.date||'').split('T')[0];
+  eid('m-nv-header').value = n.header || '';
   _nvImages = imgs.slice(); nvRenderThumbs();
   eid('modal-novedad').classList.add('show');
 }
@@ -3683,7 +3676,7 @@ async function saveNovedad() {
   if (!title) { toast('El título es obligatorio', 'err'); return; }
   const id = fv('m-nv-id');
   try {
-    const payload = {title, description: fv('m-nv-desc'), date: fv('m-nv-date')||null, type: fv('m-nv-type')};
+    const payload = {title, description: fv('m-nv-desc'), date: fv('m-nv-date')||null, type: fv('m-nv-type'), header: fv('m-nv-header')||null};
     if (_nvImages.length) payload.images = JSON.stringify(_nvImages);
     if (id) { await API.put('novedades/'+id, payload); toast('Novedad actualizada ✓','ok'); }
     else     { await API.post('novedades', payload);    toast('Novedad guardada ✓','ok'); }
@@ -3692,7 +3685,7 @@ async function saveNovedad() {
     if (_nvImages.length && (e.message||'').toLowerCase().includes('images')) {
       toast('Columna "images" faltante — guardando sin imágenes', 'err');
       try {
-        const p2 = {title, description: fv('m-nv-desc'), date: fv('m-nv-date')||null, type: fv('m-nv-type')};
+        const p2 = {title, description: fv('m-nv-desc'), date: fv('m-nv-date')||null, type: fv('m-nv-type'), header: fv('m-nv-header')||null};
         if (id) await API.put('novedades/'+id, p2); else await API.post('novedades', p2);
         closeModal('novedad'); renderAvance();
       } catch(e2) { toast('Error: '+e2.message,'err'); }
