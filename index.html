@@ -1604,7 +1604,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.71';
+const APP_VERSION = 'v1.0.72';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -2955,8 +2955,7 @@ function renderBuilding(etapas) {
     `<div style="position:relative;border-radius:12px;overflow:hidden;background:#060a14;
       box-shadow:0 20px 56px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.07)">
       <img src="${ESTRUCTURA_SRC}" alt="Estructura CEOJ" style="width:100%;display:block;
-        filter:invert(1) brightness(0.72) contrast(1.2) saturate(0);
-        transform:rotate(-8deg) scale(1.22);transform-origin:center 85%;">
+        filter:invert(1) brightness(0.72) contrast(1.2) saturate(0)">
       <div style="position:absolute;inset:0;background:linear-gradient(150deg,
         rgba(6,10,20,.3) 0%,transparent 18%,transparent 82%,rgba(6,10,20,.45) 100%);
         pointer-events:none"></div>
