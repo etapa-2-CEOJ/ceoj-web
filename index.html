@@ -1666,7 +1666,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.82';
+const APP_VERSION = 'v1.0.83';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -2956,20 +2956,31 @@ async function renderNamingPres() {
 // ============================================================
 // AVANCE
 // ============================================================
-// Polygon coords calibrated manually via CAL mode (image 1274×716)
-// Point order: front-left, front-right, back-right, back-left
-const BLDG_FLOORS = [
-  { label:'Azotea', etapa:'Estructura S/Azotea',      pts:[[521,208],[772,112],[932,47], [223,122]] },
-  { label:'Piso 6', etapa:'Estructura S/6° Piso',     pts:[[501,283],[809,161],[936,78], [227,127]] },
-  { label:'Piso 5', etapa:'Estructura S/5° Piso',     pts:[[476,344],[816,227],[937,103],[188,127]] },
-  { label:'Piso 4', etapa:'Estructura S/4° Piso',     pts:[[488,399],[824,269],[937,131],[200,267]] },
-  { label:'Piso 3', etapa:'Estructura S/3° Piso',     pts:[[496,447],[818,303],[938,156],[210,303]] },
-  { label:'Piso 2', etapa:'Estructura S/2° Piso',     pts:[[509,494],[880,292],[941,181],[221,343]] },
-  { label:'Piso 1', etapa:'Estructura S/1° Piso',     pts:[[516,545],[885,318],[949,206],[230,379]] },
-  { label:'PB',     etapa:'Estructura S/Planta Baja', pts:[[529,594],[909,371],[1082,245],[241,419]] },
-  { label:'1SS',    etapa:'Estructura S/1° Subsuelo', pts:[[534,642],[911,411],[1083,272],[252,452]] },
-  { label:'2SS',    etapa:'Estructura S/2° Subsuelo', pts:[[546,690],[914,445],[1082,302],[259,489]] },
-];
+// Solo borde frontal calibrado en CAL mode (imagen 1274×716)
+// Ancla inferior (2SS):  izq(546,690) der(914,445)
+// Ancla superior (Azot): izq(521,208) der(772,112)
+// 11 líneas interpoladas → 10 bandas paralelas consistentes
+const BLDG_FLOORS = (function() {
+  const Li=[521,208], Ri=[772,112];
+  const Lf=[546,690], Rf=[914,445];
+  const N=9, lr=(a,b,t)=>Math.round(a+(b-a)*t);
+  const sl=Array.from({length:N+2},(_,i)=>({
+    l:[lr(Li[0],Lf[0],i/N), lr(Li[1],Lf[1],i/N)],
+    r:[lr(Ri[0],Rf[0],i/N), lr(Ri[1],Rf[1],i/N)]
+  }));
+  return [
+    { label:'Azotea', etapa:'Estructura S/Azotea'      },
+    { label:'Piso 6', etapa:'Estructura S/6° Piso'     },
+    { label:'Piso 5', etapa:'Estructura S/5° Piso'     },
+    { label:'Piso 4', etapa:'Estructura S/4° Piso'     },
+    { label:'Piso 3', etapa:'Estructura S/3° Piso'     },
+    { label:'Piso 2', etapa:'Estructura S/2° Piso'     },
+    { label:'Piso 1', etapa:'Estructura S/1° Piso'     },
+    { label:'PB',     etapa:'Estructura S/Planta Baja' },
+    { label:'1SS',    etapa:'Estructura S/1° Subsuelo' },
+    { label:'2SS',    etapa:'Estructura S/2° Subsuelo' },
+  ].map((f,i)=>({ ...f, pts:[sl[i].l, sl[i].r, sl[i+1].r, sl[i+1].l] }));
+})();
 
 function renderBuilding(etapas) {
   const el = eid('av-building');
