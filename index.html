@@ -1666,7 +1666,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.91';
+const APP_VERSION = 'v1.0.92';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -3010,6 +3010,12 @@ function renderBuilding(etapas) {
         font-size:8px;font-family:'DM Mono',monospace;letter-spacing:.15em;
         color:${foundPct>=100?'#34d399':'#e8a020'}">FUNDACIONES · ${foundPct}%</div>` : '';
 
+  const calBtn = (CU && CU.role === 'admin')
+    ? `<button onclick="toggleBuildingCal()" style="position:absolute;top:7px;right:8px;z-index:20;
+        background:${window._calMode?'#ef4444':'rgba(255,255,255,.15)'};color:#fff;border:none;
+        border-radius:5px;padding:3px 9px;font-size:10px;font-family:'DM Mono',monospace;
+        cursor:pointer;letter-spacing:.1em">${window._calMode ? '● CAL ON' : 'CAL'}</button>` : '';
+
   el.innerHTML =
     `<div style="position:relative;border-radius:12px;overflow:hidden;background:#060a14;
       box-shadow:0 20px 56px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.07)">
@@ -3024,8 +3030,62 @@ function renderBuilding(etapas) {
       <div style="position:absolute;top:9px;left:12px;font-size:7px;
         font-family:'DM Mono',monospace;color:rgba(255,255,255,.3);letter-spacing:.22em;
         text-transform:uppercase;pointer-events:none">CEOJ · ESTRUCTURA</div>
-      ${foundBar}
+      ${calBtn}${foundBar}
     </div>`;
+
+  window._bFloors = floors;
+  if (window._calMode) _initBuildingCal(el.querySelector('div'), floors);
+}
+
+function toggleBuildingCal() {
+  window._calMode = !window._calMode;
+  if (!window._calMode) window._calBounds = null;
+  renderAvance();
+}
+
+function _initBuildingCal(container, floors) {
+  if (!window._calBounds)
+    window._calBounds = [floors[0].top, ...floors.map(f => f.top + f.h)];
+  const cb = window._calBounds;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:absolute;inset:0;z-index:15;pointer-events:none';
+  cb.forEach((y, i) => {
+    const name = i === 0 ? floors[0].label : floors[i-1] ? floors[i-1].label : '';
+    const line = document.createElement('div');
+    line.style.cssText = `position:absolute;left:0;right:0;top:${y}%;height:4px;background:rgba(239,68,68,.9);cursor:ns-resize;z-index:16;pointer-events:all`;
+    const tag = document.createElement('span');
+    tag.style.cssText = 'position:absolute;left:6px;top:-16px;font-size:9px;color:#fca5a5;font-family:monospace;background:rgba(0,0,0,.85);padding:1px 5px;border-radius:3px;white-space:nowrap;pointer-events:none';
+    tag.textContent = name + ' · ' + y + '%';
+    line.appendChild(tag);
+    line.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const rect = container.getBoundingClientRect();
+      const move = ev => {
+        let ny = Math.round((ev.clientY - rect.top) / rect.height * 100);
+        ny = Math.max(0, Math.min(100, ny));
+        window._calBounds[i] = ny;
+        line.style.top = ny + '%';
+        tag.textContent = name + ' · ' + ny + '%';
+      };
+      const up = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); };
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', up);
+    });
+    overlay.appendChild(line);
+  });
+  const copyBtn = document.createElement('button');
+  copyBtn.textContent = '📋 Copiar valores al código';
+  copyBtn.style.cssText = 'position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:20;background:#c8880a;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;pointer-events:all;white-space:nowrap';
+  copyBtn.onclick = () => {
+    const b = window._calBounds;
+    const f = window._bFloors;
+    const code = f.map((fl, i) => `    { label:'${fl.label}', etapa:'${fl.etapa}', top:${b[i]}, h:${b[i+1]-b[i]} },`).join('\n');
+    navigator.clipboard.writeText(code).catch(() => {});
+    console.log('=== FLOORS CALIBRADOS ===\n' + code);
+    toast('Valores copiados ✓ — también en consola', 'ok');
+  };
+  overlay.appendChild(copyBtn);
+  container.appendChild(overlay);
 }
 
 
