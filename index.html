@@ -1666,7 +1666,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.97';
+const APP_VERSION = 'v1.0.98';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -5040,7 +5040,12 @@ async function printDonantes() {
     const slRows = window._sluisRows || [];
     const fmtN = v => Math.round(parseFloat(v)||0).toLocaleString('es-AR');
     const statusLabel = {confirmado:'Confirmado',reservado:'Reservado',proceso:'En proceso',negociacion:'Negociación'};
-    const donRows = don.map(d => {
+    const donActivos = don.filter(d => (parseFloat(d.compromiso)||0) !== 0 || (parseFloat(d.pagado)||0) !== 0);
+    donActivos.sort((a,b)=>(a.name||'').localeCompare(b.name||'','es'));
+    const totalComp  = donActivos.reduce((a,d) => a+(parseFloat(d.compromiso)||0), 0);
+    const totalPag   = donActivos.reduce((a,d) => a+(parseFloat(d.pagado)||0), 0);
+    const totalSaldo = donActivos.reduce((a,d) => a+Math.max(0,(parseFloat(d.compromiso)||0)-(parseFloat(d.pagado)||0)), 0);
+    const donRows = donActivos.map(d => {
       const saldo = (parseFloat(d.compromiso)||0)-(parseFloat(d.pagado)||0);
       return `<tr><td>${d.name}</td><td>${d.naming_name||'—'}</td><td>USD ${fmtN(d.compromiso)}</td><td>USD ${fmtN(d.pagado)}</td><td>USD ${fmtN(saldo)}</td><td>${statusLabel[d.status]||d.status||'—'}</td></tr>`;
     }).join('');
@@ -5049,12 +5054,17 @@ async function printDonantes() {
       return `<tr><td>${r.donante}</td><td>USD ${toN(r.compromiso).toLocaleString('es-AR')}</td><td>USD ${toN(r.pagado).toLocaleString('es-AR')}</td><td>USD ${toN(r.deuda).toLocaleString('es-AR')}</td></tr>`;
     }).join('');
     const now = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const kpisHtml =
+      `<table style="margin-bottom:18px"><thead><tr><th>Total comprometido</th><th>Total pagado</th><th>Saldo pendiente</th><th>Donantes activos</th></tr></thead>` +
+      `<tbody><tr><td>USD ${fmtN(totalComp)}</td><td>USD ${fmtN(totalPag)}</td><td>USD ${fmtN(totalSaldo)}</td><td>${donActivos.length}</td></tr></tbody></table>`;
     let el = document.getElementById('print-area');
     if(!el){ el = document.createElement('div'); el.id='print-area'; document.body.appendChild(el); }
     el.innerHTML =
       `<div class="print-title">Portal de Donantes — CEOJ</div>` +
       `<div class="print-sub">Generado el ${now}</div>` +
-      `<div class="print-section">Edificio Tucumán (${don.length} donantes)</div>` +
+      `<div class="print-section">Resumen Edificio Tucumán</div>` +
+      kpisHtml +
+      `<div class="print-section">Detalle Donantes Tucumán (${donActivos.length})</div>` +
       `<table><thead><tr><th>Donante</th><th>Naming</th><th>Compromiso</th><th>Pagado</th><th>Saldo</th><th>Estado</th></tr></thead><tbody>${donRows}</tbody></table>` +
       (slRows.length ? `<div class="print-section">Deudores S.Luis (${slRows.length})</div><table><thead><tr><th>Donante</th><th>Compromiso</th><th>Pagado</th><th>Deuda</th></tr></thead><tbody>${slRowsHtml}</tbody></table>` : '');
     window.print();
