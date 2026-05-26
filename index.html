@@ -546,8 +546,8 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
       <div class="atab" onclick="swTab('reg')">Registrarse</div>
     </div>
     <div id="div-login">
-      <div class="fl"><label>Email</label><input class="fi" type="email" id="f-email" placeholder="tu@email.com" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <div class="fl"><label>Contraseña</label><input class="fi" type="password" id="f-pass" placeholder="••••••••" autocomplete="new-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="fl"><label>Email</label><input class="fi" type="email" id="f-email" placeholder="tu@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="fl"><label>Contraseña</label><input class="fi" type="password" id="f-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button class="abtn" onclick="doLogin()">Ingresar al Sistema</button>
       <div class="aerr" id="login-err"></div>
     </div>
@@ -1675,7 +1675,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.109';
+const APP_VERSION = 'v1.0.110';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
