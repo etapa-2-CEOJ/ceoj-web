@@ -1522,6 +1522,10 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
       <div class="fl"><label>Fecha</label><input class="fi" type="date" id="m-don-date"></div>
     </div>
     <div class="fl"><label>Notas</label><textarea class="fi" id="m-don-notes" style="min-height:64px;resize:vertical"></textarea></div>
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 0">
+      <input type="checkbox" id="m-don-unsub" style="width:15px;height:15px;cursor:pointer">
+      <label for="m-don-unsub" style="font-size:12px;color:#64748b;cursor:pointer;margin:0">No recibe notificaciones de pago por email</label>
+    </div>
   </div>
   <div class="mf"><button class="btn btn-ghost" onclick="closeModal('donante')">Cancelar</button><button class="btn btn-gold" onclick="saveDonante()">Guardar</button></div>
 </div></div>
@@ -1667,7 +1671,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.106';
+const APP_VERSION = 'v1.0.107';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -2550,6 +2554,7 @@ function openModal(name, data) {
     eid('m-don-comp').value = data.compromiso || '';
     eid('m-don-pag').value = data.pagado || '';
     eid('m-don-pag-orig').value = data.pagado || '0';
+    eid('m-don-unsub').checked = data.email_unsub || false;
     eid('m-don-status').value = data.status || 'negociacion';
     eid('m-don-date').value = data.date ? data.date.split('T')[0] : new Date().toISOString().split('T')[0];
     eid('m-don-notes').value = data.notes || '';
@@ -3343,7 +3348,7 @@ async function saveDonante() {
   console.log('saveDonante llamado');
   const id = fv('m-don-id'), name = fv('m-don-name').trim();
   if (!name) { toast('El nombre es obligatorio', 'err'); return; }
-  const data = { name, phone: fv('m-don-tel'), email: fv('m-don-email'), currency: fv('m-don-cur'), compromiso: parseFloat(fv('m-don-comp'))||0, pagado: parseFloat(fv('m-don-pag'))||0, naming_id: fv('m-don-naming') || null, status: fv('m-don-status'), date: fv('m-don-date'), notes: fv('m-don-notes') };
+  const data = { name, phone: fv('m-don-tel'), email: fv('m-don-email'), currency: fv('m-don-cur'), compromiso: parseFloat(fv('m-don-comp'))||0, pagado: parseFloat(fv('m-don-pag'))||0, naming_id: fv('m-don-naming') || null, status: fv('m-don-status'), date: fv('m-don-date'), notes: fv('m-don-notes'), email_unsub: eid('m-don-unsub').checked };
   const pagadoOrig = parseFloat(fv('m-don-pag-orig')) || 0;
   try {
     if (id) { await API.put('donantes/' + id, data); toast('Donante actualizado ✓', 'ok'); }
