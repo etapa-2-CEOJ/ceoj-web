@@ -1667,7 +1667,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.103';
+const APP_VERSION = 'v1.0.104';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -3255,7 +3255,7 @@ async function renderDon() {
       const saldo = (parseFloat(d.compromiso)||0) - (parseFloat(d.pagado)||0);
       const dj = JSON.stringify(d).replace(/'/g,"&#39;");
       const chk = bulkMode ? '<td style="width:32px"><input type="checkbox" data-id="'+d.id+'" class="don-bulk-cb" onchange="_updDonBulkCount()" style="width:14px;height:14px;cursor:pointer"></td>' : '';
-      const acts = bulkMode ? '' : '<td><div style="display:flex;gap:3px"><button class="btn btn-outline btn-xs" onclick=\'openModal("donante",' + dj + ')\'>✎</button><button class="btn btn-danger btn-xs" onclick="delDonante(' + d.id + ')">✕</button></div></td>';
+      const acts = bulkMode ? '' : '<td><div style="display:flex;gap:3px"><button class="btn btn-outline btn-xs" onclick=\'openModal("donante",' + dj + ')\'>✎</button><button class="btn btn-danger btn-xs" onclick="delDonante(\'' + d.id + '\')">✕</button></div></td>';
       const saldoZero = saldo === 0;
       const cComp  = saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-gold"';
       const cPag   = saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-green"';
