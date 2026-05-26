@@ -1666,7 +1666,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.95';
+const APP_VERSION = 'v1.0.96';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -3210,7 +3210,13 @@ async function renderDon() {
   try {
     const all = await API.get('donantes');
     const q = (fv('don-search')||'').toLowerCase(), f = fv('don-filter');
-    const filtered = all.filter(d => (!q||d.name.toLowerCase().includes(q)||(d.naming_name||'').toLowerCase().includes(q)) && (!f||d.status===f));
+    const filtered = all.filter(d => {
+      const comp = parseFloat(d.compromiso)||0, pag = parseFloat(d.pagado)||0;
+      const tieneMovimiento = comp !== 0 || pag !== 0;
+      const matchSearch = !q || d.name.toLowerCase().includes(q) || (d.naming_name||'').toLowerCase().includes(q);
+      const matchFilter = !f || d.status === f;
+      return tieneMovimiento && matchSearch && matchFilter;
+    });
     const total = all.reduce((a,d) => a+(parseFloat(d.compromiso)||0), 0);
     const pagado = all.reduce((a,d) => a+(parseFloat(d.pagado)||0), 0);
     const fmtM = v => { const m = v/1000000; return (m % 1 === 0 ? m.toFixed(0) : m.toFixed(1).replace('.',',')) + 'M'; };
