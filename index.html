@@ -1666,7 +1666,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.93';
+const APP_VERSION = 'v1.0.94';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -1849,7 +1849,7 @@ async function supabaseRouter(method, path, body) {
   }
 
   if (path === 'donantes' && method === 'GET') {
-    const rows = await SB.rest('GET', 'donantes', 'select=*,naming(name)&order=created_at.desc') || [];
+    const rows = await SB.rest('GET', 'donantes', 'select=*,naming(name)&order=created_at.desc&limit=10000') || [];
     return rows.map(d => ({ ...d, naming_name: d.naming?.name || null, naming: undefined }));
   }
 
