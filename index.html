@@ -1499,6 +1499,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
   <div class="mh"><span class="mh-title" id="m-don-title">Nuevo Donante</span><button class="mh-close" onclick="closeModal('donante')">&#x2715;</button></div>
   <div class="mb">
     <input type="hidden" id="m-don-id">
+    <input type="hidden" id="m-don-pag-orig">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="fl"><label>Nombre / Familia *</label><input class="fi" type="text" id="m-don-name"></div>
       <div class="fl"><label>Teléfono</label><input class="fi" type="text" id="m-don-tel"></div>
@@ -1666,7 +1667,9 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.100';
+const APP_VERSION = 'v1.0.101';
+const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
+const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -2530,6 +2533,7 @@ function openModal(name, data) {
     eid('m-don-cur').value = data.currency || 'USD';
     eid('m-don-comp').value = data.compromiso || '';
     eid('m-don-pag').value = data.pagado || '';
+    eid('m-don-pag-orig').value = data.pagado || '0';
     eid('m-don-status').value = data.status || 'negociacion';
     eid('m-don-date').value = data.date ? data.date.split('T')[0] : new Date().toISOString().split('T')[0];
     eid('m-don-notes').value = data.notes || '';
@@ -3287,13 +3291,48 @@ async function delDonante(id) {
   catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
+async function sendPaymentEmail(donante, montoPago) {
+  if (!donante.email || !RESEND_KEY || RESEND_KEY === 'TU_API_KEY_AQUI') return;
+  const cur = donante.currency || 'USD';
+  const montoFmt = parseFloat(montoPago).toLocaleString('es-AR');
+  const pagadoFmt = parseFloat(donante.pagado).toLocaleString('es-AR');
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + RESEND_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: RESEND_FROM,
+        to: [donante.email],
+        subject: 'Confirmación de pago recibido – CEOJ',
+        html: `<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;color:#1a2540">
+<h2 style="color:#b8860b">Confirmación de pago</h2>
+<p>Estimado/a <strong>${donante.name}</strong>,</p>
+<p>Confirmamos la recepción de su pago por <strong>${cur} ${montoFmt}</strong>.</p>
+<p>Total acumulado: <strong>${cur} ${pagadoFmt}</strong>.</p>
+<p>Muchas gracias por su generosa contribución al proyecto CEOJ.<br>¡Su apoyo hace posible esta obra!</p>
+<p style="margin-top:32px;font-size:12px;color:#94a3b8">Este es un mensaje automático. Ante cualquier consulta, respondé a este correo.</p>
+</div>`
+      })
+    });
+    const resBody = await res.json().catch(() => ({}));
+    console.log('Resend status:', res.status, resBody);
+    if (!res.ok) console.error('Resend error detail:', JSON.stringify(resBody));
+  } catch(e) { console.warn('Resend error:', e); }
+}
+
 async function saveDonante() {
   const id = fv('m-don-id'), name = fv('m-don-name').trim();
   if (!name) { toast('El nombre es obligatorio', 'err'); return; }
   const data = { name, phone: fv('m-don-tel'), email: fv('m-don-email'), currency: fv('m-don-cur'), compromiso: parseFloat(fv('m-don-comp'))||0, pagado: parseFloat(fv('m-don-pag'))||0, naming_id: fv('m-don-naming') || null, status: fv('m-don-status'), date: fv('m-don-date'), notes: fv('m-don-notes') };
+  const pagadoOrig = parseFloat(fv('m-don-pag-orig')) || 0;
   try {
     if (id) { await API.put('donantes/' + id, data); toast('Donante actualizado ✓', 'ok'); }
     else { await API.post('donantes', data); toast('Donante registrado ✓', 'ok'); }
+    console.log('pagado nuevo:', data.pagado, '| pagado orig:', pagadoOrig, '| email:', data.email);
+    if (data.email && data.pagado > pagadoOrig) {
+      const montoPago = data.pagado - pagadoOrig;
+      sendPaymentEmail(data, montoPago).catch(()=>{});
+    }
     closeModal('donante'); pushNamingSnapshot().catch(()=>{}); renderDon(); if(document.querySelector('#pg-naming.on')) renderNaming();
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
