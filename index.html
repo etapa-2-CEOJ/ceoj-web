@@ -1666,7 +1666,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.94';
+const APP_VERSION = 'v1.0.95';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -5158,8 +5158,7 @@ async function syncSheets() {
 }
 
 async function syncSheetsQuick() {
-  const url = localStorage.getItem('ceoj_sheets_url') || '';
-  if(!url){ toast('Configurá la URL del Apps Script en Importar Datos → Google Sheets','info'); return; }
+  const url = 'https://script.google.com/macros/s/AKfycbwVJdHnvU3hP6JedFy2jWESijbmBf3JS6YUa-L1vRH39424LXbK0nsVliuHAQpzeFyxdg/exec';
   await _doSheetsSync(url, 'donantes');
 }
 
