@@ -532,7 +532,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 
 <!-- TOAST + CONFIRM + LB + APP SHELL -->
 <div id="toast-wrap"></div>
-<div id="confirm-wrap"><div class="cbox"><h3 id="c-title">Confirmar</h3><p id="c-msg">Esta acción no se puede deshacer.</p><div class="cbtns"><button class="btn btn-ghost" onclick="cR(false)">Cancelar</button><button class="btn btn-danger" id="c-ok" onclick="cR(true)">Confirmar</button></div></div></div>
+<div id="confirm-wrap"><div class="cbox"><h3 id="c-title">Confirmar</h3><p id="c-msg">Esta acción no se puede deshacer.</p><div id="c-check-wrap" style="display:none;margin:8px 0"><p id="c-check-label" style="font-size:12px;color:#64748b;margin:0 0 6px 0"></p><input class="fi" id="c-check-input" type="text" placeholder="" oninput="cCheckInput()" style="font-size:13px"></div><div class="cbtns"><button class="btn btn-ghost" onclick="cR(false)">Cancelar</button><button class="btn btn-danger" id="c-ok" onclick="cR(true)">Confirmar</button></div></div></div>
 <div id="lb"><button id="lb-close" onclick="closeLb()">&#x2715;</button><button id="lb-prev" onclick="lbNav(-1)">&#8249;</button><img id="lb-img" src="" alt=""><button id="lb-next" onclick="lbNav(1)">&#8250;</button><div id="lb-cap"></div><div id="lb-counter"></div></div>
 
 <!-- AUTH -->
@@ -1667,7 +1667,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.104';
+const APP_VERSION = 'v1.0.105';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -2268,15 +2268,31 @@ function toast(msg, type) {
 }
 
 let _cRes = null;
-function confirm2(title, msg, okLabel, okCls) {
+let _cCheckVal = null;
+function confirm2(title, msg, okLabel, okCls, checkVal) {
   return new Promise(res => {
     eid('c-title').textContent = title || 'Confirmar';
     eid('c-msg').textContent = msg || 'Esta acción no se puede deshacer.';
     const b = eid('c-ok'); b.textContent = okLabel || 'Confirmar'; b.className = 'btn ' + (okCls || 'btn-danger');
+    _cCheckVal = checkVal || null;
+    const wrap = eid('c-check-wrap');
+    if (checkVal) {
+      eid('c-check-label').textContent = 'Escribí "' + checkVal + '" para confirmar:';
+      eid('c-check-input').value = '';
+      b.disabled = true;
+      wrap.style.display = 'block';
+    } else {
+      wrap.style.display = 'none';
+      b.disabled = false;
+    }
     _cRes = res; eid('confirm-wrap').classList.add('show');
   });
 }
-function cR(v) { eid('confirm-wrap').classList.remove('show'); if (_cRes) { _cRes(v); _cRes = null; } }
+function cCheckInput() {
+  if (!_cCheckVal) return;
+  eid('c-ok').disabled = eid('c-check-input').value.trim() !== _cCheckVal.trim();
+}
+function cR(v) { eid('confirm-wrap').classList.remove('show'); _cCheckVal = null; if (_cRes) { _cRes(v); _cRes = null; } }
 
 let lbList = [], lbIdx = 0;
 function lbShow() {
@@ -3285,7 +3301,10 @@ async function renderDon() {
 }
 
 async function delDonante(id) {
-  const ok = await confirm2('Eliminar donante', '¿Eliminás este donante?');
+  const donantes = await API.get('donantes');
+  const d = donantes.find(x => x.id === id);
+  const nombre = d ? d.name : '';
+  const ok = await confirm2('Eliminar donante', 'Esta acción no se puede deshacer.', 'Eliminar', 'btn-danger', nombre);
   if(!ok) return;
   try { await API.del('donantes/' + id); toast('Eliminado ✓', 'ok'); pushNamingSnapshot().catch(()=>{}); renderDon(); }
   catch(e) { toast('Error: ' + e.message, 'err'); }
