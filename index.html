@@ -1666,7 +1666,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.96';
+const APP_VERSION = 'v1.0.97';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -3219,6 +3219,7 @@ async function renderDon() {
     });
     const total = all.reduce((a,d) => a+(parseFloat(d.compromiso)||0), 0);
     const pagado = all.reduce((a,d) => a+(parseFloat(d.pagado)||0), 0);
+    const saldoTotal = all.reduce((a,d) => a+Math.max(0,(parseFloat(d.compromiso)||0)-(parseFloat(d.pagado)||0)), 0);
     const fmtM = v => { const m = v/1000000; return (m % 1 === 0 ? m.toFixed(0) : m.toFixed(1).replace('.',',')) + 'M'; };
     const fmtDots = v => Math.round(v).toLocaleString('es-AR');
     const slRows = window._sluisRows || [];
@@ -3237,7 +3238,7 @@ async function renderDon() {
       '<div style="grid-column:1/-1;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#c026d3;margin-bottom:2px">Tucumán</div>' +
       '<div class="kpi kpi-fuchsia"><div class="kv">USD ' + fmtM(total) + '</div><div class="kl">Total comprometido</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">USD ' + fmtDots(total) + '</div><div class="prog" style="margin-top:4px"><div class="pf" style="width:' + pct.toFixed(0) + '%"></div></div></div>' +
       '<div class="kpi kpi-fuchsia"><div class="kv">USD ' + fmtM(pagado) + '</div><div class="kl">Total pagado</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">USD ' + fmtDots(pagado) + '</div><div class="kbadge kb-green" style="margin-top:4px">' + Math.round(pagado/(total||1)*100) + '% cobrado</div></div>' +
-      '<div class="kpi kpi-fuchsia"><div class="kv">USD ' + fmtM(total-pagado) + '</div><div class="kl">Saldo pendiente</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">USD ' + fmtDots(total-pagado) + '</div><div class="kbadge kb-red" style="margin-top:4px">Por cobrar</div></div>' +
+      '<div class="kpi kpi-fuchsia"><div class="kv">USD ' + fmtM(saldoTotal) + '</div><div class="kl">Saldo pendiente</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">USD ' + fmtDots(saldoTotal) + '</div><div class="kbadge kb-red" style="margin-top:4px">Por cobrar</div></div>' +
       '<div class="kpi kpi-fuchsia"><div class="kv">' + all.length + '</div><div class="kl">Donantes</div><div class="kbadge kb-green">' + all.filter(d=>d.status==='confirmado').length + ' confirmados</div></div>' +
       slKpis;
 
