@@ -1666,7 +1666,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.99';
+const APP_VERSION = 'v1.0.100';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -5072,12 +5072,20 @@ async function printDonantes() {
       `<div style="font-size:11px;color:#64748b;margin-top:4px">Meta: USD ${fmtN(meta)}</div>` +
       `<div style="font-size:11px;color:#64748b">Tucumán: ${fmtN(totalComp)} + S.Luis: ${fmtN(slTotal)}</div>` +
       `</div>`;
+    const slComp2 = slRows.reduce((a,r) => a+slToNum(r.compromiso), 0);
+    const slPag2  = slRows.reduce((a,r) => a+slToNum(r.pagado), 0);
+    const slKpisHtml = slRows.length
+      ? `<div class="print-section">Resumen S.Luis</div>` +
+        `<table style="margin-bottom:18px"><thead><tr><th>Deudores</th><th>Total deuda</th><th>Total pagado</th><th>Cobrado</th></tr></thead>` +
+        `<tbody><tr><td>${slRows.length}</td><td>USD ${fmtN(slTotal)}</td><td>USD ${fmtN(slPag2)}</td><td>${Math.round(slPag2/(slComp2||1)*100)}%</td></tr></tbody></table>`
+      : '';
     el.innerHTML =
       `<div class="print-title">Portal de Donantes — CEOJ</div>` +
       `<div class="print-sub">Generado el ${now}</div>` +
       metaHtml +
       `<div class="print-section">Resumen Edificio Tucumán</div>` +
       kpisHtml +
+      slKpisHtml +
       `<div class="print-section">Detalle Donantes Tucumán (${donActivos.length})</div>` +
       `<table><thead><tr><th>Donante</th><th>Naming</th><th>Compromiso</th><th>Pagado</th><th>Saldo</th><th>Estado</th></tr></thead><tbody>${donRows}</tbody></table>` +
       (slRows.length ? `<div class="print-section">Deudores S.Luis (${slRows.length})</div><table><thead><tr><th>Donante</th><th>Compromiso</th><th>Pagado</th><th>Deuda</th></tr></thead><tbody>${slRowsHtml}</tbody></table>` : '');
