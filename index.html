@@ -1667,7 +1667,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.102';
+const APP_VERSION = 'v1.0.103';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -5315,25 +5315,40 @@ async function _autoSyncDonantes(rows) {
 
   toast('Sincronizando '+validRows.length+' donantes...','info');
 
-  // Borrar todos los donantes existentes y recrear desde Sheets
   if(USE_LOCAL) {
     DB.set('donantes', []);
-  } else {
-    await SB.rest('DELETE','donantes','id=neq.00000000-0000-0000-0000-000000000000');
+    for(const row of validRows) {
+      const name = String(row.donante).trim();
+      DB.add('donantes',{name,compromiso:toNum(row.compromiso),pagado:toNum(row.pagado),currency:'USD',status:'negociacion',email:'',phone:'',notes:''});
+    }
+    toast('Sync completo: '+validRows.length+' donantes importados','ok');
+    renderDon();
+    return;
   }
 
-  let created=0, errors=0;
+  // Traer donantes existentes para comparar por nombre
+  const existing = await API.get('donantes');
+  const byName = {};
+  existing.forEach(d => { byName[d.name.trim().toLowerCase()] = d; });
+
+  let updated=0, created=0, errors=0;
   for(const row of validRows) {
     const name = String(row.donante).trim();
     const compromiso = toNum(row.compromiso);
     const pagado     = toNum(row.pagado);
+    const key = name.toLowerCase();
     try {
-      if(USE_LOCAL) DB.add('donantes',{name,compromiso,pagado,currency:'USD',status:'negociacion',email:'',phone:'',notes:''});
-      else await SB.rest('POST','donantes','',{name,compromiso,pagado,currency:'USD',status:'negociacion'});
-      created++;
-    } catch(e){ errors++; }
+      if(byName[key]) {
+        // PATCH: solo actualiza montos, preserva email/phone/notes/status
+        await SB.rest('PATCH','donantes','id=eq.'+byName[key].id, {compromiso, pagado});
+        updated++;
+      } else {
+        await SB.rest('POST','donantes','',{name,compromiso,pagado,currency:'USD',status:'negociacion'});
+        created++;
+      }
+    } catch(e){ errors++; console.warn('Sync error',name,e); }
   }
-  toast('Sync completo: '+created+' donantes importados'+(errors?', '+errors+' errores':''),'ok');
+  toast('Sync: '+updated+' actualizados, '+created+' nuevos'+(errors?', '+errors+' errores':''),'ok');
   renderDon();
 }
 
