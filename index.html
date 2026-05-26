@@ -1666,7 +1666,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.92';
+const APP_VERSION = 'v1.0.93';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
@@ -2962,16 +2962,16 @@ function renderBuilding(etapas) {
   const pct = (name) => parseInt((etapas.find(e => e.name === name) || {}).pct) || 0;
 
   const floors = [
-    { label:'Azotea', etapa:'Estructura S/Azotea',      top:26, h:8 },
-    { label:'Piso 6', etapa:'Estructura S/6° Piso',     top:34, h:3 },
-    { label:'Piso 5', etapa:'Estructura S/5° Piso',     top:37, h:4 },
-    { label:'Piso 4', etapa:'Estructura S/4° Piso',     top:41, h:3 },
-    { label:'Piso 3', etapa:'Estructura S/3° Piso',     top:44, h:3 },
-    { label:'Piso 2', etapa:'Estructura S/2° Piso',     top:47, h:4 },
-    { label:'Piso 1', etapa:'Estructura S/1° Piso',     top:51, h:2 },
-    { label:'PB',     etapa:'Estructura S/Planta Baja', top:53, h:4 },
-    { label:'1SS',    etapa:'Estructura S/1° Subsuelo', top:57, h:3 },
-    { label:'2SS',    etapa:'Estructura S/2° Subsuelo', top:60, h:4 },
+    { label:'Azotea', etapa:'Estructura S/Azotea',      top:17, h:16 },
+    { label:'Piso 6', etapa:'Estructura S/6° Piso',     top:33, h:7  },
+    { label:'Piso 5', etapa:'Estructura S/5° Piso',     top:40, h:7  },
+    { label:'Piso 4', etapa:'Estructura S/4° Piso',     top:47, h:6  },
+    { label:'Piso 3', etapa:'Estructura S/3° Piso',     top:53, h:7  },
+    { label:'Piso 2', etapa:'Estructura S/2° Piso',     top:60, h:7  },
+    { label:'Piso 1', etapa:'Estructura S/1° Piso',     top:67, h:6  },
+    { label:'PB',     etapa:'Estructura S/Planta Baja', top:73, h:7  },
+    { label:'1SS',    etapa:'Estructura S/1° Subsuelo', top:80, h:7  },
+    { label:'2SS',    etapa:'Estructura S/2° Subsuelo', top:87, h:8  },
   ];
 
   const foundPct = Math.round((pct('Tareas Preliminares') + pct('Movimiento de Suelos') + pct('Estructura Fundaciones')) / 3);
