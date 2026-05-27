@@ -1675,7 +1675,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.110';
+const APP_VERSION = 'v1.0.111';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -5285,21 +5285,15 @@ async function syncSheetsQuick() {
 
 function renderSLuis() {
   const rows = window._sluisRows || [];
-  const toNum = v => { if(typeof v==='number') return isNaN(v)?0:Math.round(v*100)/100; const s=String(v||'').trim(); if(!s) return 0; if(s.includes(',')) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0; return parseFloat(s.replace(/[^0-9.-]/g,''))||0; };
+  const toNum = v => { if(typeof v==='number') return isNaN(v)?0:v; const s=String(v||'').replace(/[^0-9,.-]/g,'').trim(); if(!s) return 0; if(s.includes(',')) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0; return parseFloat(s)||0; };
   const tbody = document.getElementById('sluis-tbody');
   const kpis  = document.getElementById('sluis-kpis');
   if(!rows.length){ if(tbody) tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:16px">Sincronizá para ver los datos</td></tr>'; return; }
-  const deudores = rows.filter(r => toNum(r.deuda) > 0);
-  if(tbody) tbody.innerHTML = deudores.map(r => {
-    const deuda = toNum(r.deuda);
-    const saldoZero = deuda === 0;
-    const cComp = saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-gold"';
-    const cPag  = saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-green"';
-    const cDeuda= saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-red"';
+  if(tbody) tbody.innerHTML = rows.map(r => {
     return '<tr><td><strong>'+String(r.donante)+'</strong></td>' +
-      '<td '+cComp+'>USD '+Math.round(toNum(r.compromiso)).toLocaleString('es-AR')+'</td>' +
-      '<td '+cPag+'>USD '+Math.round(toNum(r.pagado)).toLocaleString('es-AR')+'</td>' +
-      '<td '+cDeuda+'>USD '+Math.round(deuda).toLocaleString('es-AR')+'</td></tr>';
+      '<td class="td-gold">USD '+Math.round(toNum(r.compromiso)).toLocaleString('es-AR')+'</td>' +
+      '<td class="td-green">USD '+Math.round(toNum(r.pagado)).toLocaleString('es-AR')+'</td>' +
+      '<td class="td-red">USD '+Math.round(toNum(r.deuda)).toLocaleString('es-AR')+'</td></tr>';
   }).join('');
   if(kpis) kpis.innerHTML = '';
 }
@@ -5312,7 +5306,8 @@ async function syncSLuis() {
     if(!r.ok) throw new Error('HTTP ' + r.status);
     const json = await r.json();
     if(json.error) throw new Error(json.error);
-    const rows = json.rows || [];
+    const toNum = v => { if(typeof v==='number') return isNaN(v)?0:v; const s=String(v||'').replace(/[^0-9,.-]/g,'').trim(); if(!s) return 0; if(s.includes(',')) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0; return parseFloat(s)||0; };
+    const rows = (json.rows || []).filter(r => toNum(r.deuda) > 0);
     rows.sort((a,b) => String(a.donante||'').localeCompare(String(b.donante||''),'es'));
     window._sluisRows = rows;
     try { localStorage.setItem('sluis_rows', JSON.stringify(rows)); } catch(_) {}
