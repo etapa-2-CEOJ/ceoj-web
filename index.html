@@ -3370,6 +3370,13 @@ async function saveDonante() {
       sendPaymentEmail(data, montoPago).catch(()=>{});
     }
     closeModal('donante'); pushNamingSnapshot().catch(()=>{}); renderDon(); if(document.querySelector('#pg-naming.on')) renderNaming();
+    if (data.email) {
+      fetch('https://czsqbdjlptcgkxrrfceu.supabase.co/functions/v1/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB.token },
+        body: JSON.stringify({ to: data.email, donante: data.name, status: data.status, compromiso: data.compromiso, pagado: data.pagado, currency: data.currency })
+      }).then(r => r.json()).then(j => { if (j.ok) toast('Mail enviado a ' + data.email, 'ok'); else toast('Mail no enviado: ' + (j.error||''), 'err'); }).catch(() => {});
+    }
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
@@ -5282,7 +5289,8 @@ function renderSLuis() {
   const tbody = document.getElementById('sluis-tbody');
   const kpis  = document.getElementById('sluis-kpis');
   if(!rows.length){ if(tbody) tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:16px">Sincronizá para ver los datos</td></tr>'; return; }
-  if(tbody) tbody.innerHTML = rows.map(r => {
+  const deudores = rows.filter(r => toNum(r.deuda) > 0);
+  if(tbody) tbody.innerHTML = deudores.map(r => {
     const deuda = toNum(r.deuda);
     const saldoZero = deuda === 0;
     const cComp = saldoZero ? 'style="color:#16a34a;font-weight:600"' : 'class="td-gold"';
