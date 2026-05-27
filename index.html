@@ -1675,7 +1675,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.113';
+const APP_VERSION = 'v1.0.114';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -2341,7 +2341,7 @@ document.getElementById('lb').addEventListener('touchend', e => {
 }, {passive:true});
 eid('lb').addEventListener('click', e => { if(e.target === eid('lb')) closeLb(); });
 
-function fmt(n, cur) { cur = cur || 'USD'; return cur + ' ' + (Number(n)||0).toLocaleString('es-AR'); }
+function fmt(n, cur) { cur = cur || 'USD'; return cur + ' ' + Math.round(Number(n)||0).toLocaleString('es-AR'); }
 
 function badge(status) {
   const cls = { confirmado:'b-green', reservado:'b-gold', negociacion:'b-navy', proceso:'b-teal', available:'b-teal', reserved:'b-gold', taken:'b-green', activo:'b-teal', pendiente:'b-navy', completado:'b-green' }[status] || 'b-gray';
