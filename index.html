@@ -1675,7 +1675,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.112';
+const APP_VERSION = 'v1.0.113';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -5307,7 +5307,7 @@ async function syncSLuis() {
     const json = await r.json();
     if(json.error) throw new Error(json.error);
     const toNum = v => { if(typeof v==='number') return isNaN(v)?0:v; const s=String(v||'').replace(/[^0-9,.-]/g,'').trim(); if(!s) return 0; if(s.includes(',')) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0; return parseFloat(s)||0; };
-    const rows = (json.rows || []).filter(r => toNum(r.deuda) > 0);
+    const rows = (json.rows || []).filter(r => toNum(r.deuda) > 0 && !String(r.donante||'').toLowerCase().includes('total'));
     rows.sort((a,b) => String(a.donante||'').localeCompare(String(b.donante||''),'es'));
     window._sluisRows = rows;
     try { localStorage.setItem('sluis_rows', JSON.stringify(rows)); } catch(_) {}
