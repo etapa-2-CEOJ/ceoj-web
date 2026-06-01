@@ -1675,7 +1675,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.115';
+const APP_VERSION = 'v1.0.116';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -3382,12 +3382,12 @@ async function saveDonante() {
       const cur = data.currency || 'USD';
       const saldo = Math.round((data.compromiso||0) - (data.pagado||0));
       const statusLabel = {confirmado:'Confirmado ✓',reservado:'Reservado',proceso:'En proceso',negociacion:'En negociación'};
-      const msg = `Hola ${data.name}, te informamos que tu donación fue actualizada:\n\n` +
+      const msg = `Hola ${data.name}, muchas gracias, recibimos el pago de tu compromiso.\n\n` +
         `• Estado: ${statusLabel[data.status]||data.status}\n` +
         `• Comprometido: ${cur} ${Math.round(data.compromiso||0).toLocaleString('es-AR')}\n` +
         `• Pagado: ${cur} ${Math.round(data.pagado||0).toLocaleString('es-AR')}\n` +
         `• Saldo pendiente: ${cur} ${saldo.toLocaleString('es-AR')}\n\n` +
-        `Centro Educativo Oholey Jinuj — Etapa 2`;
+        `Proyecto Construcción "Centro Educativo Oholey Jinuj"`;
       window.open('https://wa.me/' + tel + '?text=' + encodeURIComponent(msg), '_blank');
     }
   } catch(e) { toast('Error: ' + e.message, 'err'); }
