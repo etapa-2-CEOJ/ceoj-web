@@ -1680,7 +1680,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.124';
+const APP_VERSION = 'v1.0.125';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -3367,6 +3367,7 @@ async function saveDonante() {
   const data = { name, phone: fv('m-don-tel'), email: fv('m-don-email'), currency: fv('m-don-cur'), compromiso: parseFloat(fv('m-don-comp'))||0, pagado: parseFloat(fv('m-don-pag'))||0, naming_id: fv('m-don-naming') || null, status: fv('m-don-status'), date: fv('m-don-date'), notes: fv('m-don-notes'), email_unsub: eid('m-don-unsub').checked, wa_unsub: eid('m-don-wa-unsub').checked };
   const pagadoOrig = parseFloat(fv('m-don-pag-orig')) || 0;
   const pagadoCambio = data.pagado !== pagadoOrig;
+  toast('DEBUG — phone:'+data.phone+' | wa_unsub:'+data.wa_unsub+' | pagadoCambio:'+pagadoCambio+' | orig:'+pagadoOrig+' | nuevo:'+data.pagado, 'info');
 
   let waUrl = null;
   if (data.phone && !data.wa_unsub && pagadoCambio) {
