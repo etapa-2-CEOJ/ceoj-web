@@ -1680,7 +1680,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.122';
+const APP_VERSION = 'v1.0.123';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -3376,14 +3376,14 @@ async function saveDonante() {
       sendPaymentEmail(data, montoPago).catch(()=>{});
     }
     closeModal('donante'); pushNamingSnapshot().catch(()=>{}); renderDon(); if(document.querySelector('#pg-naming.on')) renderNaming();
-    if (data.email) {
+    if (data.email && data.pagado !== pagadoOrig) {
       fetch('https://czsqbdjlptcgkxrrfceu.supabase.co/functions/v1/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB.token },
         body: JSON.stringify({ to: data.email, donante: data.name, status: data.status, compromiso: data.compromiso, pagado: data.pagado, currency: data.currency })
       }).then(r => r.json()).then(j => { if (j.ok) toast('Mail enviado a ' + data.email, 'ok'); else toast('Mail no enviado: ' + (j.error||''), 'err'); }).catch(() => {});
     }
-    if (data.phone && !data.wa_unsub) {
+    if (data.phone && !data.wa_unsub && data.pagado !== pagadoOrig) {
       const tel = data.phone.replace(/\D/g,'').replace(/^0/,'').replace(/^(?!54)/,'54');
       const cur = data.currency || 'USD';
       const saldo = Math.round((data.compromiso||0) - (data.pagado||0));
