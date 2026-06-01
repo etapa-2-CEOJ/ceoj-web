@@ -1511,7 +1511,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="fl"><label>Compromiso total *</label><input class="fi" type="number" id="m-don-comp" oninput="calcSaldo()"></div>
-      <div class="fl"><label>Monto pagado</label><input class="fi" type="number" id="m-don-pag" oninput="calcSaldo()"></div>
+      <div class="fl"><label>Monto pagado</label><input class="fi" type="number" id="m-don-pag" oninput="calcSaldo()" readonly style="background:#f1f5f9;color:#94a3b8;cursor:not-allowed" title="Se actualiza desde la planilla de Sheets"></div>
     </div>
     <div class="saldo-box"><span style="font-size:12px;color:#64748b;font-weight:600">Saldo a pagar:</span><span style="font-size:17px;font-weight:700;font-family:'DM Mono',monospace" id="m-don-saldo">USD 0</span></div>
     <div class="fl"><label>Naming / Espacio</label>
@@ -1680,7 +1680,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.126';
+const APP_VERSION = 'v1.0.127';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
