@@ -1680,7 +1680,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.123';
+const APP_VERSION = 'v1.0.124';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -3362,42 +3362,44 @@ async function sendPaymentEmail(donante, montoPago) {
 }
 
 async function saveDonante() {
-  console.log('saveDonante llamado');
   const id = fv('m-don-id'), name = fv('m-don-name').trim();
   if (!name) { toast('El nombre es obligatorio', 'err'); return; }
   const data = { name, phone: fv('m-don-tel'), email: fv('m-don-email'), currency: fv('m-don-cur'), compromiso: parseFloat(fv('m-don-comp'))||0, pagado: parseFloat(fv('m-don-pag'))||0, naming_id: fv('m-don-naming') || null, status: fv('m-don-status'), date: fv('m-don-date'), notes: fv('m-don-notes'), email_unsub: eid('m-don-unsub').checked, wa_unsub: eid('m-don-wa-unsub').checked };
   const pagadoOrig = parseFloat(fv('m-don-pag-orig')) || 0;
+  const pagadoCambio = data.pagado !== pagadoOrig;
+
+  let waUrl = null;
+  if (data.phone && !data.wa_unsub && pagadoCambio) {
+    const tel = data.phone.replace(/\D/g,'').replace(/^0/,'').replace(/^(?!54)/,'54');
+    const cur = data.currency || 'USD';
+    const saldo = Math.round((data.compromiso||0) - (data.pagado||0));
+    const edificio = fv('m-don-source') === 'sluis' ? 'EDIFICIO S.LUIS' : 'EDIFICIO TUCUMÁN';
+    const msg = `Hola ${data.name}, muchas gracias, recibimos el pago de tu compromiso.\n\n` +
+      `• Compromiso: ${edificio}\n` +
+      `• Comprometido: ${cur} ${Math.round(data.compromiso||0).toLocaleString('es-AR')}\n` +
+      `• Pagado: ${cur} ${Math.round(data.pagado||0).toLocaleString('es-AR')}\n` +
+      `• Saldo pendiente: ${cur} ${saldo.toLocaleString('es-AR')}\n\n` +
+      `Proyecto Construcción "Centro Educativo Oholey Jinuj"\n\n` +
+      `📩 Si preferís recibir estos avisos por email en lugar de WhatsApp, respondé MAIL.\n` +
+      `🚫 Si no deseás recibir ningún tipo de notificación, respondé STOP.`;
+    waUrl = 'whatsapp://send?phone=' + tel + '&text=' + encodeURIComponent(msg);
+    window.open(waUrl, '_blank');
+  }
+
   try {
     if (id) { await API.put('donantes/' + id, data); toast('Donante actualizado ✓', 'ok'); }
     else { await API.post('donantes', data); toast('Donante registrado ✓', 'ok'); }
-    console.log('pagado nuevo:', data.pagado, '| pagado orig:', pagadoOrig, '| email:', data.email);
     if (data.email && data.pagado > pagadoOrig) {
-      const montoPago = data.pagado - pagadoOrig;
-      sendPaymentEmail(data, montoPago).catch(()=>{});
+      sendPaymentEmail(data, data.pagado - pagadoOrig).catch(()=>{});
     }
-    closeModal('donante'); pushNamingSnapshot().catch(()=>{}); renderDon(); if(document.querySelector('#pg-naming.on')) renderNaming();
-    if (data.email && data.pagado !== pagadoOrig) {
+    if (data.email && pagadoCambio) {
       fetch('https://czsqbdjlptcgkxrrfceu.supabase.co/functions/v1/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB.token },
         body: JSON.stringify({ to: data.email, donante: data.name, status: data.status, compromiso: data.compromiso, pagado: data.pagado, currency: data.currency })
       }).then(r => r.json()).then(j => { if (j.ok) toast('Mail enviado a ' + data.email, 'ok'); else toast('Mail no enviado: ' + (j.error||''), 'err'); }).catch(() => {});
     }
-    if (data.phone && !data.wa_unsub && data.pagado !== pagadoOrig) {
-      const tel = data.phone.replace(/\D/g,'').replace(/^0/,'').replace(/^(?!54)/,'54');
-      const cur = data.currency || 'USD';
-      const saldo = Math.round((data.compromiso||0) - (data.pagado||0));
-      const edificio = fv('m-don-source') === 'sluis' ? 'EDIFICIO S.LUIS' : 'EDIFICIO TUCUMÁN';
-      const msg = `Hola ${data.name}, muchas gracias, recibimos el pago de tu compromiso.\n\n` +
-        `• Compromiso: ${edificio}\n` +
-        `• Comprometido: ${cur} ${Math.round(data.compromiso||0).toLocaleString('es-AR')}\n` +
-        `• Pagado: ${cur} ${Math.round(data.pagado||0).toLocaleString('es-AR')}\n` +
-        `• Saldo pendiente: ${cur} ${saldo.toLocaleString('es-AR')}\n\n` +
-        `Proyecto Construcción "Centro Educativo Oholey Jinuj"\n\n` +
-        `📩 Si preferís recibir estos avisos por email en lugar de WhatsApp, respondé MAIL.\n` +
-        `🚫 Si no deseás recibir ningún tipo de notificación, respondé STOP.`;
-      window.open('whatsapp://send?phone=' + tel + '&text=' + encodeURIComponent(msg), '_blank');
-    }
+    closeModal('donante'); pushNamingSnapshot().catch(()=>{}); renderDon(); if(document.querySelector('#pg-naming.on')) renderNaming();
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
