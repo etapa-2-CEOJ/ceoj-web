@@ -1680,7 +1680,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.127';
+const APP_VERSION = 'v1.0.128';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -5346,11 +5346,55 @@ async function syncSLuis() {
     const toNum = v => { if(typeof v==='number') return isNaN(v)?0:v; const s=String(v||'').replace(/[^0-9,.-]/g,'').trim(); if(!s) return 0; if(s.includes(',')) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0; return parseFloat(s)||0; };
     const rows = (json.rows || []).filter(r => toNum(r.deuda) > 0 && !String(r.donante||'').toLowerCase().includes('total'));
     rows.sort((a,b) => String(a.donante||'').localeCompare(String(b.donante||''),'es'));
+
+    // Detectar cambios en pagado y notificar
+    const prevRows = window._sluisRows || [];
+    const prevByName = {};
+    prevRows.forEach(r => { prevByName[String(r.donante||'').toLowerCase().trim()] = r; });
+    const existing = await API.get('donantes');
+    const dbByName = {};
+    existing.forEach(d => { dbByName[d.name.toLowerCase().trim()] = d; });
+
+    const notificarSL = [];
+    rows.forEach(r => {
+      const key = String(r.donante||'').toLowerCase().trim();
+      const prev = prevByName[key];
+      const db = dbByName[key];
+      if(prev && toNum(r.pagado) !== toNum(prev.pagado) && db && (db.phone || db.email)) {
+        notificarSL.push({ ...db, compromiso: toNum(r.compromiso), pagado: toNum(r.pagado) });
+      }
+    });
+
     window._sluisRows = rows;
     try { localStorage.setItem('sluis_rows', JSON.stringify(rows)); } catch(_) {}
     renderSLuis();
     toast('S.Luis: '+rows.length+' deudores cargados ✓','ok');
     renderDon();
+
+    for(let i=0; i<notificarSL.length; i++) {
+      const d = notificarSL[i];
+      const cur = d.currency || 'USD';
+      const saldo = Math.round((d.compromiso||0) - (d.pagado||0));
+      if(d.email && !d.email_unsub) {
+        fetch('https://czsqbdjlptcgkxrrfceu.supabase.co/functions/v1/send-email', {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB.token},
+          body:JSON.stringify({to:d.email, donante:d.name, status:d.status, compromiso:d.compromiso, pagado:d.pagado, currency:cur})
+        }).catch(()=>{});
+      }
+      if(d.phone && !d.wa_unsub) {
+        const tel = d.phone.replace(/\D/g,'').replace(/^0/,'').replace(/^(?!54)/,'54');
+        const msg = `Hola ${d.name}, muchas gracias, recibimos el pago de tu compromiso.\n\n` +
+          `• Compromiso: EDIFICIO S.LUIS\n` +
+          `• Comprometido: ${cur} ${Math.round(d.compromiso||0).toLocaleString('es-AR')}\n` +
+          `• Pagado: ${cur} ${Math.round(d.pagado||0).toLocaleString('es-AR')}\n` +
+          `• Saldo pendiente: ${cur} ${saldo.toLocaleString('es-AR')}\n\n` +
+          `Proyecto Construcción "Centro Educativo Oholey Jinuj"\n\n` +
+          `📩 Si preferís recibir estos avisos por email en lugar de WhatsApp, respondé MAIL.\n` +
+          `🚫 Si no deseás recibir ningún tipo de notificación, respondé STOP.`;
+        setTimeout(() => window.open('whatsapp://send?phone='+tel+'&text='+encodeURIComponent(msg),'_blank'), i*800);
+      }
+    }
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
@@ -5445,6 +5489,7 @@ async function _autoSyncDonantes(rows) {
     if(d.phone && !d.wa_unsub) {
       const tel = d.phone.replace(/\D/g,'').replace(/^0/,'').replace(/^(?!54)/,'54');
       const msg = `Hola ${d.name}, muchas gracias, recibimos el pago de tu compromiso.\n\n` +
+        `• Compromiso: EDIFICIO TUCUMÁN\n` +
         `• Comprometido: ${cur} ${Math.round(d.compromiso||0).toLocaleString('es-AR')}\n` +
         `• Pagado: ${cur} ${Math.round(d.pagado||0).toLocaleString('es-AR')}\n` +
         `• Saldo pendiente: ${cur} ${saldo.toLocaleString('es-AR')}\n\n` +
