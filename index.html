@@ -1679,7 +1679,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.120';
+const APP_VERSION = 'v1.0.121';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -3395,7 +3395,7 @@ async function saveDonante() {
         `Proyecto Construcción "Centro Educativo Oholey Jinuj"\n\n` +
         `📩 Si preferís recibir estos avisos por email en lugar de WhatsApp, respondé MAIL.\n` +
         `🚫 Si no deseás recibir ningún tipo de notificación, respondé STOP.`;
-      window.open('https://wa.me/' + tel + '?text=' + encodeURIComponent(msg), '_blank');
+      window.open('whatsapp://send?phone=' + tel + '&text=' + encodeURIComponent(msg), '_blank');
     }
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
