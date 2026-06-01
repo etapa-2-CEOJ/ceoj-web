@@ -938,7 +938,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
         <span class="ctitle">Deudores — Edificio S.Luis</span>
         <button class="btn btn-ghost btn-sm" onclick="syncSLuis()" title="Sincronizar con Google Sheets">↻ Sheets</button>
       </div>
-      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Donante</th><th>Compromiso</th><th>Pagado</th><th>Deuda</th></tr></thead><tbody id="sluis-tbody"><tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:20px">Sincronizá para ver los datos</td></tr></tbody></table></div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Donante</th><th>Compromiso</th><th>Pagado</th><th>Deuda</th><th></th></tr></thead><tbody id="sluis-tbody"><tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:20px">Sincronizá para ver los datos</td></tr></tbody></table></div>
       <div id="sluis-kpis" style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap"></div>
     </div>
   </div>
@@ -1679,7 +1679,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.119';
+const APP_VERSION = 'v1.0.120';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -5310,12 +5310,25 @@ function renderSLuis() {
   const kpis  = document.getElementById('sluis-kpis');
   if(!rows.length){ if(tbody) tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:16px">Sincronizá para ver los datos</td></tr>'; return; }
   if(tbody) tbody.innerHTML = rows.map(r => {
-    return '<tr><td><strong>'+String(r.donante)+'</strong></td>' +
+    const nom = String(r.donante).replace(/'/g,"&#39;");
+    return '<tr><td><strong>'+nom+'</strong></td>' +
       '<td class="td-gold">USD '+Math.round(toNum(r.compromiso)).toLocaleString('es-AR')+'</td>' +
       '<td class="td-green">USD '+Math.round(toNum(r.pagado)).toLocaleString('es-AR')+'</td>' +
-      '<td class="td-red">USD '+Math.round(toNum(r.deuda)).toLocaleString('es-AR')+'</td></tr>';
+      '<td class="td-red">USD '+Math.round(toNum(r.deuda)).toLocaleString('es-AR')+'</td>' +
+      '<td><button class="btn btn-outline btn-xs" onclick="editSLuisDonante(\''+nom+'\')">✎</button></td></tr>';
   }).join('');
   if(kpis) kpis.innerHTML = '';
+}
+
+async function editSLuisDonante(nombre) {
+  const todos = await API.get('donantes');
+  const match = todos.find(d => d.name.toLowerCase().trim() === nombre.toLowerCase().trim());
+  if (match) {
+    openModal('donante', match);
+  } else {
+    openModal('donante', { name: nombre });
+    toast('Donante no encontrado en el sistema — se abre como nuevo', 'info');
+  }
 }
 
 async function syncSLuis() {
