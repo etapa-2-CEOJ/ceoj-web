@@ -1500,6 +1500,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
   <div class="mb">
     <input type="hidden" id="m-don-id">
     <input type="hidden" id="m-don-pag-orig">
+    <input type="hidden" id="m-don-source" value="tucuman">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="fl"><label>Nombre / Familia *</label><input class="fi" type="text" id="m-don-name"></div>
       <div class="fl"><label>Teléfono</label><input class="fi" type="text" id="m-don-tel"></div>
@@ -1679,7 +1680,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.121';
+const APP_VERSION = 'v1.0.122';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -3386,9 +3387,9 @@ async function saveDonante() {
       const tel = data.phone.replace(/\D/g,'').replace(/^0/,'').replace(/^(?!54)/,'54');
       const cur = data.currency || 'USD';
       const saldo = Math.round((data.compromiso||0) - (data.pagado||0));
-      const statusLabel = {confirmado:'Confirmado ✓',reservado:'Reservado',proceso:'En proceso',negociacion:'En negociación'};
+      const edificio = fv('m-don-source') === 'sluis' ? 'EDIFICIO S.LUIS' : 'EDIFICIO TUCUMÁN';
       const msg = `Hola ${data.name}, muchas gracias, recibimos el pago de tu compromiso.\n\n` +
-        `• Estado: ${statusLabel[data.status]||data.status}\n` +
+        `• Compromiso: ${edificio}\n` +
         `• Comprometido: ${cur} ${Math.round(data.compromiso||0).toLocaleString('es-AR')}\n` +
         `• Pagado: ${cur} ${Math.round(data.pagado||0).toLocaleString('es-AR')}\n` +
         `• Saldo pendiente: ${cur} ${saldo.toLocaleString('es-AR')}\n\n` +
@@ -5329,6 +5330,7 @@ async function editSLuisDonante(nombre) {
     openModal('donante', { name: nombre });
     toast('Donante no encontrado en el sistema — se abre como nuevo', 'info');
   }
+  eid('m-don-source').value = 'sluis';
 }
 
 async function syncSLuis() {
