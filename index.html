@@ -585,6 +585,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
     </div>
     <div class="tb-right">
       <span class="tb-ver" id="tb-ver"></span>
+      <button class="pub-access-btn public-only" id="lang-btn" onclick="toggleLang()" title="Language / Idioma" style="font-weight:700;letter-spacing:.04em">EN</button>
       <button class="pub-access-btn public-only" onclick="openLoginModal()">🔐 Acceder al panel</button>
       <div class="tb-bell private-only" onclick="goPage('notif')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2a5 5 0 00-5 5v2l-1.5 2h13L13 9V7a5 5 0 00-5-5z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg>
@@ -1680,13 +1681,240 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.140';
+const APP_VERSION = 'v1.0.141';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
+  if (typeof applyLang === 'function') applyLang();
 });
+// ═══════════════════════════════════════════════════════════
+// i18n — traducción ES→EN de la parte pública (sweep del DOM)
+// Solo se aplica en modo público (no logueado). Para sumar textos,
+// agregá la línea 'texto en español': 'texto en inglés' a I18N_EN.
+// ═══════════════════════════════════════════════════════════
+const I18N_EN = {
+  // ── Navegación / topbar ──
+  'Inicio': 'Home',
+  'Proyecto Construcción': 'Construction Project',
+  '🔐 Acceder al panel': '🔐 Access Panel',
+  'Explorar': 'Explore',
+  'Avance de Obra': 'Construction Progress',
+  'Plantas': 'Floor Plans',
+  'Tour 360': '360° Tour',
+  'Galería': 'Gallery',
+  'Multimedia': 'Multimedia',
+  'Naming': 'Naming',
+  'Resumen': 'Summary',
+  // ── Encabezados de páginas públicas ──
+  'Inicio Junio 2026 · Finalización Diciembre 2029': 'Start June 2026 · Completion December 2029',
+  'Planos Interactivos': 'Interactive Floor Plans',
+  'Hover para ver info · Click para detalles · 🔍 Zoom con +/−, la rueda o pellizcando · arrastrá para mover': 'Hover for info · Click for details · 🔍 Zoom with +/−, wheel or pinch · drag to move',
+  'Galería de Renders': 'Renderings Gallery',
+  'Visualizaciones arquitectónicas CEOJ Etapa 2': 'CEOJ Phase 2 architectural visualizations',
+  'Naming Opportunities': 'Naming Opportunities',
+  'Espacios disponibles para nombramiento perpetuo': 'Spaces available for perpetual naming',
+  // ── Sección Plantas ──
+  'Espacio seleccionado': 'Selected space',
+  'Nivel': 'Level',
+  'Total del nivel': 'Level total',
+  'Superficie': 'Area',
+  'Ancho': 'Width',
+  'Largo': 'Length',
+  'Dimensiones': 'Dimensions',
+  'Click para ampliar': 'Click to enlarge',
+  'Click para ver render completo →': 'Click to view full render →',
+  'Plano ejecutivo aprobado nov 2025.': 'Executive plan approved Nov 2025.',
+  'Click en un espacio del plano para ver detalles': 'Click a space on the plan to see details',
+  'Pasá el cursor sobre el plano para ver información de cada espacio': 'Hover over the plan to see information for each space',
+  'SUBSUELO 2 — Salón de Fiestas + Gimnasio': 'BASEMENT 2 — Party Hall + Gym',
+  'SUBSUELO 1 — Salón Fiestas + Recepción': 'BASEMENT 1 — Party Hall + Reception',
+  'PLANTA BAJA — Hall + Patio + SUM': 'GROUND FLOOR — Hall + Courtyard + Multipurpose',
+  'PISO 1 — Maternal — Aulas + Dirección': 'FLOOR 1 — Nursery — Classrooms + Admin',
+  'PISO 2 — Gan — Aulas + SUM + Balcón': 'FLOOR 2 — Gan — Classrooms + Multipurpose + Balcony',
+  'PISO 3 — Gan — Aulas + SUM + Comedor': 'FLOOR 3 — Gan — Classrooms + Multipurpose + Dining',
+  'PISO 4 — Aulas + SUM + Comedor': 'FLOOR 4 — Classrooms + Multipurpose + Dining',
+  'PISO 5 — Aulas + SUM': 'FLOOR 5 — Classrooms + Multipurpose',
+  'PISO 6 — Aulas + SUM': 'FLOOR 6 — Classrooms + Multipurpose',
+  'TERRAZA — Canchas + Jardín': 'ROOFTOP — Courts + Garden',
+  // ── Nombres de espacios (datos) ──
+  'Salón de Fiestas': 'Party Hall',
+  'Gimnasio': 'Gym',
+  'Gimnasio 1': 'Gym 1',
+  'Depósito': 'Storage Room',
+  'SUM': 'Multipurpose Room',
+  'Cocina Salón': 'Hall Kitchen',
+  'Cocina Escuela': 'School Kitchen',
+  'Recepción Salón': 'Hall Reception',
+  'Sala de Máquina': 'Machine Room',
+  'Sala de Máq. 1': 'Machine Room 1',
+  'Hall Salón': 'Hall Lobby',
+  'Acceso / Recepción': 'Entrance / Reception',
+  'Hall / SUM': 'Hall / Multipurpose',
+  'Patio': 'Courtyard',
+  'Centro Educativo / Dirección': 'Education Center / Administration',
+  'Oficinas': 'Offices',
+  'Aula 1 — Maternal': 'Classroom 1 — Nursery',
+  'Aula 1': 'Classroom 1', 'Aula 2': 'Classroom 2', 'Aula 3': 'Classroom 3',
+  'Aula 4': 'Classroom 4', 'Aula 5': 'Classroom 5', 'Aula 6': 'Classroom 6', 'Aula 7': 'Classroom 7',
+  'Aula Gan 1': 'Kindergarten Classroom 1', 'Aula Gan 2': 'Kindergarten Classroom 2',
+  'Aula Gan 3': 'Kindergarten Classroom 3', 'Aula Gan 4': 'Kindergarten Classroom 4',
+  'Aula Gan 5': 'Kindergarten Classroom 5', 'Aula Gan 6': 'Kindergarten Classroom 6',
+  'Aula Gan 7': 'Kindergarten Classroom 7',
+  'Balcón': 'Balcony', 'Balcón 1': 'Balcony 1', 'Balcón 2': 'Balcony 2', 'Balcón superior': 'Upper Balcony',
+  'Comedor': 'Dining Hall',
+  'Cancha Multideporte': 'Multi-sport Court',
+  'Terraza': 'Rooftop Terrace',
+  'Cuerpo saliente': 'Projecting Wing',
+  'Local técnico': 'Technical Room',
+  // ── Descripciones de espacios (Plantas) ──
+  'Acceso principal y recepción del edificio. 17.05m × 34.09m = 150m².': 'Building main entrance and reception. 17.05m × 34.09m = 150m².',
+  'Aula 1 der. 45m².': 'Classroom 1 (right). 45m².',
+  'Aula 1 piso 5. 6.16m × 5.94m = 40m².': 'Classroom 1, floor 5. 6.16m × 5.94m = 40m².',
+  'Aula 1 piso 6. 4.17m × 5.99m = 30m².': 'Classroom 1, floor 6. 4.17m × 5.99m = 30m².',
+  'Aula 1 — Nivel Maternal. 7.00m × 6.20m = 45m².': 'Classroom 1 — Nursery level. 7.00m × 6.20m = 45m².',
+  'Aula 1 — fila derecha. 7.00m × 5.85m = 45m².': 'Classroom 1 — right row. 7.00m × 5.85m = 45m².',
+  'Aula 1. 45m².': 'Classroom 1. 45m².',
+  'Aula 2 — Maternal. 6.90m × 5.90m = 40m².': 'Classroom 2 — Nursery. 6.90m × 5.90m = 40m².',
+  'Aula 2. 40m².': 'Classroom 2. 40m².',
+  'Aula 2. 6.90m × 5.85m = 40m².': 'Classroom 2. 6.90m × 5.85m = 40m².',
+  'Aula 2. 7.46m × 5.78m = 45m².': 'Classroom 2. 7.46m × 5.78m = 45m².',
+  'Aula 2. 8.33m × 5.78m = 50m².': 'Classroom 2. 8.33m × 5.78m = 50m².',
+  'Aula 3 — Maternal. 6.90m × 5.90m = 40m².': 'Classroom 3 — Nursery. 6.90m × 5.90m = 40m².',
+  'Aula 3. 40m².': 'Classroom 3. 40m².',
+  'Aula 3. 45m².': 'Classroom 3. 45m².',
+  'Aula 3. 50m².': 'Classroom 3. 50m².',
+  'Aula 4 — Maternal. 6.90m × 5.90m = 40m².': 'Classroom 4 — Nursery. 6.90m × 5.90m = 40m².',
+  'Aula 4. 40m².': 'Classroom 4. 40m².',
+  'Aula 4. 45m².': 'Classroom 4. 45m².',
+  'Aula 4. 50m².': 'Classroom 4. 50m².',
+  'Aula 5 — Maternal. 6.90m × 5.90m = 40m².': 'Classroom 5 — Nursery. 6.90m × 5.90m = 40m².',
+  'Aula 5. 40m².': 'Classroom 5. 40m².',
+  'Aula 5. 45m².': 'Classroom 5. 45m².',
+  'Aula 5. 50m².': 'Classroom 5. 50m².',
+  'Aula 50m².': 'Classroom 50m².',
+  'Aula 6 — Maternal. 6.70m × 5.90m = 40m².': 'Classroom 6 — Nursery. 6.70m × 5.90m = 40m².',
+  'Aula 6. 40m².': 'Classroom 6. 40m².',
+  'Aula 6. 45m².': 'Classroom 6. 45m².',
+  'Aula 6. 50m².': 'Classroom 6. 50m².',
+  'Aula 7. 3.35m × 5.87m = 30m².': 'Classroom 7. 3.35m × 5.87m = 30m².',
+  'Aula 7. 5.35m × 5.66m = 35m².': 'Classroom 7. 5.35m × 5.66m = 35m².',
+  'Aula Gan. 50m².': 'Kindergarten classroom. 50m².',
+  'Aula Gan. 7.05m × 5.87m = 50m².': 'Kindergarten classroom. 7.05m × 5.87m = 50m².',
+  'Aula Gan. 7.86m × 6.21m = 50m².': 'Kindergarten classroom. 7.86m × 6.21m = 50m².',
+  'Aula Gan. 7.98m × 6.03m = 50m².': 'Kindergarten classroom. 7.98m × 6.03m = 50m².',
+  'Aula Gan. 8.11m × 6.08m = 50m².': 'Kindergarten classroom. 8.11m × 6.08m = 50m².',
+  'Aula Gan. 8.25m × 6.08m = 50m².': 'Kindergarten classroom. 8.25m × 6.08m = 50m².',
+  'Aula Gan. 8.38m × 6.08m = 50m².': 'Kindergarten classroom. 8.38m × 6.08m = 50m².',
+  'Aula Gan. 8.52m × 6.03m = 50m².': 'Kindergarten classroom. 8.52m × 6.03m = 50m².',
+  'Aula Jardín de Infantes (Gan). 7.86m × 6.21m = 50m².': 'Kindergarten classroom (Gan). 7.86m × 6.21m = 50m².',
+  'Aula piso 4. 50m².': 'Floor 4 classroom. 50m².',
+  'Balcón 55m².': 'Balcony 55m².',
+  'Balcón 70m².': 'Balcony 70m².',
+  'Balcón del cuerpo saliente. 20m².': 'Projecting wing balcony. 20m².',
+  'Balcón exterior. 34.08m × 6.16m = 210m². Vista al patio central.': 'Outdoor balcony. 34.08m × 6.16m = 210m². View over the central courtyard.',
+  'Cancha multideporte. 19.23m × 34.08m. Educación física al aire libre.': 'Multi-sport court. 19.23m × 34.08m. Outdoor physical education.',
+  'Centro Educativo y Dirección del CEOJ. 6.12m × 34.08m = 380m². Administración general.': 'CEOJ Education Center and Administration. 6.12m × 34.08m = 380m². General administration.',
+  'Cocina de servicio para el Salón de Fiestas. 10.72m × 6.60m = 75m².': 'Service kitchen for the Party Hall. 10.72m × 6.60m = 75m².',
+  'Cocina kasher de la escuela. 10.72m × 6.53m = 75m².': 'Kosher school kitchen. 10.72m × 6.53m = 75m².',
+  'Comedor escolar kasher. 10.91m × 11.83m = 125m².': 'Kosher school dining hall. 10.91m × 11.83m = 125m².',
+  'Comedor. 10.91m × 11.83m = 125m².': 'Dining hall. 10.91m × 11.83m = 125m².',
+  'Cuerpo saliente de la terraza. 10.88m × 17.38m.': 'Rooftop projecting wing. 10.88m × 17.38m.',
+  'Depósito. 8.04m × 24.33m = 180m².': 'Storage room. 8.04m × 24.33m = 180m².',
+  'Depósito. 8.18m × 19.24m = 160m².': 'Storage room. 8.18m × 19.24m = 160m².',
+  'Gimnasio. 10.91m × 11.83m = 125m².': 'Gym. 10.91m × 11.83m = 125m².',
+  'Gimnasio. 17.64m × 22.86m = 405m². Educación física y actividades deportivas.': 'Gym. 17.64m × 22.86m = 405m². Physical education and sports.',
+  'Hall de acceso al Salón de Fiestas. 6.99m de ancho. 80m².': 'Entrance hall to the Party Hall. 6.99m wide. 80m².',
+  'Hall/SUM principal. 34.09m × 34.08m = 615m². Conecta acceso con patio central.': 'Main Hall/Multipurpose. 34.09m × 34.08m = 615m². Connects the entrance with the central courtyard.',
+  'Locales técnicos de terraza. 10.13m de ancho.': 'Rooftop technical rooms. 10.13m wide.',
+  'Oficinas administrativas. 4.98m × 9.50m = 86m².': 'Administrative offices. 4.98m × 9.50m = 86m².',
+  'Oficinas. 10.91m × 9.83m = 105m².': 'Offices. 10.91m × 9.83m = 105m².',
+  'Patio central del CEOJ. 45.95m × 22.85m = 985m². Corazón del edificio. Espacio de recreo y encuentro comunitario.': 'CEOJ central courtyard. 45.95m × 22.85m = 985m². Heart of the building. Recreation and community gathering space.',
+  'Recepción y Salón de Fiestas. 26.65m × 9.50m = 230m² recepción. Gran salón para bodas, Bar/Bat Mitzvá y eventos Anash.': 'Reception and Party Hall. 26.65m × 9.50m = 230m² reception. Large hall for weddings, Bar/Bat Mitzvah and Anash events.',
+  'Sala de máquinas 1. Instalaciones técnicas del edificio.': 'Machine room 1. Building technical installations.',
+  'Salón de Fiestas. 45.75m × 26.20m = 1.050m². Eventos, bodas, Bar/Bat Mitzvá y actos comunitarios.': 'Party Hall. 45.75m × 26.20m = 1,050m². Events, weddings, Bar/Bat Mitzvah and community gatherings.',
+  'Salón de Usos Múltiples (SUM). 34.08m × 10.78m = 380m².': 'Multipurpose Room. 34.08m × 10.78m = 380m².',
+  'Salón de Usos Múltiples (SUM). 34.08m × 11.91m = 420m².': 'Multipurpose Room. 34.08m × 11.91m = 420m².',
+  'Salón de Usos Múltiples (SUM). 34.08m × 13.42m = 470m².': 'Multipurpose Room. 34.08m × 13.42m = 470m².',
+  'Salón de Usos Múltiples. 15.21m × 8.07m = 125m².': 'Multipurpose Room. 15.21m × 8.07m = 125m².',
+  'Salón de Usos Múltiples. 25.38m × 6.90m = 175m².': 'Multipurpose Room. 25.38m × 6.90m = 175m².',
+  'Salón de Usos Múltiples. 41.20m × 10.11m = 420m².': 'Multipurpose Room. 41.20m × 10.11m = 420m².',
+  'Terraza principal. 41.75m × 10.15m = 1.350m². Espacio verde y recreo en la cima del edificio.': 'Main rooftop terrace. 41.75m × 10.15m = 1,350m². Green and recreation space at the top of the building.',
+  // ── Niveles / estados / naming ──
+  'Subsuelo 2': 'Basement 2',
+  'Subsuelo 1': 'Basement 1',
+  'Planta Baja': 'Ground Floor',
+  'Piso 1': 'Floor 1', 'Piso 2': 'Floor 2', 'Piso 3': 'Floor 3',
+  'Piso 4': 'Floor 4', 'Piso 5': 'Floor 5', 'Piso 6': 'Floor 6',
+  'Pisos 1–3': 'Floors 1–3',
+  'Edificio': 'Building',
+  'Exterior': 'Outdoor',
+  'Disponible': 'Available',
+  'Reservado': 'Reserved',
+  'Confirmado': 'Confirmed',
+  'Pendiente': 'Pending',
+  'Acceso Primaria y Seminario': 'Primary & Seminary Entrance',
+  'Acceso Rampa': 'Ramp Access',
+  'Hall Entrada Tucuman': 'Tucumán Entrance Hall',
+  'Hall Salón Aguero': 'Agüero Hall Lobby',
+  'Comedor / SUM': 'Dining Hall / Multipurpose',
+  'Patio Juegos Exterior': 'Outdoor Playground',
+};
+
+// Traducción por patrón (para nombres numerados: "Aula Gan 201", etc.)
+const I18N_RE = [
+  [/^Aula Gan (\d+)$/, 'Kindergarten Classroom $1'],
+  [/^Aula Maternal (\d+)$/, 'Nursery Classroom $1'],
+  [/^Aula Primaria (\d+)$/, 'Primary Classroom $1'],
+  [/^Aula Seminario (\d+)$/, 'Seminary Classroom $1'],
+];
+
+let LANG = 'es';
+function i18nDetect() {
+  try { const s = localStorage.getItem('ceoj_lang'); if (s === 'es' || s === 'en') return s; } catch (_) {}
+  return (navigator.language || 'es').toLowerCase().startsWith('en') ? 'en' : 'es';
+}
+const _i18nOrig = new Map(); // textNode -> texto original en español
+function _i18nWalk(fn) {
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode(n) {
+      const t = n.parentNode && n.parentNode.nodeName;
+      return (t === 'SCRIPT' || t === 'STYLE' || t === 'NOSCRIPT' || t === 'TEXTAREA')
+        ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  let n; while ((n = w.nextNode())) fn(n);
+}
+function applyLang() {
+  const en = (LANG === 'en' && isPublicMode());
+  if (en) {
+    _i18nWalk((node) => {
+      const raw = node.nodeValue, key = raw.trim();
+      if (!key) return;
+      let tr = I18N_EN[key];
+      if (!tr) { for (const [re, rep] of I18N_RE) { if (re.test(key)) { tr = key.replace(re, rep); break; } } }
+      if (tr && tr !== key) {
+        if (!_i18nOrig.has(node)) _i18nOrig.set(node, raw);
+        node.nodeValue = raw.replace(key, tr);
+      }
+    });
+  } else {
+    _i18nOrig.forEach((orig, node) => { try { node.nodeValue = orig; } catch (_) {} });
+    _i18nOrig.clear();
+  }
+  const gs = document.getElementById('gs-input');
+  if (gs) gs.placeholder = en ? 'Search donors, users, spaces...' : 'Buscar donantes, usuarios, espacios...';
+  const b = document.getElementById('lang-btn');
+  if (b) b.textContent = LANG === 'en' ? 'ES' : 'EN';
+}
+function toggleLang() {
+  LANG = (LANG === 'en') ? 'es' : 'en';
+  try { localStorage.setItem('ceoj_lang', LANG); } catch (_) {}
+  applyLang();
+}
+LANG = i18nDetect();
+
 const LOGO_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/logo.jpg';
 const ESTRUCTURA_SRC = 'https://czsqbdjlptcgkxrrfceu.supabase.co/storage/v1/object/public/ceoj-assets/edificio-nuevo.jpg';
 const IMGS = {
@@ -2497,6 +2725,7 @@ function goPage(page) {
   if (page === 'v360') setTimeout(initV360, 80);
   clearInterval(_ovRefreshTimer);
   if (page === 'overview') _ovRefreshTimer = setInterval(renderOverview, 60000);
+  if (typeof applyLang === 'function') applyLang();
   closeSidebar();
 }
 document.querySelectorAll('.ni[data-page]').forEach(el => el.addEventListener('click', () => goPage(el.dataset.page)));
@@ -4559,6 +4788,7 @@ function fpHover(event, id) {
   tip.style.display = 'block';
   tip.style.left    = (event.clientX + 16) + 'px';
   tip.style.top     = Math.max(10, event.clientY - 80) + 'px';
+  if (typeof applyLang === 'function') applyLang();
 }
 
 function fpUnhover() {
@@ -4630,6 +4860,7 @@ function fpClick(id) {
       <div style="font-size:12px;color:#64748b;line-height:1.6;padding:9px;
         background:#f8fafc;border-radius:7px;border-left:3px solid ${r.color}">${r.desc}</div>`;
   }
+  if (typeof applyLang === 'function') applyLang();
 
   const tip = document.getElementById('fp-tooltip');
   if (tip) tip.style.display = 'none';
