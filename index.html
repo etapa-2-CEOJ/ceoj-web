@@ -688,7 +688,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
     <div><h1>Planos Interactivos</h1><p>Hover sobre cada espacio para ver info · Click para detalles · Plano ejecutivo aprobado Nov 2025</p></div>
     <div class="ph-btns">
       <select id="floor-sel" onchange="renderFloor(this.value)" style="background:#fff;border:1.5px solid #e2e8f0;color:#1a2540;padding:7px 12px;border-radius:7px;font-size:13px;font-weight:600;outline:none;cursor:pointer">
-        <option value="ss2">SUBSUELO 2 — Gimnasio + SUM</option>
+        <option value="ss2">SUBSUELO 2 — Salón de Fiestas + Gimnasio</option>
         <option value="ss1">SUBSUELO 1 — Salón Fiestas + Recepción</option>
         <option value="pb" selected>PLANTA BAJA — Hall + Patio + SUM</option>
         <option value="p1">PISO 1 — Maternal — Aulas + Dirección</option>
@@ -1680,7 +1680,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.136';
+const APP_VERSION = 'v1.0.138';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -3919,21 +3919,21 @@ const FLOOR_MAP = {
       { id:'maq1',  name:'Sala de Máq. 1',         m2:140,  w:'8.38m', h:'16.70m', color:'#6366f1',
         x:171, y:385, W:114, H:114,
         img:'', desc:'Sala de máquinas 1. Instalaciones técnicas del edificio.' },
-      { id:'maq2',  name:'Sala de Máq. 2',         m2:180,  w:'8.04m', h:'24.33m', color:'#6366f1',
+      { id:'maq2',  name:'Depósito',                m2:180,  w:'8.04m', h:'24.33m', color:'#6366f1',
         x:173, y:504, W:115, H:139,
-        img:'', desc:'Sala de máquinas 2. Instalaciones del edificio. 8.04m × 24.33m.' },
-      { id:'sum2',  name:'SUM',                    m2:135,  w:'15.21m',h:'8.17m',  color:'#7c3aed',
+        img:'', desc:'Depósito. 8.04m × 24.33m = 180m².' },
+      { id:'sum2',  name:'SUM',                    m2:125,  w:'15.21m',h:'8.07m',  color:'#7c3aed',
         x:307, y:302, W:232, H:113,
-        img:'g1', desc:'Salón de Usos Múltiples. 15.21m × 8.17m = 135m².' },
+        img:'g1', desc:'Salón de Usos Múltiples. 15.21m × 8.07m = 125m².' },
       { id:'coc2',  name:'Cocina Salón',            m2:75,   w:'10.72m',h:'6.60m',  color:'#059669',
         x:810, y:61, W:159, H:101,
         img:'comedor', desc:'Cocina de servicio para el Salón de Fiestas. 10.72m × 6.60m = 75m².' },
-      { id:'gym1',  name:'Gimnasio 1',              m2:405,  w:'~27m',  h:'~15m',   color:'#2563eb',
+      { id:'gym1',  name:'Gimnasio',                m2:405,  w:'17.64m',h:'22.86m', color:'#2563eb',
         x:289, y:421, W:264, H:337,
-        img:'gimnasio', desc:'Gimnasio 1. ~27m × ~15m = 405m². Educación física y actividades deportivas.' },
-      { id:'gym2',  name:'Gimnasio 2 — Principal', m2:1050, w:'45.75m',h:'29.20m', color:'#1d4ed8',
+        img:'gimnasio', desc:'Gimnasio. 17.64m × 22.86m = 405m². Educación física y actividades deportivas.' },
+      { id:'gym2',  name:'Salón de Fiestas',       m2:1050, w:'45.75m',h:'26.20m', color:'#1d4ed8',
         x:556, y:377, W:601, H:400,
-        img:'gimnasio', desc:'Gimnasio Principal. 45.75m × 29.20m = 1.050m². Actos escolares y eventos comunitarios.' },
+        img:'salon', desc:'Salón de Fiestas. 45.75m × 26.20m = 1.050m². Eventos, bodas, Bar/Bat Mitzvá y actos comunitarios.' },
     ]
   },
 
@@ -3944,9 +3944,9 @@ const FLOOR_MAP = {
     key: 'ss1', label: 'PLANTA SUBSUELO 1',
     vw: 1400, vh: 989,
     rooms: [
-      { id:'maq1', name:'Sala de Máquina',  m2:160, w:'8.18m', h:'19.24m', color:'#6366f1',
+      { id:'maq1', name:'Depósito',  m2:160, w:'8.18m', h:'19.24m', color:'#6366f1',
         x:171, y:418, W:117, H:116,
-        img:'', desc:'Sala de máquinas. 8.18m × 19.24m = 160m².' },
+        img:'', desc:'Depósito. 8.18m × 19.24m = 160m².' },
       { id:'sum1', name:'SUM',              m2:175, w:'25.38m',h:'6.90m',  color:'#7c3aed',
         x:167, y:296, W:370, H:119,
         img:'g1', desc:'Salón de Usos Múltiples. 25.38m × 6.90m = 175m².' },
@@ -3978,9 +3978,9 @@ const FLOOR_MAP = {
       { id:'hsum',   name:'Hall / SUM',         m2:615, w:'34.09m',h:'34.08m', color:'#16a34a',
         x:299, y:326, W:252, H:462,
         img:'patio', desc:'Hall/SUM principal. 34.09m × 34.08m = 615m². Conecta acceso con patio central.' },
-      { id:'patio',  name:'Patio',              m2:985, w:'39.90m',h:'22.85m', color:'#22c55e',
+      { id:'patio',  name:'Patio',              m2:985, w:'45.95m',h:'22.85m', color:'#22c55e',
         x:574, y:531, W:640, H:262,
-        img:'patio', desc:'Patio central del CEOJ. 39.90m × 22.85m = 985m². Corazón del edificio. Espacio de recreo y encuentro comunitario.' },
+        img:'patio', desc:'Patio central del CEOJ. 45.95m × 22.85m = 985m². Corazón del edificio. Espacio de recreo y encuentro comunitario.' },
     ]
   },
 
@@ -4064,15 +4064,15 @@ const FLOOR_MAP = {
       { id:'ad6', name:'Aula 6', m2:40, w:'6.70m', h:'5.85m', color:'#38bdf8',
         x:1061, y:420, W:99, H:103,
         img:'aula_gan', desc:'Aula 6. 40m².' },
-      { id:'sum2', name:'SUM', m2:455, w:'34.08m', h:'13.42m', color:'#7c3aed',
+      { id:'sum2', name:'SUM', m2:470, w:'34.08m', h:'13.42m', color:'#7c3aed',
         x:314, y:304, W:197, H:489,
-        img:'g3', desc:'Salón de Usos Múltiples (SUM). 34.08m × 13.42m = 455m².' },
+        img:'g3', desc:'Salón de Usos Múltiples (SUM). 34.08m × 13.42m = 470m².' },
       { id:'bal2', name:'Balcón', m2:210, w:'34.08m', h:'6.16m', color:'#84cc16',
         x:519, y:530, W:129, H:325,
         img:'patio_piso', desc:'Balcón exterior. 34.08m × 6.16m = 210m². Vista al patio central.' },
-      { id:'of2', name:'Oficinas', m2:125, w:'10.91m', h:'11.83m', color:'#94a3b8',
+      { id:'of2', name:'Gimnasio', m2:125, w:'10.91m', h:'11.83m', color:'#2563eb',
         x:808, y:65, W:161, H:166,
-        img:'', desc:'Oficinas. 10.91m × 11.83m = 125m².' },
+        img:'gimnasio', desc:'Gimnasio. 10.91m × 11.83m = 125m².' },
     ]
   },
 
@@ -4108,8 +4108,8 @@ const FLOOR_MAP = {
         x:956, y:417, W:97, H:105, img:'aula_gan', desc:'Aula 5. 40m².' },
       { id:'b36', name:'Aula 6', m2:40, w:'6.70m', h:'6.30m', color:'#4ade80',
         x:1062, y:421, W:97, H:104, img:'aula_gan', desc:'Aula 6. 40m².' },
-      { id:'sum3', name:'SUM', m2:455, w:'34.08m', h:'13.42m', color:'#7c3aed',
-        x:299, y:303, W:209, H:489, img:'g1', desc:'Salón de Usos Múltiples (SUM). 34.08m × 13.42m = 455m².' },
+      { id:'sum3', name:'SUM', m2:470, w:'34.08m', h:'13.42m', color:'#7c3aed',
+        x:299, y:303, W:209, H:489, img:'g1', desc:'Salón de Usos Múltiples (SUM). 34.08m × 13.42m = 470m².' },
       { id:'com3', name:'Comedor', m2:125, w:'10.91m', h:'11.83m', color:'#c8880a',
         x:810, y:64, W:156, H:164, img:'comedor', desc:'Comedor escolar kasher. 10.91m × 11.83m = 125m².' },
     ]
@@ -4147,8 +4147,8 @@ const FLOOR_MAP = {
         x:958, y:417, W:98, H:105, img:'aula_gan', desc:'Aula 5. 40m².' },
       { id:'d46', name:'Aula 6', m2:40, w:'6.70m', h:'5.85m', color:'#fbbf24',
         x:1061, y:418, W:93, H:105, img:'aula_gan', desc:'Aula 6. 40m².' },
-      { id:'sum4', name:'SUM', m2:455, w:'34.08m', h:'13.42m', color:'#7c3aed',
-        x:316, y:295, W:192, H:497, img:'g1', desc:'Salón de Usos Múltiples (SUM). 34.08m × 13.42m = 455m².' },
+      { id:'sum4', name:'SUM', m2:470, w:'34.08m', h:'13.42m', color:'#7c3aed',
+        x:316, y:295, W:192, H:497, img:'g1', desc:'Salón de Usos Múltiples (SUM). 34.08m × 13.42m = 470m².' },
       { id:'com4', name:'Comedor', m2:125, w:'10.91m', h:'11.83m', color:'#c8880a',
         x:814, y:61, W:159, H:146, img:'comedor', desc:'Comedor. 10.91m × 11.83m = 125m².' },
       { id:'bal4', name:'Balcón',  m2:55,  w:'~10m',   h:'~5.4m',  color:'#84cc16',
@@ -4190,8 +4190,8 @@ const FLOOR_MAP = {
         x:961, y:420, W:95, H:100, img:'aula_gan', desc:'Aula 5. 40m².' },
       { id:'f56', name:'Aula 6', m2:40, w:'6.70m', h:'6.30m', color:'#f9a8d4',
         x:1066, y:424, W:88, H:98, img:'aula_gan', desc:'Aula 6. 40m².' },
-      { id:'sum5', name:'SUM', m2:405, w:'34.08m', h:'11.91m', color:'#7c3aed',
-        x:332, y:303, W:175, H:489, img:'g1', desc:'Salón de Usos Múltiples (SUM). 34.08m × 11.91m = 405m².' },
+      { id:'sum5', name:'SUM', m2:420, w:'34.08m', h:'11.91m', color:'#7c3aed',
+        x:332, y:303, W:175, H:489, img:'g1', desc:'Salón de Usos Múltiples (SUM). 34.08m × 11.91m = 420m².' },
       { id:'of5',  name:'Oficinas',m2:105, w:'10.91m', h:'9.83m',  color:'#94a3b8',
         x:808, y:90, W:157, H:135, img:'', desc:'Oficinas. 10.91m × 9.83m = 105m².' },
       { id:'bal5top', name:'Balcón superior', m2:20, w:'10.91m', h:'~', color:'#a3e635',
@@ -4234,8 +4234,8 @@ const FLOOR_MAP = {
         x:960, y:412, W:97, H:113, img:'aula_gan', desc:'Aula 5. 40m².' },
       { id:'h66', name:'Aula 6', m2:40, w:'6.70m', h:'6.30m', color:'#818cf8',
         x:1058, y:415, W:103, H:110, img:'aula_gan', desc:'Aula 6. 40m².' },
-      { id:'sum6',  name:'SUM',    m2:370, w:'34.08m', h:'10.78m', color:'#0891b2',
-        x:354, y:295, W:156, H:500, img:'g5', desc:'Salón de Usos Múltiples (SUM). 34.08m × 10.78m = 370m².' },
+      { id:'sum6',  name:'SUM',    m2:380, w:'34.08m', h:'10.78m', color:'#0891b2',
+        x:354, y:295, W:156, H:500, img:'g5', desc:'Salón de Usos Múltiples (SUM). 34.08m × 10.78m = 380m².' },
       { id:'bal6a', name:'Balcón 1',        m2:70,  w:'~',      h:'~',      color:'#84cc16',
         x:200, y:232, W:20, H:621, img:'', desc:'Balcón 70m².' },
       { id:'bal6b', name:'Balcón 2',        m2:55,  w:'~',      h:'~',      color:'#84cc16',
