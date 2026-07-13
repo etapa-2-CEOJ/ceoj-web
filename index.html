@@ -1680,7 +1680,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.139';
+const APP_VERSION = 'v1.0.140';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -4321,8 +4321,8 @@ function renderFloor(fid) {
     <!-- Controles de zoom -->
     <div id="fp-zoom-ctrl" style="position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:5px;z-index:60">
       <div id="fp-zoom-pct" style="text-align:center;font-size:9px;font-weight:700;color:#64748b;font-family:'DM Mono',monospace;background:rgba(255,255,255,.9);border-radius:5px;padding:2px 0">100%</div>
-      <button onclick="fpZoomBy(1.4)" title="Acercar" style="width:34px;height:34px;border:1.5px solid #e2e8f0;background:#fff;border-radius:8px;font-size:18px;font-weight:700;color:#1a2540;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12);line-height:1">+</button>
-      <button onclick="fpZoomBy(0.71)" title="Alejar" style="width:34px;height:34px;border:1.5px solid #e2e8f0;background:#fff;border-radius:8px;font-size:22px;font-weight:700;color:#1a2540;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12);line-height:1">−</button>
+      <button onclick="fpZoomBy(1.25)" title="Acercar" style="width:34px;height:34px;border:1.5px solid #e2e8f0;background:#fff;border-radius:8px;font-size:18px;font-weight:700;color:#1a2540;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12);line-height:1">+</button>
+      <button onclick="fpZoomBy(0.8)" title="Alejar" style="width:34px;height:34px;border:1.5px solid #e2e8f0;background:#fff;border-radius:8px;font-size:22px;font-weight:700;color:#1a2540;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12);line-height:1">−</button>
       <button onclick="fpResetZoom()" title="Restablecer zoom" style="width:34px;height:34px;border:1.5px solid #e2e8f0;background:#fff;border-radius:8px;font-size:14px;color:#64748b;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12);line-height:1">⤢</button>
     </div>`;
   fpResetZoom();
@@ -4440,10 +4440,13 @@ function fpInitZoom() {
   fpZoomBound = true;
 
   // ── Desktop: rueda del mouse para acercar/alejar (hacia el cursor) ──
+  // Suave: proporcional al scroll y con tope por evento (el trackpad dispara muchos)
   wrap.addEventListener('wheel', (e) => {
     e.preventDefault();
     const wr = wrap.getBoundingClientRect();
-    fpZoomBy(e.deltaY < 0 ? 1.15 : 1 / 1.15, e.clientX - wr.left, e.clientY - wr.top);
+    let f = Math.exp(-e.deltaY * 0.0009);
+    f = Math.max(0.94, Math.min(1.06, f));
+    fpZoomBy(f, e.clientX - wr.left, e.clientY - wr.top);
   }, { passive: false });
 
   // ── Desktop: arrastrar para desplazar cuando hay zoom ──
