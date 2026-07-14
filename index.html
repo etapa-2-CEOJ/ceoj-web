@@ -585,7 +585,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
     </div>
     <div class="tb-right">
       <span class="tb-ver" id="tb-ver"></span>
-      <button class="pub-access-btn public-only" id="lang-btn" onclick="toggleLang()" title="Language / Idioma" style="font-weight:700;letter-spacing:.04em">EN</button>
+      <button class="pub-access-btn public-only" id="lang-btn" onclick="toggleLang()" title="Cambiar idioma · Change language" style="font-weight:700;letter-spacing:.04em">🇦🇷 ES</button>
       <button class="pub-access-btn public-only" onclick="openLoginModal()">🔐 Acceder al panel</button>
       <div class="tb-bell private-only" onclick="goPage('notif')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2a5 5 0 00-5 5v2l-1.5 2h13L13 9V7a5 5 0 00-5-5z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg>
@@ -1681,12 +1681,13 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.145';
+const APP_VERSION = 'v1.0.146';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
   const el=document.getElementById('tb-ver');if(el)el.textContent=APP_VERSION;
   try { const saved=localStorage.getItem('sluis_rows'); if(saved){ window._sluisRows=JSON.parse(saved); renderSLuis(); } } catch(_) {}
+  try { i18nObserve(); } catch(_) {}
   if (typeof applyLang === 'function') applyLang();
 });
 // ═══════════════════════════════════════════════════════════
@@ -2026,6 +2027,66 @@ const I18N_EN = {
   'Generaciones': 'Generations',
   'Tucumán 3177 / Agüero 841, CABA · Jabad Lubavitch Argentina': 'Tucumán 3177 / Agüero 841, CABA · Chabad Lubavitch Argentina',
   'ESC · Salir': 'ESC · Exit',
+  // ── Naming: KPIs, banners y tarjetas ──
+  'Espacios totales': 'Total spaces',
+  'Disponibles': 'Available',
+  'Confirmados': 'Confirmed',
+  '✅ CONFIRMADO': '✅ CONFIRMED',
+  '🔒 RESERVADO': '🔒 RESERVED',
+  'Precio no disponible públicamente': 'Price not publicly available',
+  // ── Naming: nombres de espacios ──
+  'Balcón Gan': 'Kindergarten Balcony',
+  'Biblioteca / Lounge': 'Library / Lounge',
+  'Centro Capacitación Docente': 'Teacher Training Center',
+  'Comedor Gan': 'Kindergarten Dining Hall',
+  'Dirección General': 'General Administration',
+  'Edificio Aguero': 'Agüero Building',
+  'Gimnasio Gan': 'Kindergarten Gym',
+  'Lactario': 'Nursing Room',
+  'Nombre de la Primaria': 'Primary School Name',
+  'Nombre del Jardín (Pisos 1–3)': 'Kindergarten Name (Floors 1–3)',
+  'Nombre del Piso Gan (Piso 2)': 'Gan Floor Name (Floor 2)',
+  'Nombre del Piso Gan (Piso 3)': 'Gan Floor Name (Floor 3)',
+  'Nombre del Piso Primaria (Piso 4)': 'Primary Floor Name (Floor 4)',
+  'Nombre del Piso Primaria (Piso 5)': 'Primary Floor Name (Floor 5)',
+  'Nombre del Piso Seminario': 'Seminary Floor Name',
+  'Nombre del Seminario': 'Seminary Name',
+  'Oficina Coordinación Chica': 'Small Coordination Office',
+  'Oficina Coordinación Grande': 'Large Coordination Office',
+  'Oficinas Administrativas Oholey': 'Oholey Administrative Offices',
+  'SUM — Centro Capacitación Docente': 'Multipurpose — Teacher Training Center',
+  'Sector Multideportes': 'Multi-sport Area',
+  // ── Naming: descripciones ──
+  'Balcón exterior del Jardín de Infantes. Piso 2.': 'Kindergarten outdoor balcony. Floor 2.',
+  'Biblioteca y espacio Lounge. Piso 6.': 'Library and Lounge space. Floor 6.',
+  'Centro de Capacitación Docente. Piso 1.': 'Teacher Training Center. Floor 1.',
+  'Cocina de la escuela. Subsuelo 1.': 'School kitchen. Basement 1.',
+  'Cocina del Salón de Fiestas.': 'Party Hall kitchen.',
+  'Comedor del Jardín de Infantes. Piso 3.': 'Kindergarten dining hall. Floor 3.',
+  'Comedor y SUM de Planta Baja.': 'Ground floor dining hall and Multipurpose.',
+  'Derecho de denominación de la escuela primaria (pisos 4 y 5).': 'Naming rights for the primary school (floors 4 and 5).',
+  'Derecho de denominación del Edificio Aguero del CEOJ.': 'Naming rights for the CEOJ Agüero Building.',
+  'Derecho de denominación del Edificio Tucuman del CEOJ.': 'Naming rights for the CEOJ Tucumán Building.',
+  'Derecho de denominación del Jardín de Infantes (pisos 1 a 3).': 'Naming rights for the Kindergarten (floors 1 to 3).',
+  'Derecho de denominación del Seminario (Piso 6).': 'Naming rights for the Seminary (Floor 6).',
+  'Dirección General. Piso 1.': 'General Administration. Floor 1.',
+  'Gimnasio del CEOJ. Educación física, actos y eventos deportivos.': 'CEOJ gym. Physical education, ceremonies and sports events.',
+  'Gimnasio del Jardín de Infantes. Piso 2.': 'Kindergarten gym. Floor 2.',
+  'Gran salón para bodas, Bar/Bat Mitzvá y eventos Anash.': 'Large hall for weddings, Bar/Bat Mitzvah and Anash events.',
+  'Hall de entrada principal del Edificio Tucuman.': 'Main entrance hall of the Tucumán Building.',
+  'Hall del Salón del Edificio Aguero.': 'Lobby of the Agüero Building hall.',
+  'Hall y SUM principal de Planta Baja.': 'Main ground floor Hall and Multipurpose.',
+  'Lactario. Piso 1.': 'Nursing room. Floor 1.',
+  'Lobby y recepción del Subsuelo 1.': 'Basement 1 lobby and reception.',
+  'Naming completo del Piso 2 — Jardín de Infantes (Gan).': 'Full naming of Floor 2 — Kindergarten (Gan).',
+  'Naming completo del Piso 3 — Jardín de Infantes (Gan).': 'Full naming of Floor 3 — Kindergarten (Gan).',
+  'Naming completo del Piso 4 — Escuela Primaria.': 'Full naming of Floor 4 — Primary School.',
+  'Naming completo del Piso 5 — Escuela Primaria.': 'Full naming of Floor 5 — Primary School.',
+  'Naming completo del Piso 6 — Seminario.': 'Full naming of Floor 6 — Seminary.',
+  'Patio de juegos exterior del CEOJ.': 'CEOJ outdoor playground.',
+  'SUM del Centro de Capacitación Docente. Subsuelo 1.': 'Teacher Training Center Multipurpose. Basement 1.',
+  'SUM del Subsuelo 2.': 'Basement 2 Multipurpose Room.',
+  'Sector multideportes en la terraza del edificio.': 'Multi-sport area on the building rooftop.',
 };
 
 // Traducción por patrón (para nombres numerados: "Aula Gan 201", etc.)
@@ -2034,6 +2095,17 @@ const I18N_RE = [
   [/^Aula Maternal (\d+)$/, 'Nursery Classroom $1'],
   [/^Aula Primaria (\d+)$/, 'Primary Classroom $1'],
   [/^Aula Seminario (\d+)$/, 'Seminary Classroom $1'],
+  [/^Oficina (\d+)$/, 'Office $1'],
+  [/^Sala de Reunión (\d+)$/, 'Meeting Room $1'],
+  [/^Aula (\d+) del Jardín de Infantes \(Gan\)\.$/, 'Classroom $1 of the Kindergarten (Gan).'],
+  [/^Aula (\d+) — Escuela Primaria\.$/, 'Classroom $1 — Primary School.'],
+  [/^Aula (\d+) — Seminario\.$/, 'Classroom $1 — Seminary.'],
+  [/^Aula Maternal (\d+)\. Piso 1\.$/, 'Nursery Classroom $1. Floor 1.'],
+  [/^Oficina (\d+)\. Piso 1\.$/, 'Office $1. Floor 1.'],
+  [/^Sala de Reunión (\d+)\. Piso 1\.$/, 'Meeting Room $1. Floor 1.'],
+  [/^Oficina de Coordinación Chica\. Piso (\d+)\.$/, 'Small Coordination Office. Floor $1.'],
+  [/^Oficina de Coordinación Grande\. Piso (\d+)\.$/, 'Large Coordination Office. Floor $1.'],
+  [/^Oficinas Administrativas Oholey\. Piso (\d+)\.$/, 'Oholey Administrative Offices. Floor $1.'],
 ];
 
 let LANG = 'es';
@@ -2072,12 +2144,27 @@ function applyLang() {
   const gs = document.getElementById('gs-input');
   if (gs) gs.placeholder = en ? 'Search donors, users, spaces...' : 'Buscar donantes, usuarios, espacios...';
   const b = document.getElementById('lang-btn');
-  if (b) b.textContent = LANG === 'en' ? 'ES' : 'EN';
+  if (b) b.textContent = LANG === 'en' ? '🇺🇸 EN' : '🇦🇷 ES';
 }
+function t(s) { return (LANG === 'en' && isPublicMode() && I18N_EN[s]) ? I18N_EN[s] : s; }
+let _curPage = 'planos';
 function toggleLang() {
   LANG = (LANG === 'en') ? 'es' : 'en';
   try { localStorage.setItem('ceoj_lang', LANG); } catch (_) {}
+  // re-render de la página actual para refrescar contenido dinámico (planos ya se traduce por sweep)
+  if (_curPage !== 'planos' && typeof PAGE_RENDERS !== 'undefined' && PAGE_RENDERS[_curPage]) {
+    try { PAGE_RENDERS[_curPage](); } catch (_) {}
+  }
   applyLang();
+}
+// Observa el DOM y reaplica la traducción cuando aparece contenido nuevo (renders async: naming, galería...)
+function i18nObserve() {
+  const root = document.getElementById('body') || document.body;
+  if (!root || root._i18nObs) return;
+  let timer = null;
+  const obs = new MutationObserver(() => { clearTimeout(timer); timer = setTimeout(applyLang, 40); });
+  obs.observe(root, { childList: true, subtree: true });
+  root._i18nObs = obs;
 }
 LANG = i18nDetect();
 
@@ -2882,6 +2969,7 @@ function closeSidebar() {
 
 let _ovRefreshTimer = null;
 function goPage(page) {
+  _curPage = page;
   document.querySelectorAll('.pg').forEach(el => el.classList.remove('on'));
   document.querySelectorAll('.ni[data-page]').forEach(el => el.classList.remove('on'));
   const pg = eid('pg-' + page); if(pg) pg.classList.add('on');
@@ -3606,14 +3694,16 @@ function renderGal() {
   eid('gal-cats').innerHTML = cats.map(c => {
     const active = c===galCat||(!galCat&&c==='Todos');
     const count  = c==='Todos' ? GALLERY_ITEMS.length : GALLERY_ITEMS.filter(i=>i.cat===c).length;
-    return '<span class="badge ' + (active?'b-gold':'b-navy') + '" style="cursor:pointer;padding:4px 11px" onclick="galCat=\'' + (c==='Todos'?'':c) + '\';renderGal()">' + c + ' (' + count + ')</span>';
+    return '<span class="badge ' + (active?'b-gold':'b-navy') + '" style="cursor:pointer;padding:4px 11px" onclick="galCat=\'' + (c==='Todos'?'':c) + '\';renderGal()">' + t(c) + ' (' + count + ')</span>';
   }).join('');
 
   const filtered = GALLERY_ITEMS.filter(g =>
     (!galCat || g.cat===galCat) && (!floorF || g.floor===floorF || g.piso===floorF)
   );
 
-  eid('gal-cnt').textContent = 'CEOJ Etapa 2 — ' + filtered.length + ' imágenes';
+  eid('gal-cnt').textContent = (LANG === 'en' && isPublicMode())
+    ? 'CEOJ Phase 2 — ' + filtered.length + ' images'
+    : 'CEOJ Etapa 2 — ' + filtered.length + ' imágenes';
 
   const isAdmin = CU && (CU.role==='admin'||CU.role==='marketing');
 
@@ -3882,7 +3972,7 @@ async function renderNaming() {
       const imgStyle = rawSrc ? '' : 'object-fit:contain;padding:16px;background:#f1f5f9;';
       const isHidden = n.status !== 'available';
       const nj = JSON.stringify(n).replace(/'/g,"&#39;");
-      return '<div class="nc"><div class="nc-img"><img src="' + imgSrc + '" alt="' + n.name + '" style="' + imgStyle + '" onerror="this.src=document.getElementById(\'tb-logo\').src;this.style.objectFit=\'contain\';this.style.padding=\'16px\';this.style.background=\'#f1f5f9\';this.onerror=null"><div class="nc-ov"></div><div class="nc-floor">' + (n.floor||'') + ' · ' + (n.m2||'—') + '</div>' +
+      return '<div class="nc"><div class="nc-img"><img src="' + imgSrc + '" alt="' + n.name + '" style="' + imgStyle + '" onerror="this.src=document.getElementById(\'tb-logo\').src;this.style.objectFit=\'contain\';this.style.padding=\'16px\';this.style.background=\'#f1f5f9\';this.onerror=null"><div class="nc-ov"></div><div class="nc-floor">' + t(n.floor||'') + ' · ' + (n.m2||'—') + '</div>' +
         (isHidden?'<div class="nc-banner ' + n.status + '">' + (n.status==='taken'?'✅ CONFIRMADO':'🔒 RESERVADO') + '</div>':'') +
         '</div><div class="nc-body"><div class="nc-name">' + n.name + '</div><div class="nc-desc">' + (n.description||'').substring(0,80) + (n.description&&n.description.length>80?'…':'') + '</div>' +
         (isPublicMode() ? '' : (!isHidden?'<div class="nc-price">USD ' + Number(n.amount).toLocaleString('es-AR') + '</div>':'<div class="nc-price-hidden">Precio no disponible públicamente</div>')) +
