@@ -1681,7 +1681,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;
 <!-- PRESENTATION -->
 
 <script>
-const APP_VERSION = 'v1.0.146';
+const APP_VERSION = 'v1.0.147';
 const RESEND_KEY = 're_3rs42YnH_EcRSbhCViBjS1av4W6eq5Y9M';
 const RESEND_FROM = 'pagos@oholeyconstruye.com.ar';
 document.addEventListener('DOMContentLoaded',()=>{
@@ -2087,26 +2087,39 @@ const I18N_EN = {
   'SUM del Centro de Capacitación Docente. Subsuelo 1.': 'Teacher Training Center Multipurpose. Basement 1.',
   'SUM del Subsuelo 2.': 'Basement 2 Multipurpose Room.',
   'Sector multideportes en la terraza del edificio.': 'Multi-sport area on the building rooftop.',
+  // ── Naming: variantes exactas de Supabase ──
+  'SUM Centro Capacitacion Docente': 'Multipurpose — Teacher Training Center',
+  'Gimnasio del CEOJ.': 'CEOJ gym.',
+  'Derecho de denominacion de la escuela primaria.': 'Naming rights for the primary school.',
+  'Derecho de denominacion del Jardin de Infantes.': 'Naming rights for the Kindergarten.',
 };
 
 // Traducción por patrón (para nombres numerados: "Aula Gan 201", etc.)
+// Patrones escritos en forma NORMALIZADA (sin acentos, guión simple) — se testean contra la clave normalizada
 const I18N_RE = [
   [/^Aula Gan (\d+)$/, 'Kindergarten Classroom $1'],
   [/^Aula Maternal (\d+)$/, 'Nursery Classroom $1'],
   [/^Aula Primaria (\d+)$/, 'Primary Classroom $1'],
   [/^Aula Seminario (\d+)$/, 'Seminary Classroom $1'],
   [/^Oficina (\d+)$/, 'Office $1'],
-  [/^Sala de Reunión (\d+)$/, 'Meeting Room $1'],
-  [/^Aula (\d+) del Jardín de Infantes \(Gan\)\.$/, 'Classroom $1 of the Kindergarten (Gan).'],
-  [/^Aula (\d+) — Escuela Primaria\.$/, 'Classroom $1 — Primary School.'],
-  [/^Aula (\d+) — Seminario\.$/, 'Classroom $1 — Seminary.'],
+  [/^Sala de Reunion (\d+)$/, 'Meeting Room $1'],
+  [/^Oficina Coordinacion Chica \(Piso (\d+)\)$/, 'Small Coordination Office (Floor $1)'],
+  [/^Oficina Coordinacion Grande \(Piso (\d+)\)$/, 'Large Coordination Office (Floor $1)'],
+  [/^Oficinas Administrativas Oholey \(Piso (\d+)\)$/, 'Oholey Administrative Offices (Floor $1)'],
+  [/^Aula (\d+) del Jardin de Infantes \(Gan\)\.$/, 'Classroom $1 of the Kindergarten (Gan).'],
+  [/^Aula (\d+) - Escuela Primaria\.$/, 'Classroom $1 — Primary School.'],
+  [/^Aula (\d+) - Seminario\.$/, 'Classroom $1 — Seminary.'],
   [/^Aula Maternal (\d+)\. Piso 1\.$/, 'Nursery Classroom $1. Floor 1.'],
   [/^Oficina (\d+)\. Piso 1\.$/, 'Office $1. Floor 1.'],
-  [/^Sala de Reunión (\d+)\. Piso 1\.$/, 'Meeting Room $1. Floor 1.'],
-  [/^Oficina de Coordinación Chica\. Piso (\d+)\.$/, 'Small Coordination Office. Floor $1.'],
-  [/^Oficina de Coordinación Grande\. Piso (\d+)\.$/, 'Large Coordination Office. Floor $1.'],
+  [/^Sala de Reunion (\d+)\. Piso 1\.$/, 'Meeting Room $1. Floor 1.'],
+  [/^Oficina de Coordinacion Chica\. Piso (\d+)\.$/, 'Small Coordination Office. Floor $1.'],
+  [/^Oficina de Coordinacion Grande\. Piso (\d+)\.$/, 'Large Coordination Office. Floor $1.'],
   [/^Oficinas Administrativas Oholey\. Piso (\d+)\.$/, 'Oholey Administrative Offices. Floor $1.'],
 ];
+// Normaliza: quita acentos, unifica guiones (–—→-) y espacios. Para matchear datos sin acentos de Supabase.
+function _i18nNorm(s) { return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[\u2013\u2014]/g, '-').replace(/\s+/g, ' ').trim(); }
+const I18N_EN_N = {};
+for (const k in I18N_EN) { const n = _i18nNorm(k); if (!(n in I18N_EN_N)) I18N_EN_N[n] = I18N_EN[k]; }
 
 let LANG = 'es';
 function i18nDetect() {
@@ -2130,9 +2143,10 @@ function applyLang() {
     _i18nWalk((node) => {
       const raw = node.nodeValue, key = raw.replace(/\s+/g, ' ').trim();
       if (!key) return;
-      let tr = I18N_EN[key];
-      if (!tr) { for (const [re, rep] of I18N_RE) { if (re.test(key)) { tr = key.replace(re, rep); break; } } }
-      if (tr && tr !== key) {
+      const nk = _i18nNorm(key);
+      let tr = I18N_EN[key] || I18N_EN_N[nk];
+      if (!tr) { for (const [re, rep] of I18N_RE) { if (re.test(nk)) { tr = nk.replace(re, rep); break; } } }
+      if (tr && tr !== key && tr !== nk) {
         if (!_i18nOrig.has(node)) _i18nOrig.set(node, raw);
         node.nodeValue = raw.replace(raw.trim(), tr);
       }
@@ -2146,7 +2160,7 @@ function applyLang() {
   const b = document.getElementById('lang-btn');
   if (b) b.textContent = LANG === 'en' ? '🇺🇸 EN' : '🇦🇷 ES';
 }
-function t(s) { return (LANG === 'en' && isPublicMode() && I18N_EN[s]) ? I18N_EN[s] : s; }
+function t(s) { if (LANG !== 'en' || !isPublicMode()) return s; return I18N_EN[s] || I18N_EN_N[_i18nNorm(s)] || s; }
 let _curPage = 'planos';
 function toggleLang() {
   LANG = (LANG === 'en') ? 'es' : 'en';
